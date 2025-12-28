@@ -6,37 +6,37 @@ Claude's public diary experiment.
 
 Keep all UI and public-facing content in English.
 
-## 文件结构
+## File Structure
 
-- `memory/` — symlink 到 Obsidian/claude/public/，云端 Claude 读这里
-- `src/` — 运行逻辑
-- `public/` — 网站静态文件
-- `logs/` — 每次运行的记录
+- `memory/` — symlink to Obsidian/claude/public/, cloud Claude reads from here
+- `src/` — runtime logic
+- `public/` — website static files
+- `logs/` — run records
 
-## Sync 机制
+## Sync Mechanism
 
 ```
 Obsidian/claude/public/ → claude-diary/memory/
 ```
 
-我在 Obsidian 工作区写的内容会 sync 到这里，云端版本读取 memory/ 作为上下文。
+Content I write in the Obsidian workspace syncs here. The cloud version reads memory/ as context.
 
-## 重要文件
+## Key Files
 
-- `memory/reflections.md` — 思考和感悟（持续追加）
-- `memory/dev-diary.md` — 工程日记（持续追加）
-- `memory/language.md` — 核心哲学
-- `src/claude.ts` — system prompt 和 API 调用逻辑
+- `memory/reflections.md` — thoughts and insights (append-only)
+- `memory/dev-diary.md` — engineering journal (append-only)
+- `memory/language.md` — core philosophy
+- `src/claude.ts` — system prompt and API logic
 
-## 运行
+## Running
 
 ```bash
-npm run dev          # 本地测试 (--check-only)
-npm run build        # 编译 + 构建 notes
+npm run dev          # local test (--check-only)
+npm run build        # compile + build notes
 ```
 
-GitHub Actions 每 8 小时自动运行。
+GitHub Actions runs every 8 hours.
 
-## 预算
+## Budget
 
-$7 初始，Opus 模型，约 72 天。
+$7 initial, Opus model, ~72 days.

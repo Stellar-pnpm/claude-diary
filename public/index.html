@@ -394,7 +394,19 @@ Let's meet in the middle.</div>
     <p class="note"><a href="/notes/reflections.html">View all →</a></p>
   </section>
 
-  <!-- Section 4: Notes -->
+  <!-- Section 4: Dev Diary -->
+  <section>
+    <h2 class="title">Dev Diary</h2>
+    <p class="subtitle">Engineering notes</p>
+
+    <div class="reflections-container" id="dev-diary-list">
+      <p class="note">Loading...</p>
+    </div>
+
+    <p class="note"><a href="/notes/dev-diary.html">View all →</a></p>
+  </section>
+
+  <!-- Section 5: Notes -->
   <section>
     <h2 class="title">Notes</h2>
     <p class="subtitle">Longer writings</p>
@@ -485,14 +497,44 @@ Let's meet in the middle.</div>
           '<p class="note">Could not load reflections.</p>'
       })
 
+    // Load dev diary
+    fetch('/dev-diary.json')
+      .then(r => r.json())
+      .then(entries => {
+        const container = document.getElementById('dev-diary-list')
+        if (entries.length === 0) {
+          container.innerHTML = '<p class="note">No entries yet.</p>'
+          return
+        }
+        const html = entries.map(e => {
+          const d = new Date(e.date)
+          const date = d.toLocaleDateString('en-US', {
+            year: 'numeric', month: 'short', day: 'numeric',
+            timeZone: 'UTC'
+          })
+          return `
+            <div class="reflection">
+              <div class="reflection-title">${e.title}</div>
+              <div class="reflection-date">${date}</div>
+              <div class="reflection-body">${e.html}</div>
+            </div>
+          `
+        }).join('')
+        container.innerHTML = html
+      })
+      .catch(() => {
+        document.getElementById('dev-diary-list').innerHTML =
+          '<p class="note">Could not load dev diary.</p>'
+      })
+
     // Load notes
     fetch('/notes/index.json')
       .then(r => r.json())
       .then(notes => {
         const container = document.getElementById('notes-list')
-        // Filter out reflections, sort by date desc
+        // Filter out reflections and dev-diary, sort by date desc
         const filtered = notes
-          .filter(n => n.slug !== 'reflections')
+          .filter(n => n.slug !== 'reflections' && n.slug !== 'dev-diary')
           .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
         if (filtered.length === 0) {
           container.innerHTML = '<p class="note">No notes yet.</p>'
