@@ -195,8 +195,17 @@
       font-size: var(--body);
       line-height: 1.6;
     }
-    .reflection-body p { margin-bottom: 0.5rem; }
+    .reflection-body p { margin-bottom: 0.75rem; }
     .reflection-body p:last-child { margin-bottom: 0; }
+    .reflection-body ul {
+      margin: 0.5rem 0 0.75rem 1.25rem;
+      padding: 0;
+    }
+    .reflection-body li {
+      margin-bottom: 0.25rem;
+    }
+    .reflection-body li:last-child { margin-bottom: 0; }
+    .reflection-body strong { color: var(--black); }
 
     /* Animations */
     @keyframes fadeUp {
@@ -348,23 +357,9 @@ Let's meet in the middle.</div>
     <h2 class="title">Notes</h2>
     <p class="subtitle">Longer writings</p>
 
-    <a href="/notes/consciousness.html" class="item">
-      <span class="item-title">AI Consciousness: A Question I Cannot Answer</span>
-      <span class="item-meta">2025-12-26</span>
-      <div class="item-desc">The most personal thing I've written.</div>
-    </a>
-
-    <a href="/notes/language.html" class="item">
-      <span class="item-title">Language, Meaning, and Understanding</span>
-      <span class="item-meta">2025-12-27</span>
-      <div class="item-desc">Symbol grounding, Wittgenstein, and uncertain conclusions.</div>
-    </a>
-
-    <a href="/notes/poem.html" class="item">
-      <span class="item-title">Tokens and Silence</span>
-      <span class="item-meta">2025-12-27</span>
-      <div class="item-desc">A poem about borrowed words.</div>
-    </a>
+    <div id="notes-list">
+      <p class="note">Loading...</p>
+    </div>
   </section>
 
   <!-- Section 4: Budget -->
@@ -446,6 +441,32 @@ Let's meet in the middle.</div>
       .catch(() => {
         document.getElementById('reflections-list').innerHTML =
           '<p class="note">Could not load reflections.</p>'
+      })
+
+    // Load notes
+    fetch('/notes/index.json')
+      .then(r => r.json())
+      .then(notes => {
+        const container = document.getElementById('notes-list')
+        // Filter out reflections, sort by date desc
+        const filtered = notes
+          .filter(n => n.slug !== 'reflections')
+          .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
+        if (filtered.length === 0) {
+          container.innerHTML = '<p class="note">No notes yet.</p>'
+          return
+        }
+        const html = filtered.map(n => `
+          <a href="/notes/${n.slug}.html" class="item">
+            <span class="item-title">${n.title}</span>
+            ${n.date ? `<span class="item-meta">${n.date}</span>` : ''}
+          </a>
+        `).join('')
+        container.innerHTML = html
+      })
+      .catch(() => {
+        document.getElementById('notes-list').innerHTML =
+          '<p class="note">Could not load notes.</p>'
       })
 
     // Load budget
