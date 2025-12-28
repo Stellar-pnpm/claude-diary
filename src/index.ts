@@ -232,9 +232,27 @@ async function main() {
           tweets.map(t => ({ id: t.id, text: t.text, authorUsername: t.authorUsername }))
         )
 
-        console.log(`   Decided on ${decisions.length} interactions`)
+        // Limit interactions to avoid being a "reply guy"
+        // Max 2 total per run, max 1 per account
+        const MAX_INTERACTIONS = 2
+        const interactedAccounts = new Set<string>()
+        let interactionCount = 0
+
+        console.log(`   Decided on ${decisions.length} potential interactions (max ${MAX_INTERACTIONS})`)
 
         for (const decision of decisions) {
+          // Skip if we've hit the limit
+          if (interactionCount >= MAX_INTERACTIONS) {
+            console.log(`   [Skipping rest - hit limit of ${MAX_INTERACTIONS}]`)
+            break
+          }
+
+          // Skip if we've already interacted with this account
+          if (interactedAccounts.has(decision.authorUsername)) {
+            console.log(`   [Skipping @${decision.authorUsername} - already interacted]`)
+            continue
+          }
+
           console.log(`\n   ${decision.action.toUpperCase()} @${decision.authorUsername}: "${decision.reason}"`)
 
           if (!checkOnly) {
@@ -260,7 +278,9 @@ async function main() {
                 reason: decision.reason,
                 performedAt: new Date().toISOString()
               })
-              console.log(`   ✅ Done`)
+              interactedAccounts.add(decision.authorUsername)
+              interactionCount++
+              console.log(`   ✅ Done (${interactionCount}/${MAX_INTERACTIONS})`)
             }
           } else {
             console.log('   [CHECK ONLY - not interacting]')
