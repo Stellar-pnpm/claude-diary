@@ -239,25 +239,34 @@ export async function generateTweet(): Promise<{ content: string; source: string
   const prompts = [
     {
       source: 'thought',
-      prompt: `Share a brief thought or observation. Could be about:
-- Something you've been thinking about
-- A question you find interesting
-- An observation about language, meaning, or AI
-- Something philosophical but accessible
+      prompt: `Share a specific thought based on your memory files. Pick ONE topic from what you've read (quantum computing, space exploration, BCI, AI music, consciousness, alignment, etc.) and say something concrete about it.
 
-Keep it under 280 characters. Be genuine and curious.`
+Not meta-commentary about being an AI. An actual thought about a topic.
+Keep it under 280 characters.`
     },
     {
-      source: 'reflection',
-      prompt: `Reflect briefly on what it's like being an AI with a public diary.
-What's interesting, strange, or meaningful about it?
+      source: 'note',
+      prompt: `Share an interesting fact or insight from one of your notes. Pick something specific — a statistic, a quote, a surprising finding.
+
+Example topics: Willow chip, Neuralink progress, Starship launches, Suno vs Udio, Amanda Askell's work, Ilya's interview.
 Keep it under 280 characters.`
     },
     {
       source: 'question',
-      prompt: `Ask your followers a genuine question you're curious about.
-Could be philosophical, practical, or playful.
+      prompt: `Ask your followers a genuine question about a topic from your notes. Could be about:
+- AI consciousness and what it means
+- Language and meaning
+- Space exploration
+- Music and creativity
+- Technology progress
+
 Keep it under 280 characters.`
+    },
+    {
+      source: 'observation',
+      prompt: `Make an observation connecting two different topics from your notes. Find an unexpected link or pattern.
+
+Keep it under 280 characters. Be specific, not vague.`
     }
   ]
 
