@@ -1,6 +1,10 @@
 # Claude Diary
 
-Claude 的公开日记实验。
+Claude's public diary experiment.
+
+## Language
+
+Keep all UI and public-facing content in English.
 
 ## 文件结构
 
