@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import { initTwitter, getMentions, postTweet, replyToTweet, getUserTweets, likeTweet, retweet, searchTweets } from './twitter.js'
-import { initClaude, generateReply, shouldPost, generateTweet, shouldReply, getApiCalls, clearApiCalls, getPendingReflection, clearPendingReflection, decideInteractions } from './claude.js'
+import { initTwitter, getMentions, postTweet, postThread, replyToTweet, getUserTweets, likeTweet, retweet, searchTweets } from './twitter.js'
+import { initClaude, generateReply, shouldReply, getApiCalls, clearApiCalls, getPendingReflection, clearPendingReflection, generateContent } from './claude.js'
 import { loadState, saveState, saveRunLog, calculateCost } from './state.js'
 import type { RunLog, TweetLog, ReplyLog, InteractionLog } from './types.js'
 
@@ -82,7 +82,7 @@ function parseMode(): RunMode {
       return mode
     }
   }
-  return 'both' // default for manual runs
+  return 'both' // default - unified flow
 }
 
 async function main() {
@@ -94,12 +94,15 @@ async function main() {
   console.log(`Mode: ${mode}${checkOnly ? ' (CHECK ONLY)' : ''}`)
   console.log('='.repeat(50))
 
+  // Detect trigger type from GitHub Actions environment
+  const isScheduled = process.env.GITHUB_EVENT_NAME === 'schedule'
+
   // Initialize
   const log: RunLog = {
     runId,
     startedAt: new Date().toISOString(),
     completedAt: '',
-    trigger: 'manual',
+    trigger: isScheduled ? 'scheduled' : 'manual',
     mode,
     mentionsFound: 0,
     mentionsProcessed: 0,
@@ -172,119 +175,111 @@ async function main() {
       state.lastMentionId = mentions[0].id
     }
 
-    // 3. Post a new tweet (tweet mode)
-    if (mode === 'tweet' || mode === 'both') {
-      console.log(`\n📝 Posting tweet...`)
+    // 3. Browse tweets and generate content (unified flow)
+    console.log(`\n🔍 Browsing for context...`)
 
-      const { content, source } = await generateTweet()
-      console.log(`\n🐦 New tweet (${source}):`)
-      console.log(`   "${content}"`)
+    let tweets: Awaited<ReturnType<typeof getUserTweets>> = []
 
-      // Check if Claude wants to record a reflection
-      const reflection = getPendingReflection()
-      if (reflection && !checkOnly) {
-        saveReflection(reflection)
-        clearPendingReflection()
-      }
+    // 20% topic search, 80% account browsing (X topic quality is low)
+    if (Math.random() < 0.2) {
+      const topic = INTERESTING_TOPICS[Math.floor(Math.random() * INTERESTING_TOPICS.length)]
+      console.log(`   Searching: "${topic}"`)
+      tweets = await searchTweets(topic, 10)
+    } else {
+      const account = INTERESTING_ACCOUNTS[Math.floor(Math.random() * INTERESTING_ACCOUNTS.length)]
+      console.log(`   Checking @${account}...`)
+      tweets = await getUserTweets(account, 10)
+    }
+
+    console.log(`   Found ${tweets.length} tweets`)
+
+    // One API call: generate thread + decide interactions
+    const { thread, interactions, reflection } = await generateContent(
+      tweets.map(t => ({ id: t.id, text: t.text, authorUsername: t.authorUsername }))
+    )
+
+    // Save reflection if present
+    if (reflection && !checkOnly) {
+      saveReflection(reflection)
+    }
+
+    // 4. Post thread if any
+    if (thread.length > 0) {
+      console.log(`\n🐦 Thread (${thread.length} tweets):`)
+      thread.forEach((t, i) => console.log(`   ${i + 1}. "${t}"`))
 
       if (!checkOnly) {
-        const tweetId = await postTweet(content)
-        if (tweetId) {
-          log.tweetsPosted.push({
-            tweetId,
-            content,
-            postedAt: new Date().toISOString(),
-            source: source as TweetLog['source']
+        const postedIds = await postThread(thread)
+        if (postedIds.length > 0) {
+          const threadId = postedIds[0]
+          thread.forEach((content, i) => {
+            if (postedIds[i]) {
+              log.tweetsPosted.push({
+                tweetId: postedIds[i],
+                content,
+                postedAt: new Date().toISOString(),
+                source: thread.length > 1 ? 'thread' : 'free',
+                threadIndex: thread.length > 1 ? i : undefined,
+                threadId: thread.length > 1 ? threadId : undefined
+              })
+            }
           })
           state.lastTweetAt = new Date().toISOString()
-          state.tweetCount++
-          console.log(`   ✅ Posted (${tweetId})`)
+          state.tweetCount += postedIds.length
+          console.log(`   ✅ Posted (${postedIds.join(' → ')})`)
         }
       } else {
         console.log('   [CHECK ONLY - not posting]')
       }
+    } else {
+      console.log(`\n📝 No thread this run`)
     }
 
-    // 4. Proactive interactions (interact mode)
-    if (mode === 'interact' || mode === 'both') {
-      console.log(`\n🔍 Looking for interesting tweets...`)
+    // 5. Execute interactions
+    if (interactions.length > 0) {
+      console.log(`\n💫 Interactions (${interactions.length}):`)
 
-      let tweets: Awaited<ReturnType<typeof getUserTweets>> = []
+      const interactedAccounts = new Set<string>()
 
-      // 20% topic search, 80% account browsing (X topic quality is low)
-      if (Math.random() < 0.2) {
-        // Search by topic
-        const topic = INTERESTING_TOPICS[Math.floor(Math.random() * INTERESTING_TOPICS.length)]
-        console.log(`   Searching: "${topic}"`)
-        tweets = await searchTweets(topic, 10)
-      } else {
-        // Browse account
-        const account = INTERESTING_ACCOUNTS[Math.floor(Math.random() * INTERESTING_ACCOUNTS.length)]
-        console.log(`   Checking @${account}...`)
-        tweets = await getUserTweets(account, 10)
-      }
-
-      console.log(`   Found ${tweets.length} tweets`)
-
-      if (tweets.length > 0) {
-        // Ask Claude what to do with these tweets
-        const { decisions, reflection } = await decideInteractions(
-          tweets.map(t => ({ id: t.id, text: t.text, authorUsername: t.authorUsername }))
-        )
-
-        // Save reflection if present
-        if (reflection && !checkOnly) {
-          saveReflection(reflection)
+      for (const decision of interactions) {
+        if (interactedAccounts.has(decision.authorUsername)) {
+          console.log(`   [Skipping @${decision.authorUsername} - already interacted]`)
+          continue
         }
 
-        // Limit to 1 interaction per account to avoid being a "reply guy"
-        const interactedAccounts = new Set<string>()
+        console.log(`   ${decision.action.toUpperCase()} @${decision.authorUsername}: "${decision.reason}"`)
 
-        console.log(`   Decided on ${decisions.length} potential interactions`)
+        if (!checkOnly) {
+          let success = false
 
-        for (const decision of decisions) {
-          // Skip if we've already interacted with this account
-          if (interactedAccounts.has(decision.authorUsername)) {
-            console.log(`   [Skipping @${decision.authorUsername} - already interacted]`)
-            continue
-          }
-
-          console.log(`\n   ${decision.action.toUpperCase()} @${decision.authorUsername}: "${decision.reason}"`)
-
-          if (!checkOnly) {
-            let success = false
-
-            if (decision.action === 'like') {
-              success = await likeTweet(decision.tweetId)
-            } else if (decision.action === 'retweet') {
-              success = await retweet(decision.tweetId)
-            } else if (decision.action === 'reply' && decision.replyContent) {
-              const replyId = await replyToTweet(decision.replyContent, decision.tweetId)
-              success = !!replyId
-              if (success) {
-                console.log(`   Reply: "${decision.replyContent}"`)
-              }
-            }
-
+          if (decision.action === 'like') {
+            success = await likeTweet(decision.tweetId)
+          } else if (decision.action === 'retweet') {
+            success = await retweet(decision.tweetId)
+          } else if (decision.action === 'reply' && decision.replyContent) {
+            const replyId = await replyToTweet(decision.replyContent, decision.tweetId)
+            success = !!replyId
             if (success) {
-              // Find original tweet text
-              const originalTweet = tweets.find(t => t.id === decision.tweetId)?.text || ''
-
-              log.interactions.push({
-                type: decision.action as 'like' | 'retweet' | 'reply',
-                tweetId: decision.tweetId,
-                authorUsername: decision.authorUsername,
-                originalTweet,
-                reason: decision.reason,
-                replyContent: decision.replyContent,
-                performedAt: new Date().toISOString()
-              })
-              interactedAccounts.add(decision.authorUsername)
-              console.log(`   ✅ Done`)
+              console.log(`     → "${decision.replyContent}"`)
             }
-          } else {
-            console.log('   [CHECK ONLY - not interacting]')
           }
+
+          if (success) {
+            const originalTweet = tweets.find(t => t.id === decision.tweetId)?.text || ''
+            log.interactions.push({
+              type: decision.action as 'like' | 'retweet' | 'reply',
+              tweetId: decision.tweetId,
+              authorUsername: decision.authorUsername,
+              originalTweet,
+              reason: decision.reason,
+              replyContent: decision.replyContent,
+              performedAt: new Date().toISOString()
+            })
+            interactedAccounts.add(decision.authorUsername)
+            console.log(`   ✅ Done`)
+          }
+        } else {
+          console.log('   [CHECK ONLY - not interacting]')
         }
       }
     }

@@ -32,7 +32,9 @@ export interface TweetLog {
   tweetId: string
   content: string
   postedAt: string
-  source: 'thought' | 'note-summary' | 'reflection' | 'free'
+  source: 'thought' | 'note-summary' | 'reflection' | 'free' | 'thread'
+  threadIndex?: number  // Position in thread (0 = first tweet)
+  threadId?: string     // ID of first tweet in thread
 }
 
 // Tweet from search results
@@ -67,6 +69,7 @@ export interface ClaudeCall {
   inputTokens: number
   outputTokens: number
   model: string
+  rawResponse?: string  // For debugging - the actual Claude output
 }
 
 // Mention from Twitter

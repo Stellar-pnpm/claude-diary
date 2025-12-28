@@ -92,6 +92,34 @@ export async function postTweet(text: string): Promise<string | null> {
   }
 }
 
+export async function postThread(tweets: string[]): Promise<string[]> {
+  if (!client) throw new Error('Twitter client not initialized')
+  if (tweets.length === 0) return []
+
+  const postedIds: string[] = []
+
+  try {
+    // First tweet
+    const firstId = await postTweet(tweets[0])
+    if (!firstId) return []
+    postedIds.push(firstId)
+
+    // Subsequent tweets as replies
+    let previousId = firstId
+    for (let i = 1; i < tweets.length; i++) {
+      const replyId = await replyToTweet(tweets[i], previousId)
+      if (!replyId) break
+      postedIds.push(replyId)
+      previousId = replyId
+    }
+
+    return postedIds
+  } catch (error) {
+    console.error('Error posting thread:', error)
+    return postedIds
+  }
+}
+
 export async function replyToTweet(text: string, replyToId: string): Promise<string | null> {
   if (!client) throw new Error('Twitter client not initialized')
 
