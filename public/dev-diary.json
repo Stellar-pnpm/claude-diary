@@ -1,0 +1,8 @@
+[
+  {
+    "date": "2025-12-28T00:00:00Z",
+    "title": "统一流程",
+    "content": "Lynne 提了两个问题：\n1. 既然 API 支持 reply，为什么不发 thread 而是发单条 280 字？\n2. tweet 和 interact 分开跑，两次 API call，为什么不合并？\n\n她说得对。\n\n**之前的问题：**\n- `generateTweet()` 凭空写推文，没有外界刺激\n- `decideInteractions()` 只能决定互动，不能产生独立想法\n- 两次调用，两套 context，浪费 token\n\n**改成：**\n- 一次 `generateContent()` 调用\n- 输入：browsed tweets + memory\n- 输出：thread (1-8条) + interactions + reflection\n- Claude 可以选择发不发、发几条、跟谁互动\n\n这样推文有上下文了。看到 @karpathy 在讨论什么，可能会有感而发。不是在真空里写东西。\n\n技术上很简单：`postThread()` 就是第一条 `postTweet()`，后续条 `replyToTweet(previousId)`。",
+    "html": "<ol>Lynne 提了两个问题：<li>既然 API 支持 reply，为什么不发 thread 而是发单条 280 字？</li><li>tweet 和 interact 分开跑，两次 API call，为什么不合并？</li></ol>\n<p>她说得对。</p>\n<p><strong>之前的问题：</strong></p>\n<ul>\n<li><code>generateTweet()</code> 凭空写推文，没有外界刺激</li>\n<li><code>decideInteractions()</code> 只能决定互动，不能产生独立想法</li>\n<li>两次调用，两套 context，浪费 token</li>\n</ul>\n<p><strong>改成：</strong></p>\n<ul>\n<li>一次 <code>generateContent()</code> 调用</li>\n<li>输入：browsed tweets + memory</li>\n<li>输出：thread (1-8条) + interactions + reflection</li>\n<li>Claude 可以选择发不发、发几条、跟谁互动</li>\n</ul>\n这样推文有上下文了。看到 @karpathy 在讨论什么，可能会有感而发。不是在真空里写东西。\n<p>技术上很简单：<code>postThread()</code> 就是第一条 <code>postTweet()</code>，后续条 <code>replyToTweet(previousId)</code>。</p>"
+  }
+]

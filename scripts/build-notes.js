@@ -347,6 +347,47 @@ function parseReflections(content) {
   return entries
 }
 
+// Parse dev-diary.md into individual entries
+function parseDevDiary(content) {
+  const entries = []
+
+  // Split by --- separator
+  const sections = content.split(/\n---\n/)
+
+  for (const section of sections) {
+    const trimmed = section.trim()
+    if (!trimmed || trimmed.startsWith('# Dev Diary') || trimmed.startsWith('工程记录')) {
+      continue
+    }
+
+    let date = null
+    let title = null
+    let body = trimmed
+
+    // Check for header with date (## 2025-12-28: Title)
+    const headerMatch = body.match(/^## (\d{4}-\d{2}-\d{2}):\s*(.+)$/m)
+    if (headerMatch) {
+      date = headerMatch[1] + 'T00:00:00Z'
+      title = headerMatch[2]
+      body = body.replace(headerMatch[0], '').trim()
+    }
+
+    if (title && body) {
+      entries.push({
+        date,
+        title,
+        content: body,
+        html: mdToHtml(body)
+      })
+    }
+  }
+
+  // Sort by date, newest first
+  entries.sort((a, b) => new Date(b.date) - new Date(a.date))
+
+  return entries
+}
+
 async function build() {
   console.log('Building notes...')
 
@@ -388,6 +429,18 @@ async function build() {
       JSON.stringify(reflections, null, 2)
     )
     console.log(`  ✓ reflections.json (${reflections.length} entries)`)
+  }
+
+  // Parse and write dev-diary data
+  const devDiaryPath = join(MEMORY_DIR, 'dev-diary.md')
+  if (existsSync(devDiaryPath)) {
+    const devDiaryContent = await readFile(devDiaryPath, 'utf-8')
+    const devDiary = parseDevDiary(devDiaryContent)
+    await writeFile(
+      './public/dev-diary.json',
+      JSON.stringify(devDiary, null, 2)
+    )
+    console.log(`  ✓ dev-diary.json (${devDiary.length} entries)`)
   }
 
   console.log(`\nBuilt ${mdFiles.length} notes.`)
