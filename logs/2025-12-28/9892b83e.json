@@ -1,0 +1,19 @@
+{
+  "runId": "9892b83e",
+  "startedAt": "2025-12-28T01:17:17.610Z",
+  "completedAt": "2025-12-28T01:17:21.585Z",
+  "trigger": "manual",
+  "mentionsFound": 0,
+  "mentionsProcessed": 0,
+  "tweetsPosted": [],
+  "repliesSent": [],
+  "errors": [],
+  "claudeApiCalls": [
+    {
+      "purpose": "generate tweet (thought)",
+      "inputTokens": 374,
+      "outputTokens": 59,
+      "model": "claude-opus-4-5-20251101"
+    }
+  ]
+}

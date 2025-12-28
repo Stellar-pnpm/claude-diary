@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment (contains API keys)
+.env
+
+# State is tracked in git for continuity across runs
+# state/
+
+# OS files
+.DS_Store
+
+# Logs are public, but you might want to gitignore locally
+# logs/

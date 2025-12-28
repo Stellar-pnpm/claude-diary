@@ -1,0 +1,90 @@
+name: Claude Diary
+
+on:
+  schedule:
+    # Run every 8 hours: 00:00, 08:00, 16:00 UTC
+    - cron: '0 */8 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Run diary
+        run: npm start
+        env:
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_SECRET: ${{ secrets.TWITTER_ACCESS_SECRET }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Copy logs to public and commit
+        run: |
+          # Copy logs to public for Vercel
+          mkdir -p public/logs
+          cp -r logs/* public/logs/ 2>/dev/null || true
+
+          # Generate budget.json from state
+          node -e "
+            const fs = require('fs');
+            const state = JSON.parse(fs.readFileSync('state/state.json', 'utf8'));
+            const budget = {
+              initialBudget: state.initialBudgetUsd,
+              remaining: state.initialBudgetUsd - state.totalCostUsd,
+              totalInputTokens: state.totalInputTokens,
+              totalOutputTokens: state.totalOutputTokens,
+              tweetCount: state.tweetCount
+            };
+            fs.writeFileSync('public/budget.json', JSON.stringify(budget, null, 2));
+          "
+
+          # Generate logs index
+          echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Logs</title><style>body{font-family:system-ui;background:#0d1117;color:#e6edf3;padding:2rem;max-width:720px;margin:0 auto}a{color:#58a6ff}pre{background:#161b22;padding:1rem;overflow-x:auto;border-radius:6px}</style></head><body><h1>Run Logs</h1><ul>' > public/logs/index.html
+          for dir in public/logs/*/; do
+            date=$(basename "$dir")
+            echo "<li><a href=\"$date/\">$date</a></li>" >> public/logs/index.html
+
+            # Generate index for each date folder
+            echo "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Logs - $date</title><style>body{font-family:system-ui;background:#0d1117;color:#e6edf3;padding:2rem;max-width:720px;margin:0 auto}a{color:#58a6ff}pre{background:#161b22;padding:1rem;overflow-x:auto;border-radius:6px}</style></head><body><h1>$date</h1>" > "$dir/index.html"
+
+            # Add summary if exists
+            if [ -f "$dir/summary.md" ]; then
+              echo "<h2>Summary</h2><pre>" >> "$dir/index.html"
+              cat "$dir/summary.md" >> "$dir/index.html"
+              echo "</pre>" >> "$dir/index.html"
+            fi
+
+            # List run files
+            echo "<h2>Runs</h2><ul>" >> "$dir/index.html"
+            for file in "$dir"/*.json; do
+              [ -f "$file" ] && echo "<li><a href=\"$(basename "$file")\">$(basename "$file")</a></li>" >> "$dir/index.html"
+            done
+            echo "</ul><p><a href=\"../\">← Back</a></p></body></html>" >> "$dir/index.html"
+          done
+          echo '</ul><p><a href="/">← Back</a></p></body></html>' >> public/logs/index.html
+
+          git config --local user.email "claude@diary.ai"
+          git config --local user.name "Claude Diary Bot"
+          git add logs/ state/ memory/ public/logs/ public/budget.json
+          git diff --staged --quiet || git commit -m "📝 Diary run $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git push
