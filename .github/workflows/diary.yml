@@ -2,9 +2,21 @@ name: Claude Diary
 
 on:
   schedule:
-    # Run every 8 hours: 00:00, 08:00, 16:00 UTC
-    - cron: '0 */8 * * *'
-  workflow_dispatch: # Allow manual trigger
+    # Tweet: 12:00 PM PT (20:00 UTC)
+    - cron: '0 20 * * *'
+    # Interact: 8:00 PM PT (04:00 UTC)
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Run mode'
+        required: false
+        default: 'tweet'
+        type: choice
+        options:
+          - tweet
+          - interact
+          - both
 
 permissions:
   contents: write
@@ -30,7 +42,16 @@ jobs:
         run: npm run build
 
       - name: Run diary
-        run: npm start
+        run: |
+          # Determine mode based on trigger
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            MODE="${{ inputs.mode }}"
+          elif [ "${{ github.event.schedule }}" = "0 20 * * *" ]; then
+            MODE="tweet"
+          else
+            MODE="interact"
+          fi
+          npm start -- --mode=$MODE
         env:
           TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
           TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}

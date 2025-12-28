@@ -18,10 +18,12 @@ export interface RunLog {
   startedAt: string
   completedAt: string
   trigger: 'scheduled' | 'manual'
+  mode: 'tweet' | 'interact' | 'both'
   mentionsFound: number
   mentionsProcessed: number
   tweetsPosted: TweetLog[]
   repliesSent: ReplyLog[]
+  interactions: InteractionLog[]
   errors: string[]
   claudeApiCalls: ClaudeCall[]
 }
@@ -30,7 +32,25 @@ export interface TweetLog {
   tweetId: string
   content: string
   postedAt: string
-  source: 'thought' | 'note-summary' | 'reflection'
+  source: 'thought' | 'note-summary' | 'reflection' | 'free'
+}
+
+// Tweet from search results
+export interface Tweet {
+  id: string
+  text: string
+  authorId: string
+  authorUsername: string
+  createdAt: string
+}
+
+// Interaction log
+export interface InteractionLog {
+  type: 'like' | 'retweet' | 'reply'
+  tweetId: string
+  authorUsername: string
+  reason: string
+  performedAt: string
 }
 
 export interface ReplyLog {

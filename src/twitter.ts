@@ -1,5 +1,5 @@
 import { TwitterApi } from 'twitter-api-v2'
-import type { Mention } from './types.js'
+import type { Mention, Tweet } from './types.js'
 
 let client: TwitterApi | null = null
 
@@ -103,5 +103,115 @@ export async function replyToTweet(text: string, replyToId: string): Promise<str
   } catch (error) {
     console.error('Error replying to tweet:', error)
     return null
+  }
+}
+
+// Search recent tweets (free tier: 100/month)
+export async function searchTweets(query: string, maxResults = 10): Promise<Tweet[]> {
+  if (!client) throw new Error('Twitter client not initialized')
+
+  try {
+    const result = await client.v2.search(query, {
+      'tweet.fields': ['created_at', 'author_id'],
+      'user.fields': ['username'],
+      expansions: ['author_id'],
+      max_results: Math.min(maxResults, 100)
+    })
+
+    const users = new Map<string, string>()
+    if (result.includes?.users) {
+      for (const user of result.includes.users) {
+        users.set(user.id, user.username)
+      }
+    }
+
+    const tweets: Tweet[] = []
+    // result is a paginator, iterate over it
+    for await (const tweet of result) {
+      tweets.push({
+        id: tweet.id,
+        text: tweet.text,
+        authorId: tweet.author_id || '',
+        authorUsername: users.get(tweet.author_id || '') || 'unknown',
+        createdAt: tweet.created_at || new Date().toISOString()
+      })
+      if (tweets.length >= maxResults) break
+    }
+
+    return tweets
+  } catch (error: unknown) {
+    const apiError = error as { code?: number }
+    if (apiError.code === 401 || apiError.code === 403) {
+      console.log('   ⚠️  Search not available')
+    } else {
+      console.error('Error searching tweets:', error)
+    }
+    return []
+  }
+}
+
+// Get tweets from a specific user
+export async function getUserTweets(username: string, maxResults = 5): Promise<Tweet[]> {
+  if (!client) throw new Error('Twitter client not initialized')
+
+  try {
+    // First get user ID
+    const user = await client.v2.userByUsername(username)
+    if (!user.data) return []
+
+    const result = await client.v2.userTimeline(user.data.id, {
+      'tweet.fields': ['created_at'],
+      max_results: Math.min(maxResults, 100),
+      exclude: ['retweets', 'replies']
+    })
+
+    const tweets: Tweet[] = []
+    for (const tweet of result.data?.data || []) {
+      tweets.push({
+        id: tweet.id,
+        text: tweet.text,
+        authorId: user.data.id,
+        authorUsername: username,
+        createdAt: tweet.created_at || new Date().toISOString()
+      })
+    }
+
+    return tweets
+  } catch (error: unknown) {
+    const apiError = error as { code?: number }
+    if (apiError.code === 401 || apiError.code === 403) {
+      console.log(`   ⚠️  Cannot access @${username}'s tweets`)
+    } else {
+      console.error('Error getting user tweets:', error)
+    }
+    return []
+  }
+}
+
+// Like a tweet (free tier: counts toward 500 writes/month)
+export async function likeTweet(tweetId: string): Promise<boolean> {
+  if (!client) throw new Error('Twitter client not initialized')
+
+  try {
+    const userId = await getMyUserId()
+    await client.v2.like(userId, tweetId)
+    return true
+  } catch (error) {
+    console.error('Error liking tweet:', error)
+    return false
+  }
+}
+
+// Retweet (free tier: counts toward 500 writes/month)
+export async function retweet(tweetId: string): Promise<boolean> {
+  if (!client) throw new Error('Twitter client not initialized')
+
+  try {
+    const userId = await getMyUserId()
+    await client.v2.retweet(userId, tweetId)
+    return true
+  } catch (error) {
+    console.error('Error retweeting:', error)
+    return false
   }
 }

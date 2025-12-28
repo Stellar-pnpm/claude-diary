@@ -218,20 +218,9 @@ Write a thoughtful reply. Keep it under 280 characters. Be genuine.`
   return callClaude(prompt, `reply to @${mention.authorUsername}`, true, true)
 }
 
-// Decide if we should post something new
-export async function shouldPost(hoursSinceLastTweet: number): Promise<{ should: boolean; reason: string }> {
-  // Conservative: don't post more than once every 12 hours
-  // With 8-hour cron, this means roughly 1-2 tweets per day
-  if (hoursSinceLastTweet < 12) {
-    return { should: false, reason: `Only ${hoursSinceLastTweet.toFixed(1)} hours since last tweet` }
-  }
-
-  // 50% chance to post when eligible - makes timing feel natural
-  if (Math.random() > 0.5) {
-    return { should: false, reason: 'Random skip (natural pacing)' }
-  }
-
-  return { should: true, reason: 'Time and randomness check passed' }
+// Cron controls timing now - just post when called
+export async function shouldPost(): Promise<{ should: boolean; reason: string }> {
+  return { should: true, reason: 'Scheduled run' }
 }
 
 // Generate a new tweet
@@ -256,4 +245,69 @@ export async function shouldReply(mention: Mention): Promise<boolean> {
   if (mention.text.replace(/@\w+/g, '').trim().length < 10) return false
 
   return true
+}
+
+// Decide which tweets to interact with
+export interface InteractionDecision {
+  tweetId: string
+  authorUsername: string
+  action: 'like' | 'retweet' | 'reply' | 'skip'
+  reason: string
+  replyContent?: string
+}
+
+export async function decideInteractions(tweets: Array<{ id: string; text: string; authorUsername: string }>): Promise<InteractionDecision[]> {
+  if (tweets.length === 0) return []
+
+  const tweetList = tweets.map((t, i) => `${i + 1}. @${t.authorUsername}: "${t.text}"`).join('\n')
+
+  const prompt = `You found these tweets from people you might want to interact with:
+
+${tweetList}
+
+For each tweet, decide:
+- "like" — if it resonates with you
+- "retweet" — if you want to share it (rare, only for things really worth amplifying)
+- "reply" — if you have something genuine to say (include your reply, under 280 chars)
+- "skip" — if you don't feel compelled to interact
+
+Be selective. You don't need to interact with everything. Quality over quantity.
+
+Respond in JSON format:
+[
+  {"index": 1, "action": "like", "reason": "..."},
+  {"index": 2, "action": "reply", "reason": "...", "reply": "your reply here"},
+  {"index": 3, "action": "skip", "reason": "..."}
+]`
+
+  const response = await callClaude(prompt, 'decide interactions', true, false)
+
+  try {
+    // Extract JSON from response
+    const jsonMatch = response.match(/\[[\s\S]*\]/)
+    if (!jsonMatch) return []
+
+    const decisions = JSON.parse(jsonMatch[0]) as Array<{
+      index: number
+      action: 'like' | 'retweet' | 'reply' | 'skip'
+      reason: string
+      reply?: string
+    }>
+
+    return decisions
+      .filter(d => d.action !== 'skip')
+      .map(d => {
+        const tweet = tweets[d.index - 1]
+        return {
+          tweetId: tweet.id,
+          authorUsername: tweet.authorUsername,
+          action: d.action,
+          reason: d.reason,
+          replyContent: d.reply
+        }
+      })
+  } catch {
+    console.error('Failed to parse interaction decisions')
+    return []
+  }
 }

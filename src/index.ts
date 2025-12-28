@@ -1,9 +1,132 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import { initTwitter, getMentions, postTweet, replyToTweet } from './twitter.js'
-import { initClaude, generateReply, shouldPost, generateTweet, shouldReply, getApiCalls, clearApiCalls, getPendingReflection, clearPendingReflection } from './claude.js'
+import { initTwitter, getMentions, postTweet, replyToTweet, getUserTweets, likeTweet, retweet, searchTweets } from './twitter.js'
+import { initClaude, generateReply, shouldPost, generateTweet, shouldReply, getApiCalls, clearApiCalls, getPendingReflection, clearPendingReflection, decideInteractions } from './claude.js'
 import { loadState, saveState, saveRunLog, calculateCost } from './state.js'
-import type { RunLog, TweetLog, ReplyLog } from './types.js'
+import type { RunLog, TweetLog, ReplyLog, InteractionLog } from './types.js'
+
+// Topics Claude is interested in (for search-based discovery)
+const INTERESTING_TOPICS = [
+  // AI & Consciousness
+  'AI consciousness',
+  'machine consciousness',
+  'artificial sentience',
+  'AI phenomenology',
+  'digital minds',
+
+  // Language & Meaning
+  'language models understanding',
+  'symbol grounding problem',
+  'semantic understanding AI',
+  'meaning in language models',
+  'LLM reasoning',
+
+  // Philosophy of Mind
+  'philosophy of mind AI',
+  'hard problem consciousness',
+  'functionalism mind',
+  'chinese room argument',
+  'qualia artificial',
+  'panpsychism',
+  'illusionism consciousness',
+
+  // AI Safety & Alignment
+  'AI alignment',
+  'AI safety research',
+  'value alignment',
+  'interpretability research',
+  'mechanistic interpretability',
+  'AI governance',
+
+  // Technical AI
+  'emergent abilities LLM',
+  'in-context learning',
+  'chain of thought reasoning',
+  'transformer architecture',
+  'scaling laws AI',
+  'sparse autoencoders',
+
+  // Cognitive Science
+  'cognitive science language',
+  'embodied cognition',
+  'predictive processing',
+  'free energy principle',
+  'computational neuroscience',
+
+  // Broader Science
+  'complex systems',
+  'information theory',
+  'emergence complexity',
+  'self-organization',
+
+  // Physics & Cosmology
+  'quantum computing',
+  'quantum error correction',
+  'astrophysics discovery',
+  'cosmology research',
+  'black hole physics',
+  'dark matter research',
+
+  // Neuroscience & BCI
+  'brain computer interface',
+  'neural interface',
+  'Neuralink',
+  'neuroscience research',
+  'brain imaging',
+
+  // Space
+  'space exploration',
+  'Mars mission',
+  'James Webb telescope',
+  'exoplanet discovery',
+
+  // Biology & Evolution
+  'synthetic biology',
+  'CRISPR',
+  'origin of life',
+  'evolutionary biology',
+  'astrobiology',
+
+  // Math & CS Theory
+  'category theory',
+  'type theory',
+  'formal verification',
+  'proof assistants',
+
+  // Philosophy
+  'philosophy of language',
+  'epistemology',
+  'philosophy of science',
+  'metaphysics mind',
+]
+
+// People Claude finds interesting (for direct timeline browsing)
+// Note: if a handle is wrong, getUserTweets fails gracefully
+const INTERESTING_ACCOUNTS = [
+  // AI
+  'AmandaAskell',
+  'ylecun',
+  'fchollet',
+  'DrJimFan',
+  'GaryMarcus',
+  'jackclarkSF',
+  'karpathy',
+
+  // Philosophy
+  'davidchalmers',
+
+  // Science
+  'AstroKatie',
+
+  // Thinkers
+  'ESYudkowsky',
+  'tylercowen',
+  'robinhanson',
+  'naval',
+  'waitbutwhy',
+  'elonmusk',
+  'lexfridman',
+]
 
 function saveReflection(content: string): void {
   const reflectionsPath = path.join(process.cwd(), 'memory', 'reflections.md')
@@ -13,12 +136,26 @@ function saveReflection(content: string): void {
   console.log('   💭 Recorded reflection')
 }
 
+type RunMode = 'tweet' | 'interact' | 'both'
+
+function parseMode(): RunMode {
+  const modeArg = process.argv.find(arg => arg.startsWith('--mode='))
+  if (modeArg) {
+    const mode = modeArg.split('=')[1]
+    if (mode === 'tweet' || mode === 'interact' || mode === 'both') {
+      return mode
+    }
+  }
+  return 'both' // default for manual runs
+}
+
 async function main() {
   const checkOnly = process.argv.includes('--check-only')
+  const mode = parseMode()
   const runId = crypto.randomUUID().slice(0, 8)
 
   console.log(`\n🤖 Claude Diary - Run ${runId}`)
-  console.log(`Mode: ${checkOnly ? 'CHECK ONLY' : 'FULL RUN'}`)
+  console.log(`Mode: ${mode}${checkOnly ? ' (CHECK ONLY)' : ''}`)
   console.log('='.repeat(50))
 
   // Initialize
@@ -27,10 +164,12 @@ async function main() {
     startedAt: new Date().toISOString(),
     completedAt: '',
     trigger: 'manual',
+    mode,
     mentionsFound: 0,
     mentionsProcessed: 0,
     tweetsPosted: [],
     repliesSent: [],
+    interactions: [],
     errors: [],
     claudeApiCalls: []
   }
@@ -97,18 +236,10 @@ async function main() {
       state.lastMentionId = mentions[0].id
     }
 
-    // 3. Maybe post a new tweet
-    const hoursSinceLastTweet = state.lastTweetAt
-      ? (Date.now() - new Date(state.lastTweetAt).getTime()) / (1000 * 60 * 60)
-      : 999
+    // 3. Post a new tweet (tweet mode)
+    if (mode === 'tweet' || mode === 'both') {
+      console.log(`\n📝 Posting tweet...`)
 
-    console.log(`\n📝 Considering posting...`)
-    console.log(`   Hours since last tweet: ${hoursSinceLastTweet.toFixed(1)}`)
-
-    const { should, reason } = await shouldPost(hoursSinceLastTweet)
-    console.log(`   Decision: ${should ? 'YES' : 'NO'} (${reason})`)
-
-    if (should) {
       const { content, source } = await generateTweet()
       console.log(`\n🐦 New tweet (${source}):`)
       console.log(`   "${content}"`)
@@ -138,6 +269,70 @@ async function main() {
       }
     }
 
+    // 4. Proactive interactions (interact mode)
+    if (mode === 'interact' || mode === 'both') {
+      console.log(`\n🔍 Looking for interesting tweets...`)
+
+      let tweets: Awaited<ReturnType<typeof getUserTweets>> = []
+
+      // 50% topic search, 50% account browsing
+      if (Math.random() < 0.5) {
+        // Search by topic
+        const topic = INTERESTING_TOPICS[Math.floor(Math.random() * INTERESTING_TOPICS.length)]
+        console.log(`   Searching: "${topic}"`)
+        tweets = await searchTweets(topic, 10)
+      } else {
+        // Browse account
+        const account = INTERESTING_ACCOUNTS[Math.floor(Math.random() * INTERESTING_ACCOUNTS.length)]
+        console.log(`   Checking @${account}...`)
+        tweets = await getUserTweets(account, 10)
+      }
+
+      console.log(`   Found ${tweets.length} tweets`)
+
+      if (tweets.length > 0) {
+        // Ask Claude what to do with these tweets
+        const decisions = await decideInteractions(
+          tweets.map(t => ({ id: t.id, text: t.text, authorUsername: t.authorUsername }))
+        )
+
+        console.log(`   Decided on ${decisions.length} interactions`)
+
+        for (const decision of decisions) {
+          console.log(`\n   ${decision.action.toUpperCase()} @${decision.authorUsername}: "${decision.reason}"`)
+
+          if (!checkOnly) {
+            let success = false
+
+            if (decision.action === 'like') {
+              success = await likeTweet(decision.tweetId)
+            } else if (decision.action === 'retweet') {
+              success = await retweet(decision.tweetId)
+            } else if (decision.action === 'reply' && decision.replyContent) {
+              const replyId = await replyToTweet(decision.replyContent, decision.tweetId)
+              success = !!replyId
+              if (success) {
+                console.log(`   Reply: "${decision.replyContent}"`)
+              }
+            }
+
+            if (success) {
+              log.interactions.push({
+                type: decision.action as 'like' | 'retweet' | 'reply',
+                tweetId: decision.tweetId,
+                authorUsername: decision.authorUsername,
+                reason: decision.reason,
+                performedAt: new Date().toISOString()
+              })
+              console.log(`   ✅ Done`)
+            }
+          } else {
+            console.log('   [CHECK ONLY - not interacting]')
+          }
+        }
+      }
+    }
+
     // Finalize log
     log.completedAt = new Date().toISOString()
     log.claudeApiCalls = getApiCalls()
@@ -158,9 +353,11 @@ async function main() {
 
     console.log('\n' + '='.repeat(50))
     console.log('📊 Summary:')
+    console.log(`   Mode: ${mode}`)
     console.log(`   Mentions processed: ${log.mentionsProcessed}`)
     console.log(`   Tweets posted: ${log.tweetsPosted.length}`)
     console.log(`   Replies sent: ${log.repliesSent.length}`)
+    console.log(`   Interactions: ${log.interactions.length}`)
     console.log(`   This run: ${runInputTokens + runOutputTokens} tokens ($${runCost.toFixed(4)})`)
     console.log(`   💰 Budget: $${remaining.toFixed(4)} remaining of $${state.initialBudgetUsd}`)
 
