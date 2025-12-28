@@ -262,11 +262,16 @@ async function main() {
             }
 
             if (success) {
+              // Find original tweet text
+              const originalTweet = tweets.find(t => t.id === decision.tweetId)?.text || ''
+
               log.interactions.push({
                 type: decision.action as 'like' | 'retweet' | 'reply',
                 tweetId: decision.tweetId,
                 authorUsername: decision.authorUsername,
+                originalTweet,
                 reason: decision.reason,
+                replyContent: decision.replyContent,
                 performedAt: new Date().toISOString()
               })
               interactedAccounts.add(decision.authorUsername)

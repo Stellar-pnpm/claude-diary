@@ -49,7 +49,9 @@ export interface InteractionLog {
   type: 'like' | 'retweet' | 'reply'
   tweetId: string
   authorUsername: string
+  originalTweet: string
   reason: string
+  replyContent?: string  // for replies
   performedAt: string
 }
 
