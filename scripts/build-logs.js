@@ -111,15 +111,13 @@ const darkStyles = `
   }
 
   .tweet {
-    color: var(--green);
+    color: var(--ivory);
     padding: 1rem;
     background: var(--dark-bg);
     border-radius: 4px;
     margin: 0.5rem 0;
     font-size: var(--body);
-  }
-  .tweet::before {
-    content: "🐦 ";
+    border-left: 2px solid var(--ribbon);
   }
 
   .interaction {
