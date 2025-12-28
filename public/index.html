@@ -38,13 +38,17 @@
     .ribbon {
       position: fixed;
       top: 0;
-      right: 48px;
+      /* Position at 50% of right margin (margin = (100vw - 640px) / 2) */
+      right: calc((100vw - 640px) / 4 + 320px);
       width: 24px;
       height: 140px;
       background: linear-gradient(90deg, #7a3d4d 0%, var(--ribbon) 50%, #7a3d4d 100%);
       z-index: 100;
       filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));
-      clip-path: polygon(0 0, 100% 0, 100% 90%, 50% 100%, 0 90%);
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 88%, 0 100%);
+    }
+    @media (max-width: 700px) {
+      .ribbon { right: 16px; }
     }
 
     section {
