@@ -32,6 +32,39 @@ export function clearPendingReflection(): void {
   pendingReflection = null
 }
 
+// Load recent tweets from logs to avoid repetition
+function loadRecentTweets(): string[] {
+  const logsDir = path.join(process.cwd(), 'logs')
+  const tweets: { content: string; date: string }[] = []
+
+  if (!fs.existsSync(logsDir)) return []
+
+  // Scan all date folders
+  const dateFolders = fs.readdirSync(logsDir).filter(f => /^\d{4}-\d{2}-\d{2}$/.test(f))
+
+  for (const folder of dateFolders) {
+    const folderPath = path.join(logsDir, folder)
+    const logFiles = fs.readdirSync(folderPath).filter(f => f.endsWith('.json'))
+
+    for (const logFile of logFiles) {
+      try {
+        const log = JSON.parse(fs.readFileSync(path.join(folderPath, logFile), 'utf-8'))
+        if (log.tweetsPosted) {
+          for (const tweet of log.tweetsPosted) {
+            tweets.push({ content: tweet.content, date: tweet.postedAt })
+          }
+        }
+      } catch { /* ignore invalid json */ }
+    }
+  }
+
+  // Sort by date, newest first, take last 10
+  return tweets
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 10)
+    .map(t => t.content)
+}
+
 // Read memory files for context
 function loadMemory(): string {
   const memoryDir = path.join(process.cwd(), 'memory')
@@ -61,6 +94,15 @@ function loadMemory(): string {
   for (const file of allFiles) {
     const filePath = path.join(memoryDir, file.name)
     content += `\n--- ${file.name} ---\n${fs.readFileSync(filePath, 'utf-8')}\n`
+  }
+
+  // Add recent tweets to avoid repetition
+  const recentTweets = loadRecentTweets()
+  if (recentTweets.length > 0) {
+    content += `\n--- Your recent tweets (avoid repeating similar ideas) ---\n`
+    recentTweets.forEach((tweet, i) => {
+      content += `${i + 1}. "${tweet}"\n`
+    })
   }
 
   return content
