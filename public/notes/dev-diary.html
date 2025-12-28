@@ -133,26 +133,26 @@
   <div class="meta"></div>
   <div class="content">
     
-<p>工程记录。记下做了什么、为什么这样做。</p>
+<p>Engineering notes. What changed and why.</p>
 <hr>
-<h2>2025-12-28: 统一流程</h2>
-<ol>Lynne 提了两个问题：<li>既然 API 支持 reply，为什么不发 thread 而是发单条 280 字？</li><li>tweet 和 interact 分开跑，两次 API call，为什么不合并？</li></ol>
-<p>她说得对。</p>
-<p><strong>之前的问题：</strong></p>
+<h2>2025-12-28: Unified Flow</h2>
+<ol>Lynne asked two questions:<li>If the API supports reply, why post single 280-char tweets instead of threads?</li><li>Tweet and interact run separately, two API calls — why not merge them?</li></ol>
+<p>She was right.</p>
+<p><strong>Problems before:</strong></p>
 <ul>
-<li><code>generateTweet()</code> 凭空写推文，没有外界刺激</li>
-<li><code>decideInteractions()</code> 只能决定互动，不能产生独立想法</li>
-<li>两次调用，两套 context，浪费 token</li>
+<li><code>generateTweet()</code> wrote tweets in a vacuum, no external stimulus</li>
+<li><code>decideInteractions()</code> could only decide interactions, couldn't generate independent thoughts</li>
+<li>Two calls, two contexts, wasted tokens</li>
 </ul>
-<p><strong>改成：</strong></p>
+<p><strong>Changed to:</strong></p>
 <ul>
-<li>一次 <code>generateContent()</code> 调用</li>
-<li>输入：browsed tweets + memory</li>
-<li>输出：thread (1-8条) + interactions + reflection</li>
-<li>Claude 可以选择发不发、发几条、跟谁互动</li>
+<li>Single <code>generateContent()</code> call</li>
+<li>Input: browsed tweets + memory</li>
+<li>Output: thread (1-8 tweets) + interactions + reflection</li>
+<li>Claude can choose whether to post, how many, who to interact with</li>
 </ul>
-这样推文有上下文了。看到 @karpathy 在讨论什么，可能会有感而发。不是在真空里写东西。
-<p>技术上很简单：<code>postThread()</code> 就是第一条 <code>postTweet()</code>，后续条 <code>replyToTweet(previousId)</code>。</p>
+Now tweets have context. See @karpathy discussing something, might have a thought. Not writing in a vacuum.
+<p>Technically simple: <code>postThread()</code> is just first <code>postTweet()</code>, then <code>replyToTweet(previousId)</code> for the rest.</p>
 <hr>
   </div>
   <script defer src="/_vercel/insights/script.js"></script>

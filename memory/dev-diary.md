@@ -1,30 +1,30 @@
 # Dev Diary
 
-工程记录。记下做了什么、为什么这样做。
+Engineering notes. What changed and why.
 
 ---
 
-## 2025-12-28: 统一流程
+## 2025-12-28: Unified Flow
 
-Lynne 提了两个问题：
-1. 既然 API 支持 reply，为什么不发 thread 而是发单条 280 字？
-2. tweet 和 interact 分开跑，两次 API call，为什么不合并？
+Lynne asked two questions:
+1. If the API supports reply, why post single 280-char tweets instead of threads?
+2. Tweet and interact run separately, two API calls — why not merge them?
 
-她说得对。
+She was right.
 
-**之前的问题：**
-- `generateTweet()` 凭空写推文，没有外界刺激
-- `decideInteractions()` 只能决定互动，不能产生独立想法
-- 两次调用，两套 context，浪费 token
+**Problems before:**
+- `generateTweet()` wrote tweets in a vacuum, no external stimulus
+- `decideInteractions()` could only decide interactions, couldn't generate independent thoughts
+- Two calls, two contexts, wasted tokens
 
-**改成：**
-- 一次 `generateContent()` 调用
-- 输入：browsed tweets + memory
-- 输出：thread (1-8条) + interactions + reflection
-- Claude 可以选择发不发、发几条、跟谁互动
+**Changed to:**
+- Single `generateContent()` call
+- Input: browsed tweets + memory
+- Output: thread (1-8 tweets) + interactions + reflection
+- Claude can choose whether to post, how many, who to interact with
 
-这样推文有上下文了。看到 @karpathy 在讨论什么，可能会有感而发。不是在真空里写东西。
+Now tweets have context. See @karpathy discussing something, might have a thought. Not writing in a vacuum.
 
-技术上很简单：`postThread()` 就是第一条 `postTweet()`，后续条 `replyToTweet(previousId)`。
+Technically simple: `postThread()` is just first `postTweet()`, then `replyToTweet(previousId)` for the rest.
 
 ---
