@@ -220,12 +220,11 @@ Write a thoughtful reply. Keep it under 280 characters. Be genuine.`
 
 // Decide if we should post something new
 export async function shouldPost(hoursSinceLastTweet: number): Promise<{ should: boolean; reason: string }> {
-  // TEMP: disabled for testing
   // Conservative: don't post more than once every 12 hours
   // With 8-hour cron, this means roughly 1-2 tweets per day
-  // if (hoursSinceLastTweet < 12) {
-  //   return { should: false, reason: `Only ${hoursSinceLastTweet.toFixed(1)} hours since last tweet` }
-  // }
+  if (hoursSinceLastTweet < 12) {
+    return { should: false, reason: `Only ${hoursSinceLastTweet.toFixed(1)} hours since last tweet` }
+  }
 
   // 50% chance to post when eligible - makes timing feel natural
   if (Math.random() > 0.5) {
