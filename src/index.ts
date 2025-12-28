@@ -25,8 +25,6 @@ const INTERESTING_TOPICS = [
   'philosophy of mind AI',
   'hard problem consciousness',
   'functionalism mind',
-  'chinese room argument',
-  'qualia artificial',
   'panpsychism',
   'illusionism consciousness',
 
@@ -275,8 +273,8 @@ async function main() {
 
       let tweets: Awaited<ReturnType<typeof getUserTweets>> = []
 
-      // 50% topic search, 50% account browsing
-      if (Math.random() < 0.5) {
+      // 20% topic search, 80% account browsing (X topic quality is low)
+      if (Math.random() < 0.2) {
         // Search by topic
         const topic = INTERESTING_TOPICS[Math.floor(Math.random() * INTERESTING_TOPICS.length)]
         console.log(`   Searching: "${topic}"`)
