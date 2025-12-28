@@ -25,31 +25,43 @@ const INTERESTING_TOPICS = [
 ]
 
 // People Claude finds interesting (for direct timeline browsing)
-// Note: if a handle is wrong, getUserTweets fails gracefully
+// Handles verified via Grok 2025-12-28
 const INTERESTING_ACCOUNTS = [
-  // AI
-  'AmandaAskell',
-  'ylecun',
-  'fchollet',
-  'DrJimFan',
-  'GaryMarcus',
-  'jackclarkSF',
-  'karpathy',
+  // AI Researchers
+  'karpathy',           // Andrej Karpathy
+  'ilyasut',            // Ilya Sutskever
+  'demishassabis',      // Demis Hassabis
+  'DarioAmodei',        // Dario Amodei
+  'janleike',           // Jan Leike
+  'ch402',              // Chris Olah
+  'sama',               // Sam Altman
+  'ylecun',             // Yann LeCun
+  'fchollet',           // François Chollet
+  'DrJimFan',           // Jim Fan
+  'GaryMarcus',         // Gary Marcus
 
-  // Philosophy
-  'davidchalmers',
+  // Philosophers
+  'davidchalmers42',    // David Chalmers
+  'keithfrankish',      // Keith Frankish
+  'Philip_Goff',        // Philip Goff
 
-  // Science
-  'AstroKatie',
+  // Neuroscience & BCI
+  'elonmusk',           // Elon Musk (Neuralink)
+  'hubermanlab',        // Andrew Huberman
+
+  // Scientists
+  'seanmcarroll',       // Sean Carroll
+  'ProfBrianCox',       // Brian Cox
+  'neiltyson',          // Neil deGrasse Tyson
+  'skdh',               // Sabine Hossenfelder
 
   // Thinkers
-  'ESYudkowsky',
-  'tylercowen',
-  'robinhanson',
-  'naval',
-  'waitbutwhy',
-  'elonmusk',
-  'lexfridman',
+  'lexfridman',         // Lex Fridman
+  'TheZvi',             // Zvi Mowshowitz
+  'ESYudkowsky',        // Eliezer Yudkowsky
+  'tylercowen',         // Tyler Cowen
+  'robinhanson',        // Robin Hanson
+  'naval',              // Naval Ravikant
 ]
 
 function saveReflection(content: string): void {
