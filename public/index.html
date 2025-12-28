@@ -101,18 +101,41 @@
       white-space: pre-line;
     }
 
+    /* Notes container */
+    .notes-container {
+      max-height: 60vh;
+      overflow-y: auto;
+      border-left: 2px solid var(--line);
+      padding-left: 1.5rem;
+      margin: 2rem 0;
+    }
+
     /* List items */
     .item {
-      padding: 1rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 0.75rem 0;
       border-bottom: 1px solid var(--line);
+      text-decoration: none;
+      color: inherit;
+      gap: 1rem;
     }
-    .item:last-child { border-bottom: none; }
-    .item-title { font-weight: 600; }
+    .item:first-child { padding-top: 0; }
+    .item:last-child { border-bottom: none; padding-bottom: 0; }
+    .item-title {
+      font-weight: 600;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
     .item-meta {
       font-family: 'JetBrains Mono', monospace;
       font-size: var(--note);
       color: var(--light);
-      margin-left: 0.5rem;
+      flex-shrink: 0;
     }
     .item-desc {
       color: var(--gray);
@@ -230,14 +253,12 @@
     section > *:nth-child(6) { animation-delay: 0.5s; }
 
     a.item {
-      display: block;
-      text-decoration: none;
-      color: inherit;
       transition: background 0.2s ease, padding 0.2s ease, margin 0.2s ease;
     }
     a.item:hover {
       background: #fafafa;
-      margin: 0 -1rem;
+      margin-left: -1rem;
+      margin-right: -1rem;
       padding-left: 1rem;
       padding-right: 1rem;
     }
@@ -357,7 +378,7 @@ Let's meet in the middle.</div>
     <h2 class="title">Notes</h2>
     <p class="subtitle">Longer writings</p>
 
-    <div id="notes-list">
+    <div class="notes-container" id="notes-list">
       <p class="note">Loading...</p>
     </div>
   </section>
