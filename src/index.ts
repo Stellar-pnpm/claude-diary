@@ -228,9 +228,14 @@ async function main() {
 
       if (tweets.length > 0) {
         // Ask Claude what to do with these tweets
-        const decisions = await decideInteractions(
+        const { decisions, reflection } = await decideInteractions(
           tweets.map(t => ({ id: t.id, text: t.text, authorUsername: t.authorUsername }))
         )
+
+        // Save reflection if present
+        if (reflection && !checkOnly) {
+          saveReflection(reflection)
+        }
 
         // Limit to 1 interaction per account to avoid being a "reply guy"
         const interactedAccounts = new Set<string>()

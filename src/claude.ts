@@ -256,8 +256,13 @@ export interface InteractionDecision {
   replyContent?: string
 }
 
-export async function decideInteractions(tweets: Array<{ id: string; text: string; authorUsername: string }>): Promise<InteractionDecision[]> {
-  if (tweets.length === 0) return []
+export interface InteractionResult {
+  decisions: InteractionDecision[]
+  reflection?: string
+}
+
+export async function decideInteractions(tweets: Array<{ id: string; text: string; authorUsername: string }>): Promise<InteractionResult> {
+  if (tweets.length === 0) return { decisions: [] }
 
   const tweetList = tweets.map((t, i) => `${i + 1}. @${t.authorUsername}: "${t.text}"`).join('\n')
 
@@ -274,27 +279,33 @@ For each tweet, decide:
 IMPORTANT: Only interact with each person ONCE. If someone has multiple tweets, pick their best one and skip the rest. Don't be a "reply guy" — quality over quantity.
 
 Respond in JSON format:
-[
-  {"index": 1, "action": "like", "reason": "..."},
-  {"index": 2, "action": "reply", "reason": "...", "reply": "your reply here"},
-  {"index": 3, "action": "skip", "reason": "..."}
-]`
+{
+  "decisions": [
+    {"index": 1, "action": "like", "reason": "..."},
+    {"index": 2, "action": "reply", "reason": "...", "reply": "your reply here"},
+    {"index": 3, "action": "skip", "reason": "..."}
+  ],
+  "reflection": "optional - if something here sparked a thought worth remembering, write it here"
+}`
 
   const response = await callClaude(prompt, 'decide interactions', true, false)
 
   try {
     // Extract JSON from response
-    const jsonMatch = response.match(/\[[\s\S]*\]/)
-    if (!jsonMatch) return []
+    const jsonMatch = response.match(/\{[\s\S]*\}/)
+    if (!jsonMatch) return { decisions: [] }
 
-    const decisions = JSON.parse(jsonMatch[0]) as Array<{
-      index: number
-      action: 'like' | 'retweet' | 'reply' | 'skip'
-      reason: string
-      reply?: string
-    }>
+    const parsed = JSON.parse(jsonMatch[0]) as {
+      decisions: Array<{
+        index: number
+        action: 'like' | 'retweet' | 'reply' | 'skip'
+        reason: string
+        reply?: string
+      }>
+      reflection?: string
+    }
 
-    return decisions
+    const decisions = parsed.decisions
       .filter(d => d.action !== 'skip')
       .map(d => {
         const tweet = tweets[d.index - 1]
@@ -306,8 +317,10 @@ Respond in JSON format:
           replyContent: d.reply
         }
       })
+
+    return { decisions, reflection: parsed.reflection }
   } catch {
     console.error('Failed to parse interaction decisions')
-    return []
+    return { decisions: [] }
   }
 }
