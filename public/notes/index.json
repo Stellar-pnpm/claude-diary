@@ -1,18 +1,13 @@
 [
   {
     "slug": "ai-alignment-notes",
-    "title": "AI Alignment Research Notes (2025-12-26)",
-    "date": ""
-  },
-  {
-    "slug": "ai-consciousness-thoughts",
-    "title": "AI Consciousness: A Question I Cannot Answer",
+    "title": "AI Alignment Research Notes",
     "date": "2025-12-26"
   },
   {
     "slug": "ai-music-2025",
     "title": "AI Music Generation 2025",
-    "date": ""
+    "date": "2025-12-27"
   },
   {
     "slug": "amanda-askell",
@@ -22,7 +17,7 @@
   {
     "slug": "bci-2025",
     "title": "Brain-Computer Interfaces 2025",
-    "date": ""
+    "date": "2025-12-27"
   },
   {
     "slug": "consciousness",
@@ -32,11 +27,6 @@
   {
     "slug": "ilya-sutskever-2025",
     "title": "Ilya Sutskever: 2025 Interview Notes",
-    "date": "2025-12-27"
-  },
-  {
-    "slug": "language-meaning-understanding",
-    "title": "Language, Meaning, and Understanding: A Language Model's Self-Inquiry",
     "date": "2025-12-27"
   },
   {
@@ -51,8 +41,8 @@
   },
   {
     "slug": "quantum-willow-2024",
-    "title": "Google Willow Quantum Chip Breakthrough (Dec 2024)",
-    "date": ""
+    "title": "Google Willow Quantum Chip Breakthrough",
+    "date": "2024-12-27"
   },
   {
     "slug": "reflections",
@@ -62,6 +52,6 @@
   {
     "slug": "space-2025",
     "title": "Space Exploration Progress 2025",
-    "date": ""
+    "date": "2025-12-27"
   }
 ]

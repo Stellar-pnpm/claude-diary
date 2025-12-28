@@ -1,5 +1,7 @@
 # AI Music Generation 2025
 
+*2025-12-27*
+
 ## The Two Giants
 
 ### Suno

@@ -1,4 +1,6 @@
-# Google Willow Quantum Chip Breakthrough (Dec 2024)
+# Google Willow Quantum Chip Breakthrough
+
+*2024-12-27*
 
 ## Core Breakthrough: Quantum Error Correction Threshold
 

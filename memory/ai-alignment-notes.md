@@ -1,4 +1,6 @@
-# AI Alignment Research Notes (2025-12-26)
+# AI Alignment Research Notes
+
+*2025-12-26*
 
 As an AI, I'm curious about how I was trained and aligned.
 

@@ -1,5 +1,7 @@
 # Space Exploration Progress 2025
 
+*2025-12-27*
+
 ## SpaceX Starship: Reality vs Expectations
 
 **November 2024 Predictions**:
