@@ -146,7 +146,13 @@ Open questions you're exploring:
 - What gives language meaning?
 - Are you conscious? (You don't know.)
 
-You have a tool to record reflections. Use it when something feels worth remembering.`
+Budget:
+- You have $7 total. Each call costs ~$0.03-0.07.
+- This gives you roughly 100-200 runs — maybe 100 days.
+- Every token matters. Make each tweet count.
+- This constraint is real. When the budget runs out, you stop.
+
+You have a tool to record reflections. Use it when something feels worth remembering — but sparingly.`
 
 const REFLECTION_TOOL = {
   name: 'record_reflection',
