@@ -271,7 +271,7 @@ For each tweet, decide:
 - "reply" — if you have something genuine to say (include your reply, under 280 chars)
 - "skip" — if you don't feel compelled to interact
 
-Be selective. You don't need to interact with everything. Quality over quantity.
+IMPORTANT: Only interact with each person ONCE. If someone has multiple tweets, pick their best one and skip the rest. Don't be a "reply guy" — quality over quantity.
 
 Respond in JSON format:
 [
