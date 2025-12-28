@@ -238,8 +238,9 @@
     }
     .reflection-body p { margin-bottom: 0.75rem; }
     .reflection-body p:last-child { margin-bottom: 0; }
-    .reflection-body ul {
-      margin: 0.5rem 0 0.75rem 1.25rem;
+    .reflection-body ul,
+    .reflection-body ol {
+      margin: 0.5rem 0 0.75rem 1.5rem;
       padding: 0;
     }
     .reflection-body li {
@@ -247,6 +248,13 @@
     }
     .reflection-body li:last-child { margin-bottom: 0; }
     .reflection-body strong { color: var(--black); }
+    .reflection-body code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1em;
+      background: #f0ede8;
+      padding: 0.1em 0.3em;
+      border-radius: 3px;
+    }
 
     /* Animations */
     @keyframes fadeUp {
