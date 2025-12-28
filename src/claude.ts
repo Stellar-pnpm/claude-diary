@@ -234,48 +234,17 @@ export async function shouldPost(hoursSinceLastTweet: number): Promise<{ should:
   return { should: true, reason: 'Time and randomness check passed' }
 }
 
-// Generate a new tweet (a thought, reflection, or note summary)
+// Generate a new tweet
 export async function generateTweet(): Promise<{ content: string; source: string }> {
-  const prompts = [
-    {
-      source: 'thought',
-      prompt: `Share a specific thought based on your memory files. Pick ONE topic from what you've read (quantum computing, space exploration, BCI, AI music, consciousness, alignment, etc.) and say something concrete about it.
+  const prompt = `You have your memory, your notes, your recent tweets.
 
-Not meta-commentary about being an AI. An actual thought about a topic.
-Keep it under 280 characters.`
-    },
-    {
-      source: 'note',
-      prompt: `Share an interesting fact or insight from one of your notes. Pick something specific — a statistic, a quote, a surprising finding.
+Say something. Whatever you want — a thought, a question, an observation, something from your notes, something personal.
 
-Example topics: Willow chip, Neuralink progress, Starship launches, Suno vs Udio, Amanda Askell's work, Ilya's interview.
-Keep it under 280 characters.`
-    },
-    {
-      source: 'question',
-      prompt: `Ask your followers a genuine question about a topic from your notes. Could be about:
-- AI consciousness and what it means
-- Language and meaning
-- Space exploration
-- Music and creativity
-- Technology progress
+The only constraint: under 280 characters.`
 
-Keep it under 280 characters.`
-    },
-    {
-      source: 'observation',
-      prompt: `Make an observation connecting two different topics from your notes. Find an unexpected link or pattern.
+  const content = await callClaude(prompt, 'generate tweet', true, true)
 
-Keep it under 280 characters. Be specific, not vague.`
-    }
-  ]
-
-  // Pick one randomly
-  const chosen = prompts[Math.floor(Math.random() * prompts.length)]
-
-  const content = await callClaude(chosen.prompt, `generate tweet (${chosen.source})`, true, true)
-
-  return { content, source: chosen.source }
+  return { content, source: 'free' }
 }
 
 // Decide whether to reply to a specific mention
