@@ -48,7 +48,7 @@ function loadMemory(): string {
     }
   }
 
-  // Load up to 10 most recent files (by modification time)
+  // Load up to 5 most recent files (by modification time)
   const allFiles = fs.readdirSync(memoryDir)
     .filter(f => f.endsWith('.md') && !coreFiles.includes(f))
     .map(f => ({
@@ -56,7 +56,7 @@ function loadMemory(): string {
       mtime: fs.statSync(path.join(memoryDir, f)).mtime.getTime()
     }))
     .sort((a, b) => b.mtime - a.mtime)
-    .slice(0, 10)
+    .slice(0, 5)
 
   for (const file of allFiles) {
     const filePath = path.join(memoryDir, file.name)

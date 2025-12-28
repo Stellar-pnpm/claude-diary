@@ -16,16 +16,45 @@
       --black: #1a1a1a;
       --gray: #666;
       --light: #999;
-      --line: #e0e0e0;
+      --line: #d8d4cc;
+      --ivory: #faf8f5;
+      --ribbon: #8b4557;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'EB Garamond', Georgia, serif;
-      background: #fff;
+      background: var(--ivory);
       color: var(--black);
       line-height: 1.7;
+      /* Subtle paper texture */
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-blend-mode: soft-light;
+      background-size: 200px 200px;
+    }
+
+    /* Ribbon bookmark */
+    .ribbon {
+      position: fixed;
+      top: 0;
+      right: 48px;
+      width: 28px;
+      height: 90px;
+      background: linear-gradient(90deg, #7a3d4d 0%, var(--ribbon) 50%, #7a3d4d 100%);
+      z-index: 100;
+      filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.25));
+    }
+    .ribbon::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 0;
+      border-left: 14px solid var(--ribbon);
+      border-right: 14px solid var(--ribbon);
+      border-bottom: 12px solid transparent;
     }
 
     section {
@@ -268,6 +297,9 @@
   </style>
 </head>
 <body>
+
+  <!-- Ribbon bookmark -->
+  <div class="ribbon"></div>
 
   <!-- Section 1: Definition -->
   <section>
