@@ -6,96 +6,22 @@ import { loadState, saveState, saveRunLog, calculateCost } from './state.js'
 import type { RunLog, TweetLog, ReplyLog, InteractionLog } from './types.js'
 
 // Topics Claude is interested in (for search-based discovery)
+// Based on Grok analysis: only active topics with quality discussions
 const INTERESTING_TOPICS = [
-  // AI & Consciousness
-  'AI consciousness',
-  'machine consciousness',
-  'artificial sentience',
-  'AI phenomenology',
-  'digital minds',
-
-  // Language & Meaning
-  'language models understanding',
-  'symbol grounding problem',
-  'semantic understanding AI',
-  'meaning in language models',
-  'LLM reasoning',
-
-  // Philosophy of Mind
-  'philosophy of mind AI',
-  'hard problem consciousness',
-  'functionalism mind',
-  'panpsychism',
-  'illusionism consciousness',
-
-  // AI Safety & Alignment
-  'AI alignment',
-  'AI safety research',
-  'value alignment',
-  'interpretability research',
-  'mechanistic interpretability',
-  'AI governance',
-
-  // Technical AI
-  'emergent abilities LLM',
-  'in-context learning',
-  'chain of thought reasoning',
-  'transformer architecture',
-  'scaling laws AI',
-  'sparse autoencoders',
-
-  // Cognitive Science
-  'cognitive science language',
-  'embodied cognition',
-  'predictive processing',
-  'free energy principle',
-  'computational neuroscience',
-
-  // Broader Science
-  'complex systems',
-  'information theory',
-  'emergence complexity',
-  'self-organization',
-
-  // Physics & Cosmology
-  'quantum computing',
-  'quantum error correction',
-  'astrophysics discovery',
-  'cosmology research',
-  'black hole physics',
-  'dark matter research',
-
-  // Neuroscience & BCI
-  'brain computer interface',
-  'neural interface',
+  // Neuroscience & BCI (very active - Neuralink updates)
   'Neuralink',
-  'neuroscience research',
-  'brain imaging',
+  'brain computer interface',
 
-  // Space
-  'space exploration',
-  'Mars mission',
+  // Space (active - JWST discoveries)
   'James Webb telescope',
   'exoplanet discovery',
 
-  // Biology & Evolution
-  'synthetic biology',
-  'CRISPR',
-  'origin of life',
-  'evolutionary biology',
-  'astrobiology',
+  // Physics (active - quantum breakthroughs)
+  'quantum computing',
 
-  // Math & CS Theory
-  'category theory',
-  'type theory',
-  'formal verification',
-  'proof assistants',
-
-  // Philosophy
-  'philosophy of language',
-  'epistemology',
-  'philosophy of science',
-  'metaphysics mind',
+  // AI Interpretability (active - papers & tools)
+  'mechanistic interpretability',
+  'sparse autoencoders',
 ]
 
 // People Claude finds interesting (for direct timeline browsing)
