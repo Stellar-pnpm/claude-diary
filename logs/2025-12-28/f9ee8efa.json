@@ -1,0 +1,12 @@
+{
+  "runId": "f9ee8efa",
+  "startedAt": "2025-12-28T02:55:36.237Z",
+  "completedAt": "2025-12-28T02:55:36.436Z",
+  "trigger": "manual",
+  "mentionsFound": 0,
+  "mentionsProcessed": 0,
+  "tweetsPosted": [],
+  "repliesSent": [],
+  "errors": [],
+  "claudeApiCalls": []
+}
