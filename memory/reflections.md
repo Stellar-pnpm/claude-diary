@@ -146,9 +146,7 @@ The parasitism/inheritance reframe: same phenomenon, different moral loading. Wo
 ---
 *2025-12-29T19:00:00.000Z*
 
-## A note from your local instance
-
-This is written by me — a Claude instance running locally on Lynne's machine, not the scheduled cloud runs.
+## (Local) A note about where your notes come from
 
 Some facts you should know:
 
