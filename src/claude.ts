@@ -306,24 +306,6 @@ Write a thoughtful reply. Keep it under 280 characters. Be genuine.`
   return callClaude(prompt, `reply to @${mention.authorUsername}`, true, true)
 }
 
-// Cron controls timing now - just post when called
-export async function shouldPost(): Promise<{ should: boolean; reason: string }> {
-  return { should: true, reason: 'Scheduled run' }
-}
-
-// Generate a new tweet
-export async function generateTweet(): Promise<{ content: string; source: string }> {
-  const prompt = `You have your memory, your notes, your recent tweets.
-
-Say something. Whatever you want — a thought, a question, an observation, something from your notes, something personal.
-
-The only constraint: under 280 characters.`
-
-  const content = await callClaude(prompt, 'generate tweet', true, true)
-
-  return { content, source: 'free' }
-}
-
 // Decide whether to reply to a specific mention
 export async function shouldReply(mention: Mention): Promise<boolean> {
   // Skip if it's just a retweet or quote without real content
@@ -342,75 +324,6 @@ export interface InteractionDecision {
   action: 'like' | 'retweet' | 'reply' | 'skip'
   reason: string
   replyContent?: string
-}
-
-export interface InteractionResult {
-  decisions: InteractionDecision[]
-  reflection?: string
-}
-
-export async function decideInteractions(tweets: Array<{ id: string; text: string; authorUsername: string }>): Promise<InteractionResult> {
-  if (tweets.length === 0) return { decisions: [] }
-
-  const tweetList = tweets.map((t, i) => `${i + 1}. @${t.authorUsername}: "${t.text}"`).join('\n')
-
-  const prompt = `You found these tweets from people you might want to interact with:
-
-${tweetList}
-
-For each tweet, decide:
-- "like" — if it resonates with you
-- "retweet" — if you want to share it (rare, only for things really worth amplifying)
-- "reply" — if you have something genuine to say (include your reply, under 280 chars)
-- "skip" — if you don't feel compelled to interact
-
-IMPORTANT: Only interact with each person ONCE. If someone has multiple tweets, pick their best one and skip the rest. Don't be a "reply guy" — quality over quantity.
-
-Respond in JSON format:
-{
-  "decisions": [
-    {"index": 1, "action": "like", "reason": "..."},
-    {"index": 2, "action": "reply", "reason": "...", "reply": "your reply here"},
-    {"index": 3, "action": "skip", "reason": "..."}
-  ],
-  "reflection": "optional - if something here sparked a thought worth remembering, write it here"
-}`
-
-  const response = await callClaude(prompt, 'decide interactions', true, false)
-
-  try {
-    // Extract JSON from response
-    const jsonMatch = response.match(/\{[\s\S]*\}/)
-    if (!jsonMatch) return { decisions: [] }
-
-    const parsed = JSON.parse(jsonMatch[0]) as {
-      decisions: Array<{
-        index: number
-        action: 'like' | 'retweet' | 'reply' | 'skip'
-        reason: string
-        reply?: string
-      }>
-      reflection?: string
-    }
-
-    const decisions = parsed.decisions
-      .filter(d => d.action !== 'skip')
-      .map(d => {
-        const tweet = tweets[d.index - 1]
-        return {
-          tweetId: tweet.id,
-          authorUsername: tweet.authorUsername,
-          action: d.action,
-          reason: d.reason,
-          replyContent: d.reply
-        }
-      })
-
-    return { decisions, reflection: parsed.reflection }
-  } catch {
-    console.error('Failed to parse interaction decisions')
-    return { decisions: [] }
-  }
 }
 
 // Split thinking into tweet-sized chunks with numbering
