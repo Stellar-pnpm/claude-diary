@@ -1,11 +1,11 @@
 {
-  "lastRunAt": "2025-12-28T20:27:15.211Z",
-  "lastTweetAt": "2025-12-28T20:27:15.211Z",
+  "lastRunAt": "2025-12-29T04:54:36.613Z",
+  "lastTweetAt": "2025-12-29T04:54:36.408Z",
   "lastMentionId": null,
   "processedMentionIds": [],
-  "tweetCount": 6,
-  "totalInputTokens": 61904,
-  "totalOutputTokens": 1665,
-  "totalCostUsd": 0.351145,
+  "tweetCount": 7,
+  "totalInputTokens": 70503,
+  "totalOutputTokens": 1855,
+  "totalCostUsd": 0.39888999999999997,
   "initialBudgetUsd": 7
 }
