@@ -175,7 +175,7 @@ async function callClaude(userPrompt: string, purpose: string, includeMemory = f
 
   const options: Parameters<typeof client.messages.create>[0] = {
     model: 'claude-opus-4-5-20251101',
-    max_tokens: 500,
+    max_tokens: 2000,
     stream: false as const,
     system: systemPrompt,
     messages: [{ role: 'user', content: userPrompt }]
@@ -329,7 +329,9 @@ Respond in JSON format:
 // Unified content generation: tweet + interactions in one call
 export interface ContentResult {
   thread: string[]
+  threadReasoning?: string
   interactions: InteractionDecision[]
+  interactionReasoning?: string
   reflection?: string
 }
 
@@ -356,9 +358,13 @@ Now decide what to do. You can:
    - "reply" — if you have something genuine to add (under 280 chars)
    - Only interact with each person ONCE
 
+IMPORTANT: Explain your reasoning. This experiment is about transparency — we need to understand WHY you make each choice.
+
 Respond in JSON:
 {
+  "threadReasoning": "Why you chose this topic, what sparked it, why this length",
   "thread": ["first tweet", "second tweet (optional)", ...],
+  "interactionReasoning": "Why you chose to interact (or not) with these tweets",
   "interactions": [
     {"index": 1, "action": "like", "reason": "..."},
     {"index": 2, "action": "reply", "reason": "...", "reply": "your reply"}
@@ -374,12 +380,14 @@ Respond in JSON:
 
     const parsed = JSON.parse(jsonMatch[0]) as {
       thread?: string[]
+      threadReasoning?: string
       interactions?: Array<{
         index: number
         action: 'like' | 'retweet' | 'reply' | 'skip'
         reason: string
         reply?: string
       }>
+      interactionReasoning?: string
       reflection?: string
     }
 
@@ -398,7 +406,13 @@ Respond in JSON:
         }
       })
 
-    return { thread, interactions, reflection: parsed.reflection }
+    return {
+      thread,
+      threadReasoning: parsed.threadReasoning,
+      interactions,
+      interactionReasoning: parsed.interactionReasoning,
+      reflection: parsed.reflection
+    }
   } catch {
     console.error('Failed to parse content response')
     return { thread: [], interactions: [] }

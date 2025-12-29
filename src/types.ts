@@ -22,8 +22,10 @@ export interface RunLog {
   mentionsFound: number
   mentionsProcessed: number
   tweetsPosted: TweetLog[]
+  threadReasoning?: string       // Why Claude chose this topic/thread
   repliesSent: ReplyLog[]
   interactions: InteractionLog[]
+  interactionReasoning?: string  // Why Claude chose to interact (or not)
   errors: string[]
   claudeApiCalls: ClaudeCall[]
 }
@@ -69,6 +71,7 @@ export interface ClaudeCall {
   inputTokens: number
   outputTokens: number
   model: string
+  thinking?: string     // Extended thinking summary
   rawResponse?: string  // For debugging - the actual Claude output
 }
 

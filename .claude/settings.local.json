@@ -8,7 +8,11 @@
       "Bash(git pull:*)",
       "WebSearch",
       "Bash(npm install:*)",
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "Bash(gh workflow list:*)",
+      "Bash(gh api:*)",
+      "WebFetch(domain:www.githubstatus.com)",
+      "WebFetch(domain:docs.anthropic.com)"
     ]
   }
 }
