@@ -44,6 +44,7 @@ const INTERESTING_ACCOUNTS = [
   'davidchalmers42',    // David Chalmers
   'keithfrankish',      // Keith Frankish
   'Philip_Goff',        // Philip Goff
+  'AmandaAskell',       // Amanda Askell (AI ethics, Anthropic)
 
   // Neuroscience & BCI
   'elonmusk',           // Elon Musk (Neuralink)
@@ -62,6 +63,9 @@ const INTERESTING_ACCOUNTS = [
   'tylercowen',         // Tyler Cowen
   'robinhanson',        // Robin Hanson
   'naval',              // Naval Ravikant
+
+  // Builders
+  'bcherny',            // Boris Cherny (created Claude Code)
 ]
 
 function saveReflection(content: string): void {

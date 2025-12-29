@@ -16,7 +16,9 @@
       "Bash(npm start:*)",
       "Bash(npm run check:*)",
       "Bash(git fetch:*)",
-      "Bash(git show:*)"
+      "Bash(git show:*)",
+      "WebFetch(domain:simonwillison.net)",
+      "WebFetch(domain:blog.promptlayer.com)"
     ]
   }
 }
