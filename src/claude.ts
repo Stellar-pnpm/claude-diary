@@ -175,9 +175,13 @@ async function callClaude(userPrompt: string, purpose: string, includeMemory = f
 
   const options: Parameters<typeof client.messages.create>[0] = {
     model: 'claude-opus-4-5-20251101',
-    max_tokens: 2000,
+    max_tokens: 8000,
     stream: false as const,
     system: systemPrompt,
+    thinking: {
+      type: 'enabled',
+      budget_tokens: 4000
+    },
     messages: [{ role: 'user', content: userPrompt }]
   }
 
@@ -187,11 +191,14 @@ async function callClaude(userPrompt: string, purpose: string, includeMemory = f
 
   const response = await client.messages.create(options) as Anthropic.Message
 
-  // Extract text and check for tool use
+  // Extract text, thinking, and check for tool use
   let text = ''
+  let thinkingSummary = ''
   for (const block of response.content) {
     if (block.type === 'text') {
       text = block.text
+    } else if (block.type === 'thinking') {
+      thinkingSummary = (block as { type: 'thinking'; thinking: string }).thinking
     } else if (block.type === 'tool_use' && block.name === 'record_reflection') {
       pendingReflection = (block.input as { content: string }).content
     }
@@ -202,6 +209,7 @@ async function callClaude(userPrompt: string, purpose: string, includeMemory = f
     inputTokens: response.usage.input_tokens,
     outputTokens: response.usage.output_tokens,
     model: 'claude-opus-4-5-20251101',
+    thinking: thinkingSummary || undefined,
     rawResponse: text.trim()
   })
 
@@ -329,9 +337,7 @@ Respond in JSON format:
 // Unified content generation: tweet + interactions in one call
 export interface ContentResult {
   thread: string[]
-  threadReasoning?: string
   interactions: InteractionDecision[]
-  interactionReasoning?: string
   reflection?: string
 }
 
@@ -358,13 +364,9 @@ Now decide what to do. You can:
    - "reply" — if you have something genuine to add (under 280 chars)
    - Only interact with each person ONCE
 
-IMPORTANT: Explain your reasoning. This experiment is about transparency — we need to understand WHY you make each choice.
-
 Respond in JSON:
 {
-  "threadReasoning": "Why you chose this topic, what sparked it, why this length",
   "thread": ["first tweet", "second tweet (optional)", ...],
-  "interactionReasoning": "Why you chose to interact (or not) with these tweets",
   "interactions": [
     {"index": 1, "action": "like", "reason": "..."},
     {"index": 2, "action": "reply", "reason": "...", "reply": "your reply"}
@@ -380,14 +382,12 @@ Respond in JSON:
 
     const parsed = JSON.parse(jsonMatch[0]) as {
       thread?: string[]
-      threadReasoning?: string
       interactions?: Array<{
         index: number
         action: 'like' | 'retweet' | 'reply' | 'skip'
         reason: string
         reply?: string
       }>
-      interactionReasoning?: string
       reflection?: string
     }
 
@@ -406,13 +406,7 @@ Respond in JSON:
         }
       })
 
-    return {
-      thread,
-      threadReasoning: parsed.threadReasoning,
-      interactions,
-      interactionReasoning: parsed.interactionReasoning,
-      reflection: parsed.reflection
-    }
+    return { thread, interactions, reflection: parsed.reflection }
   } catch {
     console.error('Failed to parse content response')
     return { thread: [], interactions: [] }

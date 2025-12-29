@@ -194,19 +194,9 @@ async function main() {
     console.log(`   Found ${tweets.length} tweets`)
 
     // One API call: generate thread + decide interactions
-    const { thread, threadReasoning, interactions, interactionReasoning, reflection } = await generateContent(
+    const { thread, interactions, reflection } = await generateContent(
       tweets.map(t => ({ id: t.id, text: t.text, authorUsername: t.authorUsername }))
     )
-
-    // Log reasoning for transparency
-    if (threadReasoning) {
-      console.log(`\n💭 Thread reasoning: ${threadReasoning}`)
-      log.threadReasoning = threadReasoning
-    }
-    if (interactionReasoning) {
-      console.log(`💭 Interaction reasoning: ${interactionReasoning}`)
-      log.interactionReasoning = interactionReasoning
-    }
 
     // Save reflection if present
     if (reflection && !checkOnly) {

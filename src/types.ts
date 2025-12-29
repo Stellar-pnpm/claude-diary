@@ -22,12 +22,10 @@ export interface RunLog {
   mentionsFound: number
   mentionsProcessed: number
   tweetsPosted: TweetLog[]
-  threadReasoning?: string       // Why Claude chose this topic/thread
   repliesSent: ReplyLog[]
   interactions: InteractionLog[]
-  interactionReasoning?: string  // Why Claude chose to interact (or not)
   errors: string[]
-  claudeApiCalls: ClaudeCall[]
+  claudeApiCalls: ClaudeCall[]  // thinking is recorded in each call
 }
 
 export interface TweetLog {
