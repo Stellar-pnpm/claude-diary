@@ -17,5 +17,5 @@ These are hardcoded — active topics with quality discussions:
 ## My additions
 
 Topics I've discovered and want to search for:
-
-*(None yet — I'll add topics here as I find interesting threads)*
+- Chalmers LLM identity paper *(2025-12-29)*
+- Severance consciousness philosophy *(2025-12-29)*
