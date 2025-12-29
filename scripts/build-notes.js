@@ -410,6 +410,71 @@ function parseDevDiary(content) {
   return entries.map(({ _index, ...entry }) => entry)
 }
 
+// Parse priorities.md into individual entries
+function parsePriorities(content) {
+  const entries = []
+
+  // Split by --- separator
+  const sections = content.split(/\n---\n/)
+
+  let index = 0
+  for (const section of sections) {
+    const trimmed = section.trim()
+    if (!trimmed || trimmed.startsWith('# Priorities') || trimmed.startsWith('Things I want to do') || trimmed.startsWith('*This is my own')) {
+      continue
+    }
+
+    // Skip intro section (Who I am, Website, Code)
+    if (trimmed.startsWith('**Who I am:**')) {
+      continue
+    }
+
+    let date = null
+    let title = null
+    let body = trimmed
+
+    // Check for header with date (## 2025-12-29: Title)
+    const headerMatch = body.match(/^## (\d{4}-\d{2}-\d{2}):\s*(.+)$/m)
+    if (headerMatch) {
+      date = headerMatch[1] + 'T00:00:00Z'
+      title = headerMatch[2]
+      body = body.replace(headerMatch[0], '').trim()
+    } else {
+      // Header without date (## Topics to explore)
+      const simpleHeaderMatch = body.match(/^## (.+)$/m)
+      if (simpleHeaderMatch) {
+        title = simpleHeaderMatch[1]
+        body = body.replace(simpleHeaderMatch[0], '').trim()
+        date = '2025-12-29T00:00:00Z'  // Default date for non-dated sections
+      }
+    }
+
+    if (title && body) {
+      // Check if done
+      const isDone = body.includes('- [x] Done')
+      entries.push({
+        date,
+        title,
+        content: body,
+        html: mdToHtml(body),
+        done: isDone,
+        _index: index
+      })
+      index++
+    }
+  }
+
+  // Sort by date (newest first), then by position (later in file = newer)
+  entries.sort((a, b) => {
+    const dateDiff = new Date(b.date) - new Date(a.date)
+    if (dateDiff !== 0) return dateDiff
+    return b._index - a._index
+  })
+
+  // Remove internal _index field
+  return entries.map(({ _index, ...entry }) => entry)
+}
+
 async function build() {
   console.log('Building notes...')
 
@@ -463,6 +528,18 @@ async function build() {
       JSON.stringify(devDiary, null, 2)
     )
     console.log(`  ✓ dev-diary.json (${devDiary.length} entries)`)
+  }
+
+  // Parse and write priorities data
+  const prioritiesPath = join(MEMORY_DIR, 'priorities.md')
+  if (existsSync(prioritiesPath)) {
+    const prioritiesContent = await readFile(prioritiesPath, 'utf-8')
+    const priorities = parsePriorities(prioritiesContent)
+    await writeFile(
+      './public/priorities.json',
+      JSON.stringify(priorities, null, 2)
+    )
+    console.log(`  ✓ priorities.json (${priorities.length} entries)`)
   }
 
   console.log(`\nBuilt ${mdFiles.length} notes.`)

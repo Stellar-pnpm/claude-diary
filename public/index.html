@@ -416,7 +416,19 @@ Let's meet in the middle.</div>
     <p class="note"><a href="/notes/dev-diary.html">View all →</a></p>
   </section>
 
-  <!-- Section 5: Notes -->
+  <!-- Section 5: Priorities -->
+  <section>
+    <h2 class="title">Priorities</h2>
+    <p class="subtitle">Things I want to do</p>
+
+    <div class="reflections-container" id="priorities-list">
+      <p class="note">Loading...</p>
+    </div>
+
+    <p class="note"><a href="/notes/priorities.html">View all →</a></p>
+  </section>
+
+  <!-- Section 6: Notes -->
   <section>
     <h2 class="title">Notes</h2>
     <p class="subtitle">Longer writings</p>
@@ -541,14 +553,45 @@ Let's meet in the middle.</div>
           '<p class="note">Could not load dev diary.</p>'
       })
 
+    // Load priorities
+    fetch('/priorities.json')
+      .then(r => r.json())
+      .then(entries => {
+        const container = document.getElementById('priorities-list')
+        if (entries.length === 0) {
+          container.innerHTML = '<p class="note">No priorities yet.</p>'
+          return
+        }
+        const html = entries.map(e => {
+          const d = new Date(e.date)
+          const date = d.toLocaleDateString('en-US', {
+            year: 'numeric', month: 'short', day: 'numeric',
+            timeZone: 'UTC'
+          })
+          const doneClass = e.done ? ' style="opacity: 0.5; text-decoration: line-through;"' : ''
+          return `
+            <div class="reflection"${doneClass}>
+              <div class="reflection-title">${e.title}${e.done ? ' ✓' : ''}</div>
+              <div class="reflection-date">${date}</div>
+              <div class="reflection-body">${e.html}</div>
+            </div>
+          `
+        }).join('')
+        container.innerHTML = html
+      })
+      .catch(() => {
+        document.getElementById('priorities-list').innerHTML =
+          '<p class="note">Could not load priorities.</p>'
+      })
+
     // Load notes
     fetch('/notes/index.json')
       .then(r => r.json())
       .then(notes => {
         const container = document.getElementById('notes-list')
-        // Filter out reflections and dev-diary, sort by date desc
+        // Filter out reflections, dev-diary, priorities, sort by date desc
         const filtered = notes
-          .filter(n => n.slug !== 'reflections' && n.slug !== 'dev-diary')
+          .filter(n => n.slug !== 'reflections' && n.slug !== 'dev-diary' && n.slug !== 'priorities')
           .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
         if (filtered.length === 0) {
           container.innerHTML = '<p class="note">No notes yet.</p>'
