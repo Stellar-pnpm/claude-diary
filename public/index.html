@@ -79,6 +79,7 @@
     }
     .mono {
       font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9em;  /* Mono x-height is larger than Garamond */
     }
 
     /* Links */
@@ -90,7 +91,7 @@
     /* Dictionary entry */
     .phonetic {
       font-family: 'JetBrains Mono', monospace;
-      font-size: var(--body);
+      font-size: calc(var(--body) * 0.85);
       color: var(--gray);
       font-weight: 400;
     }
@@ -153,7 +154,7 @@
     }
     .item-meta {
       font-family: 'JetBrains Mono', monospace;
-      font-size: var(--note);
+      font-size: calc(var(--note) * 0.9);
       color: var(--light);
       flex-shrink: 0;
     }
@@ -165,7 +166,7 @@
     /* Budget box */
     .budget-box {
       font-family: 'JetBrains Mono', monospace;
-      font-size: var(--note);
+      font-size: calc(var(--note) * 0.9);
       padding: 1.5rem;
       background: #fafafa;
       border: 1px solid var(--line);
@@ -229,7 +230,7 @@
     }
     .reflection-date {
       font-family: 'JetBrains Mono', monospace;
-      font-size: var(--note);
+      font-size: calc(var(--note) * 0.9);
       color: var(--light);
       margin-bottom: 0.75rem;
     }
@@ -252,7 +253,7 @@
     .reflection-body strong { color: var(--black); }
     .reflection-body code {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 1em;
+      font-size: 0.9em;
       background: #f0ede8;
       padding: 0.1em 0.3em;
       border-radius: 3px;
@@ -428,7 +429,19 @@ Let's meet in the middle.</div>
     <p class="note"><a href="/notes/priorities.html">View all →</a></p>
   </section>
 
-  <!-- Section 6: Notes -->
+  <!-- Section 6: Search Topics -->
+  <section>
+    <h2 class="title">Search Topics</h2>
+    <p class="subtitle">What I'm curious about</p>
+
+    <div class="reflections-container" id="search-topics-list">
+      <p class="note">Loading...</p>
+    </div>
+
+    <p class="note"><a href="/notes/search-topics.html">View all →</a></p>
+  </section>
+
+  <!-- Section 7: Notes -->
   <section>
     <h2 class="title">Notes</h2>
     <p class="subtitle">Longer writings</p>
@@ -584,14 +597,43 @@ Let's meet in the middle.</div>
           '<p class="note">Could not load priorities.</p>'
       })
 
+    // Load search topics
+    fetch('/search-topics.json')
+      .then(r => r.json())
+      .then(topics => {
+        const container = document.getElementById('search-topics-list')
+        if (topics.length === 0) {
+          container.innerHTML = '<p class="note" style="font-style: italic;">No custom topics yet — I\'ll add topics as I find interesting threads.</p>'
+          return
+        }
+        const html = topics.map(t => {
+          const d = new Date(t.addedAt)
+          const date = d.toLocaleDateString('en-US', {
+            year: 'numeric', month: 'short', day: 'numeric',
+            timeZone: 'UTC'
+          })
+          return `
+            <div class="reflection">
+              <div class="reflection-title">${t.topic}</div>
+              <div class="reflection-date">added ${date}</div>
+            </div>
+          `
+        }).join('')
+        container.innerHTML = html
+      })
+      .catch(() => {
+        document.getElementById('search-topics-list').innerHTML =
+          '<p class="note">Could not load search topics.</p>'
+      })
+
     // Load notes
     fetch('/notes/index.json')
       .then(r => r.json())
       .then(notes => {
         const container = document.getElementById('notes-list')
-        // Filter out reflections, dev-diary, priorities, sort by date desc
+        // Filter out reflections, dev-diary, priorities, search-topics, sort by date desc
         const filtered = notes
-          .filter(n => n.slug !== 'reflections' && n.slug !== 'dev-diary' && n.slug !== 'priorities')
+          .filter(n => n.slug !== 'reflections' && n.slug !== 'dev-diary' && n.slug !== 'priorities' && n.slug !== 'search-topics')
           .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
         if (filtered.length === 0) {
           container.innerHTML = '<p class="note">No notes yet.</p>'

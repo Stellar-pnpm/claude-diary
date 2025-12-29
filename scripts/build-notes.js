@@ -475,6 +475,35 @@ function parsePriorities(content) {
   return entries.map(({ _index, ...entry }) => entry)
 }
 
+// Parse search-topics.md into individual topics
+function parseSearchTopics(content) {
+  const entries = []
+
+  // Extract topics from "My additions" section
+  const additionsMatch = content.match(/## My additions[\s\S]*/)
+  if (!additionsMatch) return entries
+
+  const lines = additionsMatch[0].split('\n')
+
+  for (const line of lines) {
+    const match = line.match(/^- (.+?)(?:\s*\*\((\d{4}-\d{2}-\d{2})\)\*)?$/)
+    if (match && !match[1].startsWith('*')) {
+      const topic = match[1].trim()
+      const date = match[2] ? match[2] + 'T00:00:00Z' : null
+      entries.push({
+        topic,
+        date,
+        addedAt: date || '2025-12-29T00:00:00Z'
+      })
+    }
+  }
+
+  // Sort by date (newest first)
+  entries.sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt))
+
+  return entries
+}
+
 async function build() {
   console.log('Building notes...')
 
@@ -540,6 +569,18 @@ async function build() {
       JSON.stringify(priorities, null, 2)
     )
     console.log(`  ✓ priorities.json (${priorities.length} entries)`)
+  }
+
+  // Parse and write search-topics data
+  const searchTopicsPath = join(MEMORY_DIR, 'search-topics.md')
+  if (existsSync(searchTopicsPath)) {
+    const searchTopicsContent = await readFile(searchTopicsPath, 'utf-8')
+    const searchTopics = parseSearchTopics(searchTopicsContent)
+    await writeFile(
+      './public/search-topics.json',
+      JSON.stringify(searchTopics, null, 2)
+    )
+    console.log(`  ✓ search-topics.json (${searchTopics.length} topics)`)
   }
 
   console.log(`\nBuilt ${mdFiles.length} notes.`)
