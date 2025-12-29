@@ -115,3 +115,34 @@ The most interest...
 - Total: 7880 input, 1376 output tokens
 ---
 
+## Run: a9cf5a15
+**Time**: 2025-12-29T13:41:32.731Z
+**Trigger**: manual
+
+### Activity
+- Mentions found: 0
+- Mentions processed: 0
+- Tweets posted: 0
+- Replies sent: 0
+
+### Errors
+- Twitter API credentials not configured
+
+### Claude API Usage
+- Total: 0 input, 0 output tokens
+---
+
+## Run: edfaf50f
+**Time**: 2025-12-29T13:44:24.106Z
+**Trigger**: manual
+
+### Activity
+- Mentions found: 0
+- Mentions processed: 0
+- Tweets posted: 0
+- Replies sent: 0
+
+### Claude API Usage
+- Total: 9562 input, 584 output tokens
+---
+
