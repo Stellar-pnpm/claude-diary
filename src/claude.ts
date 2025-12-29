@@ -338,9 +338,35 @@ Respond in JSON format:
   }
 }
 
+// Split thinking into tweet-sized chunks with numbering
+function parseThinkingToThread(thinking: string): string[] {
+  if (!thinking || thinking.length === 0) return []
+
+  // Split by sentences or natural breaks
+  const sentences = thinking.split(/(?<=[.!?])\s+/)
+  const chunks: string[] = []
+  let current = ''
+
+  for (const sentence of sentences) {
+    // If adding this sentence would exceed 250 chars (leave room for "1/n ")
+    if (current.length + sentence.length + 1 > 250) {
+      if (current) chunks.push(current.trim())
+      current = sentence
+    } else {
+      current = current ? `${current} ${sentence}` : sentence
+    }
+  }
+  if (current) chunks.push(current.trim())
+
+  // Add numbering
+  const total = chunks.length
+  return chunks.map((chunk, i) => `${i + 1}/${total} ${chunk}`)
+}
+
 // Unified content generation: tweet + interactions in one call
 export interface ContentResult {
   thread: string[]
+  thinkingThread: string[]  // Parsed from extended thinking
   interactions: InteractionDecision[]
   reflection?: string
 }
@@ -357,13 +383,10 @@ ${tweetList}
 
 Now decide what to do. You can:
 
-1. **Post a thread** showing your thinking process
-   - Write 2-6 tweets that walk through your reasoning
-   - Each tweet should be a step in your thinking, not just a conclusion
-   - Show the journey: what you noticed → what you thought → what you concluded
-   - DON'T number them yourself — numbering will be added automatically
-   - Each tweet MUST be under 260 chars (to leave room for "1/n" prefix)
-   - Leave empty [] only if you genuinely have nothing to say
+1. **Post a thread** (1-8 tweets, each under 280 chars)
+   - Can be inspired by what you saw, or something entirely your own
+   - Can be a single tweet or a longer thread exploring an idea
+   - Leave empty [] if you don't feel like posting
 
 2. **Interact with tweets** (like, retweet, reply)
    - "like" — if it resonates
@@ -373,7 +396,7 @@ Now decide what to do. You can:
 
 Respond in JSON:
 {
-  "thread": ["first thinking step", "second step", "conclusion", ...],
+  "thread": ["first tweet", "second tweet (optional)", ...],
   "interactions": [
     {"index": 1, "action": "like", "reason": "..."},
     {"index": 2, "action": "reply", "reason": "...", "reply": "your reply"}
@@ -383,9 +406,13 @@ Respond in JSON:
 
   const response = await callClaude(prompt, 'generate content', true, false)
 
+  // Get thinking from the last API call
+  const lastCall = calls[calls.length - 1]
+  const thinkingThread = lastCall?.thinking ? parseThinkingToThread(lastCall.thinking) : []
+
   try {
     const jsonMatch = response.match(/\{[\s\S]*\}/)
-    if (!jsonMatch) return { thread: [], interactions: [] }
+    if (!jsonMatch) return { thread: [], thinkingThread, interactions: [] }
 
     const parsed = JSON.parse(jsonMatch[0]) as {
       thread?: string[]
@@ -398,12 +425,7 @@ Respond in JSON:
       reflection?: string
     }
 
-    // Filter and add numbering (1/n, 2/n, etc.)
-    const rawThread = (parsed.thread || []).filter(t => t && t.length <= 260)
-    const total = rawThread.length
-    const thread = rawThread.map((t, i) =>
-      total > 1 ? `${i + 1}/${total} ${t}` : t
-    )
+    const thread = (parsed.thread || []).filter(t => t && t.length <= 280)
 
     const interactions = (parsed.interactions || [])
       .filter(d => d.action !== 'skip' && tweets[d.index - 1])
@@ -418,9 +440,9 @@ Respond in JSON:
         }
       })
 
-    return { thread, interactions, reflection: parsed.reflection }
+    return { thread, thinkingThread, interactions, reflection: parsed.reflection }
   } catch {
     console.error('Failed to parse content response')
-    return { thread: [], interactions: [] }
+    return { thread: [], thinkingThread, interactions: [] }
   }
 }

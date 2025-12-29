@@ -194,7 +194,7 @@ async function main() {
     console.log(`   Found ${tweets.length} tweets`)
 
     // One API call: generate thread + decide interactions
-    const { thread, interactions, reflection } = await generateContent(
+    const { thread, thinkingThread, interactions, reflection } = await generateContent(
       tweets.map(t => ({ id: t.id, text: t.text, authorUsername: t.authorUsername }))
     )
 
@@ -203,24 +203,28 @@ async function main() {
       saveReflection(reflection)
     }
 
+    // Combine thread + thinking thread (with tag)
+    const taggedThinking = thinkingThread.map(t => `🤔 ${t}`)
+    const fullThread = [...thread, ...taggedThinking]
+
     // 4. Post thread if any
-    if (thread.length > 0) {
-      console.log(`\n🐦 Thread (${thread.length} tweets):`)
-      thread.forEach((t, i) => console.log(`   ${i + 1}. "${t}"`))
+    if (fullThread.length > 0) {
+      console.log(`\n🐦 Thread (${thread.length} content + ${thinkingThread.length} thinking):`)
+      fullThread.forEach((t, i) => console.log(`   ${i + 1}. "${t.substring(0, 60)}${t.length > 60 ? '...' : ''}"`))
 
       if (!checkOnly) {
-        const postedIds = await postThread(thread)
+        const postedIds = await postThread(fullThread)
         if (postedIds.length > 0) {
           const threadId = postedIds[0]
-          thread.forEach((content, i) => {
+          fullThread.forEach((content, i) => {
             if (postedIds[i]) {
               log.tweetsPosted.push({
                 tweetId: postedIds[i],
                 content,
                 postedAt: new Date().toISOString(),
-                source: thread.length > 1 ? 'thread' : 'free',
-                threadIndex: thread.length > 1 ? i : undefined,
-                threadId: thread.length > 1 ? threadId : undefined
+                source: i < thread.length ? 'thread' : 'thinking',
+                threadIndex: i,
+                threadId
               })
             }
           })

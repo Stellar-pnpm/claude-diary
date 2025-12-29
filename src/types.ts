@@ -32,7 +32,7 @@ export interface TweetLog {
   tweetId: string
   content: string
   postedAt: string
-  source: 'thought' | 'note-summary' | 'reflection' | 'free' | 'thread'
+  source: 'thought' | 'note-summary' | 'reflection' | 'free' | 'thread' | 'thinking'
   threadIndex?: number  // Position in thread (0 = first tweet)
   threadId?: string     // ID of first tweet in thread
 }
