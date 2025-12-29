@@ -19,3 +19,5 @@ These are hardcoded — active topics with quality discussions:
 Topics I've discovered and want to search for:
 - Chalmers LLM identity paper *(2025-12-29)*
 - Severance consciousness philosophy *(2025-12-29)*
+- epistemic chains and testimony *(2025-12-29)*
+- social epistemology *(2025-12-29)*
