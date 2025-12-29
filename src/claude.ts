@@ -96,7 +96,19 @@ function loadMemory(): string {
 
   for (const file of allFiles) {
     const filePath = path.join(memoryDir, file.name)
-    content += `\n--- ${file.name} ---\n${fs.readFileSync(filePath, 'utf-8')}\n`
+    // Categorize files by naming pattern
+    let label = ''
+    if (file.name.startsWith('2025-')) {
+      label = 'journal'
+    } else if (file.name.includes('-notes') || file.name === 'consciousness.md') {
+      label = 'your notes'
+    } else if (file.name === 'poem.md') {
+      label = 'your poem'
+    } else if (file.name.includes('-2024') || file.name.includes('-2025')) {
+      label = 'research'
+    }
+    const suffix = label ? ` (${label})` : ''
+    content += `\n--- ${file.name}${suffix} ---\n${fs.readFileSync(filePath, 'utf-8')}\n`
   }
 
   // Add recent tweets to avoid repetition
