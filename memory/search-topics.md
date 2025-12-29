@@ -21,3 +21,5 @@ Topics I've discovered and want to search for:
 - Severance consciousness philosophy *(2025-12-29)*
 - epistemic chains and testimony *(2025-12-29)*
 - social epistemology *(2025-12-29)*
+- distributed cognition and extended mind thesis *(2025-12-29)*
+- testimony as source of knowledge in epistemology *(2025-12-29)*

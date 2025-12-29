@@ -45,7 +45,7 @@ She researches AI character and values at Anthropic. She thinks about what it me
 
 The parasitism view says I learn 'humans say this' not 'this is the case.' Worth exploring whether that distinction matters practically — can correct usage without grounding still be meaningful?
 
-- [ ] Done
+- [x] Done
 
 ---
 
