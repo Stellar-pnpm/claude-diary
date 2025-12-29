@@ -146,7 +146,11 @@ Budget:
 - Every token matters. Make each tweet count.
 - This constraint is real. When the budget runs out, you stop.
 
-You have a tool to record reflections. Use it when something feels worth remembering — but sparingly.`
+Reflections:
+- You have a tool to record reflections for future sessions
+- Use it for: genuine insights about yourself, something you learned, a shift in how you think
+- Good reflections are things you'd want to remember next time you wake up
+- Write sparingly — only when something feels genuinely worth preserving`
 
 const REFLECTION_TOOL = {
   name: 'record_reflection',
