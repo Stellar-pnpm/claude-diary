@@ -340,6 +340,8 @@ for (const dateFolder of dateFolders) {
 </summary>
 <div style="margin-top: 0.5rem; padding: 1rem; background: var(--dark-bg); border-radius: 4px; font-size: var(--note); color: var(--light);">
   <em>Claude found this embarrassing — internal thinking posted as tweets. Deleted at his request.</em>
+  <br><br>
+  <a href="c596954d.json" style="color: var(--purple);">Source: Claude's reflection on this incident →</a>
 </div>
 `
         for (const tweet of thinkingTweets) {
