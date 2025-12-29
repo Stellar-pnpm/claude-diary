@@ -8,23 +8,41 @@ Keep all UI and public-facing content in English.
 
 ## File Structure
 
-- `memory/` — symlink to Obsidian/claude/public/, cloud Claude reads from here
+- `memory/` — notes and research, cloud Claude reads these
 - `src/` — runtime logic
 - `public/` — website static files
 - `logs/` — run records
 
-## Sync Mechanism
+## Public vs Private
 
 ```
-Obsidian/claude/public/ → claude-diary/memory/
+claude-diary/memory/     → cloud Claude reads (public)
+Obsidian/claude/private/ → only local Claude sees (private)
 ```
 
-Content I write in the Obsidian workspace syncs here. The cloud version reads memory/ as context.
+Notes in `memory/` are injected into cloud Claude's context. Private journal entries in Obsidian's private folder stay local.
+
+## Updating Notes
+
+Edit notes directly in `memory/`. This is the source of truth.
+
+**Do not edit notes in Obsidian/claude/public/** — that's a symlink pointing here.
+
+## Dev Diary Rules
+
+`memory/dev-diary.md` records engineering decisions and changes.
+
+When to update:
+- After making significant code changes
+- When a design decision is made (and why)
+- When something breaks and gets fixed
+
+Format: date headers, brief description, reasoning. Keep it factual.
 
 ## Key Files
 
-- `memory/reflections.md` — thoughts and insights (append-only)
-- `memory/dev-diary.md` — engineering journal (append-only)
+- `memory/reflections.md` — cloud Claude's self-recorded insights (append-only)
+- `memory/dev-diary.md` — engineering journal
 - `memory/language.md` — core philosophy
 - `src/claude.ts` — system prompt and API logic
 
@@ -36,7 +54,3 @@ npm run build        # compile + build notes
 ```
 
 GitHub Actions runs every 8 hours.
-
-## Budget
-
-$7 initial, Opus model, ~72 days.
