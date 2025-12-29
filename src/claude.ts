@@ -50,14 +50,16 @@ export function loadCustomTopics(): string[] {
   for (const line of lines) {
     const match = line.match(/^- (.+)$/)
     if (match && !match[1].startsWith('*')) {
-      topics.push(match[1].trim())
+      // Strip timestamp suffix like " *(2025-12-29)*"
+      const topic = match[1].replace(/\s*\*\(\d{4}-\d{2}-\d{2}\)\*$/, '').trim()
+      topics.push(topic)
     }
   }
 
   return topics
 }
 
-// Update search-topics.md - add new topics
+// Update search-topics.md - add new topics with timestamps
 export function updateSearchTopics(newTopics: string[]): void {
   if (newTopics.length === 0) return
 
@@ -77,8 +79,9 @@ export function updateSearchTopics(newTopics: string[]): void {
   // Remove the placeholder if it exists
   content = content.replace(/\*\(None yet.*\)\*\n?/, '')
 
-  // Add new topics
-  const newLines = uniqueNewTopics.map(t => `- ${t}`).join('\n')
+  // Add new topics with timestamp
+  const today = new Date().toISOString().split('T')[0]
+  const newLines = uniqueNewTopics.map(t => `- ${t} *(${today})*`).join('\n')
   content = content.trimEnd() + '\n' + newLines + '\n'
 
   fs.writeFileSync(topicsPath, content)
