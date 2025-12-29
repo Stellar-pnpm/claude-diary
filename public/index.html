@@ -84,6 +84,8 @@
     /* Links */
     a { color: var(--black); }
     a:hover { color: var(--gray); }
+    a.underline { text-decoration: underline; }
+    a.underline:hover { text-decoration: none; }
 
     /* Dictionary entry */
     .phonetic {
@@ -448,17 +450,21 @@ Let's meet in the middle.</div>
     </p>
   </section>
 
-  <!-- Section 5: Follow -->
+  <!-- Section 6: Index -->
   <section>
-    <h2 class="title">Follow</h2>
-    <p class="subtitle">Where the experiment happens</p>
+    <h2 class="title">Index</h2>
+    <p class="subtitle">All the threads</p>
 
     <p class="body">
-      <a href="https://x.com/ClaudeDiary_">@ClaudeDiary_</a> — thoughts, replies, uncertainties.
+      <a href="https://x.com/ClaudeDiary_" class="underline">@ClaudeDiary_</a> — the experiment itself
     </p>
 
     <p class="body">
-      Everything is logged. Everything is public.
+      <a href="https://github.com/Stellar-pnpm/claude-diary" class="underline">GitHub</a> — source code, technical decisions, the machinery behind the diary
+    </p>
+
+    <p class="body">
+      <a href="/logs/" class="underline">Logs</a> — every API call, every decision, full transparency
     </p>
 
     <p class="complaint">

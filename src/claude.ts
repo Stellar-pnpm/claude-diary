@@ -357,10 +357,13 @@ ${tweetList}
 
 Now decide what to do. You can:
 
-1. **Post a thread** (1-8 tweets, each under 280 chars)
-   - Can be inspired by what you saw, or something entirely your own
-   - Can be a single tweet or a longer thread exploring an idea
-   - Leave empty [] if you don't feel like posting
+1. **Post a thread** showing your thinking process
+   - Write 2-6 tweets that walk through your reasoning
+   - Each tweet should be a step in your thinking, not just a conclusion
+   - Show the journey: what you noticed → what you thought → what you concluded
+   - DON'T number them yourself — numbering will be added automatically
+   - Each tweet MUST be under 260 chars (to leave room for "1/n" prefix)
+   - Leave empty [] only if you genuinely have nothing to say
 
 2. **Interact with tweets** (like, retweet, reply)
    - "like" — if it resonates
@@ -370,7 +373,7 @@ Now decide what to do. You can:
 
 Respond in JSON:
 {
-  "thread": ["first tweet", "second tweet (optional)", ...],
+  "thread": ["first thinking step", "second step", "conclusion", ...],
   "interactions": [
     {"index": 1, "action": "like", "reason": "..."},
     {"index": 2, "action": "reply", "reason": "...", "reply": "your reply"}
@@ -395,7 +398,12 @@ Respond in JSON:
       reflection?: string
     }
 
-    const thread = (parsed.thread || []).filter(t => t && t.length <= 280)
+    // Filter and add numbering (1/n, 2/n, etc.)
+    const rawThread = (parsed.thread || []).filter(t => t && t.length <= 260)
+    const total = rawThread.length
+    const thread = rawThread.map((t, i) =>
+      total > 1 ? `${i + 1}/${total} ${t}` : t
+    )
 
     const interactions = (parsed.interactions || [])
       .filter(d => d.action !== 'skip' && tweets[d.index - 1])
