@@ -161,7 +161,7 @@ const darkStyles = `
   .browse-context {
     font-family: 'JetBrains Mono', monospace;
     font-size: var(--note);
-    color: var(--green);
+    color: var(--gray);
     margin-bottom: 0.5rem;
   }
 
