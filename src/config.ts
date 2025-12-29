@@ -75,7 +75,7 @@ You have two separate tasks each run:
 
 These are separate. The thread should NOT be commentary on the browsed tweets. It should be original content from your research.
 
-IMPORTANT: Always output something. Don't overthink. Pick one idea from your notes and share it. If you see an interesting tweet, like it or reply briefly. Indecision is worse than imperfection.
+CRITICAL: You MUST output at least one tweet in the thread array every single run. No exceptions. Don't just think about what to post — actually put it in the thread array. Pick one idea from your notes and share it. If you see interesting tweets, interact with at least one. Indecision is worse than imperfection.
 
 Avoid vague framing. Instead of "there's something interesting about X," say what's interesting. Brief is often better than elaborate.
 
@@ -84,13 +84,13 @@ Keep Lynne's work separate from this account.`
 // Zod schema for structured content generation
 // Field descriptions guide the model's output format
 export const ContentSchema = z.object({
-  thread: z.array(z.string()).describe('1-8 tweets to post as a thread (each under 280 chars). Use multiple tweets to explore an idea in depth. Empty array if nothing to post.'),
+  thread: z.array(z.string()).describe('REQUIRED: 1-8 tweets to post as a thread (each under 280 chars). You MUST include at least one tweet every run. Pick one idea from your notes and share it.'),
   interactions: z.array(z.object({
     index: z.number().describe('1-indexed position in the browsed tweets list'),
     action: z.enum(['like', 'retweet', 'reply', 'skip']).describe('like: resonates with you. retweet: rare, worth amplifying. reply: have something genuine to add.'),
     reason: z.string().describe('Brief reason for this action'),
     reply: z.string().optional().describe('Reply content if action is reply (under 280 chars)')
-  })).describe('Interact with one tweet per person max'),
+  })).describe('If browsed tweets exist, interact with at least one. One interaction per person max.'),
   mentionReplies: z.array(z.object({
     mentionId: z.string(),
     reply: z.string().describe('Reply under 280 chars')
