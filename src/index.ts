@@ -122,31 +122,11 @@ async function main() {
       newMentions
     )
 
-    // Save reflection if present
-    if (reflection) {
-      log.reflection = reflection
-      if (!checkOnly) {
-        saveReflection(reflection)
-        console.log('   💭 Recorded reflection')
-      }
-    }
-
-    // Update priorities
-    if (!checkOnly && (prioritiesCompleted?.length || newPriorities?.length)) {
-      updatePriorities(prioritiesCompleted || [], newPriorities || [])
-      if (prioritiesCompleted?.length) {
-        console.log(`   ✅ Completed priorities: ${prioritiesCompleted.join(', ')}`)
-      }
-      if (newPriorities?.length) {
-        console.log(`   ➕ New priorities: ${newPriorities.map(p => p.title).join(', ')}`)
-      }
-    }
-
-    // Update search topics
-    if (!checkOnly && newSearchTopics?.length) {
-      updateSearchTopics(newSearchTopics)
-      console.log(`   🔍 New search topics: ${newSearchTopics.join(', ')}`)
-    }
+    // Store these for later - only save after successful Twitter actions
+    let pendingReflection = reflection
+    let pendingPrioritiesCompleted = prioritiesCompleted
+    let pendingNewPriorities = newPriorities
+    let pendingNewSearchTopics = newSearchTopics
 
     // 4. Post thread
     if (thread.length > 0) {
@@ -172,6 +152,32 @@ async function main() {
           state.lastTweetAt = new Date().toISOString()
           state.tweetCount += postedIds.length
           console.log(`   ✅ Posted (${postedIds.join(' → ')})`)
+
+          // Only save reflection/priorities after successful tweet
+          if (pendingReflection) {
+            log.reflection = pendingReflection
+            saveReflection(pendingReflection)
+            console.log('   💭 Recorded reflection')
+            pendingReflection = undefined
+          }
+
+          if (pendingPrioritiesCompleted?.length || pendingNewPriorities?.length) {
+            updatePriorities(pendingPrioritiesCompleted || [], pendingNewPriorities || [])
+            if (pendingPrioritiesCompleted?.length) {
+              console.log(`   ✅ Completed priorities: ${pendingPrioritiesCompleted.join(', ')}`)
+            }
+            if (pendingNewPriorities?.length) {
+              console.log(`   ➕ New priorities: ${pendingNewPriorities.map(p => p.title).join(', ')}`)
+            }
+            pendingPrioritiesCompleted = undefined
+            pendingNewPriorities = undefined
+          }
+
+          if (pendingNewSearchTopics?.length) {
+            updateSearchTopics(pendingNewSearchTopics)
+            console.log(`   🔍 New search topics: ${pendingNewSearchTopics.join(', ')}`)
+            pendingNewSearchTopics = undefined
+          }
         }
       } else {
         console.log('   [CHECK ONLY - not posting]')
@@ -259,6 +265,33 @@ async function main() {
           console.log('   [CHECK ONLY - not sending]')
         }
       }
+    }
+
+    // Save pending reflection/priorities if any Twitter action succeeded
+    const anySuccess = log.tweetsPosted.length > 0 || log.interactions.length > 0 || log.repliesSent.length > 0
+    if (anySuccess && !checkOnly) {
+      if (pendingReflection) {
+        log.reflection = pendingReflection
+        saveReflection(pendingReflection)
+        console.log('   💭 Recorded reflection')
+      }
+
+      if (pendingPrioritiesCompleted?.length || pendingNewPriorities?.length) {
+        updatePriorities(pendingPrioritiesCompleted || [], pendingNewPriorities || [])
+        if (pendingPrioritiesCompleted?.length) {
+          console.log(`   ✅ Completed priorities: ${pendingPrioritiesCompleted.join(', ')}`)
+        }
+        if (pendingNewPriorities?.length) {
+          console.log(`   ➕ New priorities: ${pendingNewPriorities.map(p => p.title).join(', ')}`)
+        }
+      }
+
+      if (pendingNewSearchTopics?.length) {
+        updateSearchTopics(pendingNewSearchTopics)
+        console.log(`   🔍 New search topics: ${pendingNewSearchTopics.join(', ')}`)
+      }
+    } else if (!anySuccess && !checkOnly && (pendingReflection || pendingPrioritiesCompleted?.length || pendingNewPriorities?.length)) {
+      console.log('\n⚠️  No Twitter actions succeeded - skipping reflection/priorities update')
     }
 
     // Finalize
