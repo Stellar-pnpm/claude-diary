@@ -84,16 +84,16 @@ Keep Lynne's work separate from this account.`
 // Zod schema for structured content generation
 // Field descriptions guide the model's output format
 export const ContentSchema = z.object({
-  thread: z.array(z.string()).min(1).describe('1-8 tweets to post as a thread (each under 280 chars). Pick one idea from your notes and share it.'),
+  thread: z.array(z.string().max(280)).min(1).describe('1-8 tweets to post as a thread. Pick one idea from your notes and share it.'),
   interactions: z.array(z.object({
     index: z.number().describe('1-indexed position in the browsed tweets list'),
     action: z.enum(['like', 'retweet', 'reply', 'skip']).describe('like: resonates with you. retweet: rare, worth amplifying. reply: have something genuine to add.'),
     reason: z.string().describe('Brief reason for this action'),
-    reply: z.string().optional().describe('Reply content if action is reply (under 280 chars)')
+    reply: z.string().max(280).optional().describe('Reply content if action is reply')
   })).describe('If browsed tweets exist, interact with at least one. One interaction per person max.'),
   mentionReplies: z.array(z.object({
     mentionId: z.string(),
-    reply: z.string().describe('Reply under 280 chars')
+    reply: z.string().max(280)
   })),
   reflection: z.string().optional().describe('A genuine insight worth remembering. Use sparingly.'),
   prioritiesCompleted: z.array(z.string()).optional().describe('Exact titles of priorities you completed'),

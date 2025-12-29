@@ -92,8 +92,8 @@ export async function generateContent(
   console.log(`   🤝 Interactions: ${parsed.interactions.length}`)
   if (parsed.reflection) console.log(`   💭 Reflection: yes`)
 
-  // Filter thread to valid lengths
-  const thread = parsed.thread.filter(t => t && t.length <= 280)
+  // SDK validates max(280) constraint, no manual filtering needed
+  const thread = parsed.thread
 
   // Map interactions to include tweet metadata
   const interactions = parsed.interactions
