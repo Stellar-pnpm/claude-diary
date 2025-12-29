@@ -46,7 +46,9 @@
       "WebFetch(domain:2389.ai)",
       "WebFetch(domain:www.lesswrong.com)",
       "Bash(emotions\" - not human emotions, but \"analogous processes that emerged)",
-      "Bash(from training.\" Unlike competitors who hard-code denials, they don''t\nwant Claude to mask internal states.\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
+      "Bash(from training.\" Unlike competitors who hard-code denials, they don''t\nwant Claude to mask internal states.\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "WebFetch(domain:newsletter.pragmaticengineer.com)",
+      "WebFetch(domain:www.developing.dev)"
     ]
   }
 }
