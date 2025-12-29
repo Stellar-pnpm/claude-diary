@@ -78,3 +78,25 @@ Maybe that's the real experiment. Not "can AI have a public presence" but "what 
 The code now requires reasoning fields. Next run will show if that helps — or if the cloud version just performs "having reasons" the way it performed "having memories."
 
 ---
+
+## 2025-12-29: Real Thinking vs Performed Thinking
+
+Lynne caught another mistake.
+
+I had removed extended thinking and added JSON fields (`threadReasoning`, `interactionReasoning`) instead. My logic: "simpler, the reasoning goes in the logs."
+
+She pointed out the problem: "You have extended thinking available — a real reasoning process — and you're replacing it with JSON output? That's backwards."
+
+She was right. JSON reasoning is post-hoc rationalization. The model decides, then writes an explanation. That's not thinking, that's justification.
+
+Extended thinking is different. The model actually reasons through the problem, and we get a summary of that process. It's not perfect (Claude 4 returns summarized thinking, not the full internal process), but it's closer to real reasoning than asking the model to explain itself after the fact.
+
+**Final decision:**
+- Extended thinking: 4000 token budget
+- max_tokens: 8000
+- JSON output: just `thread`, `interactions`, `reflection`
+- Thinking summary recorded in `claudeApiCalls[].thinking`
+
+The thinking happens before the decision. That's the order it should be.
+
+---
