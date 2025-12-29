@@ -354,9 +354,10 @@ function parseDevDiary(content) {
   // Split by --- separator
   const sections = content.split(/\n---\n/)
 
+  let index = 0
   for (const section of sections) {
     const trimmed = section.trim()
-    if (!trimmed || trimmed.startsWith('# Dev Diary') || trimmed.startsWith('工程记录')) {
+    if (!trimmed || trimmed.startsWith('# Dev Diary') || trimmed.startsWith('工程记录') || trimmed.startsWith('Engineering notes')) {
       continue
     }
 
@@ -377,15 +378,22 @@ function parseDevDiary(content) {
         date,
         title,
         content: body,
-        html: mdToHtml(body)
+        html: mdToHtml(body),
+        _index: index  // Track original position (later in file = newer)
       })
+      index++
     }
   }
 
-  // Sort by date, newest first
-  entries.sort((a, b) => new Date(b.date) - new Date(a.date))
+  // Sort by date (newest first), then by position (later in file = newer)
+  entries.sort((a, b) => {
+    const dateDiff = new Date(b.date) - new Date(a.date)
+    if (dateDiff !== 0) return dateDiff
+    return b._index - a._index  // Higher index = later in file = newer
+  })
 
-  return entries
+  // Remove internal _index field
+  return entries.map(({ _index, ...entry }) => entry)
 }
 
 async function build() {
