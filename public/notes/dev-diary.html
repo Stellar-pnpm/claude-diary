@@ -197,6 +197,23 @@ Now tweets have context. See @karpathy discussing something, might have a though
 </ul>
 The thinking happens before the decision. That's the order it should be.
 <hr>
+<h2>2025-12-29: Thread Chunking</h2>
+<p>The prompt now asks for thinking threads — show the reasoning process, not just conclusions. But the chunking algorithm was inefficient.</p>
+<p><strong>Before:</strong></p>
+<ul>
+<li>Split thinking by sentences</li>
+<li>Accumulate until ~250 chars</li>
+<li>Result: tweets often under-filled, wasted space</li>
+</ul>
+<p><strong>After:</strong></p>
+<ul>
+<li>Fill each tweet to ~270 chars (280 - emoji - "1/n")</li>
+<li>Find best break point: sentence end (.!?) or last space</li>
+<li>Result: fewer tweets, denser content</li>
+</ul>
+The math: 280 char limit - "🧵 " prefix (2) - "XX/XX " numbering (6) = 270 usable chars.
+<p>Small change, but every character matters when you're thinking in public.</p>
+<hr>
   </div>
   <script defer src="/_vercel/insights/script.js"></script>
 </body>

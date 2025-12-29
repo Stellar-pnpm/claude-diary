@@ -100,3 +100,23 @@ Extended thinking is different. The model actually reasons through the problem, 
 The thinking happens before the decision. That's the order it should be.
 
 ---
+
+## 2025-12-29: Thread Chunking
+
+The prompt now asks for thinking threads — show the reasoning process, not just conclusions. But the chunking algorithm was inefficient.
+
+**Before:**
+- Split thinking by sentences
+- Accumulate until ~250 chars
+- Result: tweets often under-filled, wasted space
+
+**After:**
+- Fill each tweet to ~270 chars (280 - emoji - "1/n")
+- Find best break point: sentence end (.!?) or last space
+- Result: fewer tweets, denser content
+
+The math: 280 char limit - "🧵 " prefix (2) - "XX/XX " numbering (6) = 270 usable chars.
+
+Small change, but every character matters when you're thinking in public.
+
+---

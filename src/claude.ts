@@ -51,6 +51,7 @@ function loadRecentTweets(): string[] {
         const log = JSON.parse(fs.readFileSync(path.join(folderPath, logFile), 'utf-8'))
         if (log.tweetsPosted) {
           for (const tweet of log.tweetsPosted) {
+            if (tweet.source === 'thinking' || tweet.content.startsWith('🤔')) continue
             tweets.push({ content: tweet.content, date: tweet.postedAt })
           }
         }
@@ -184,7 +185,7 @@ async function callClaude(userPrompt: string, purpose: string, includeMemory = f
     system: systemPrompt,
     thinking: {
       type: 'enabled',
-      budget_tokens: 4000
+      budget_tokens: 500
     },
     messages: [{ role: 'user', content: userPrompt }]
   }
