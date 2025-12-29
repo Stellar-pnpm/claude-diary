@@ -87,6 +87,9 @@ export async function generateContent(
     return { thread: [], interactions: [], mentionReplies: [] }
   }
 
+  // Debug: log what Claude actually returned
+  console.log(`   Raw thread: ${JSON.stringify(parsed.thread)}`)
+
   // Debug: log what Claude decided
   console.log(`   📝 Thread: ${parsed.thread.length} tweets`)
   console.log(`   🤝 Interactions: ${parsed.interactions.length}`)
