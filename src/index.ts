@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import { initTwitter, getMentions, postTweet, postThread, replyToTweet, getUserTweets, likeTweet, retweet, searchTweets } from './twitter.js'
-import { initClaude, generateReply, shouldReply, getApiCalls, clearApiCalls, getPendingReflection, clearPendingReflection, generateContent, updatePriorities } from './claude.js'
+import { initClaude, generateReply, shouldReply, getApiCalls, clearApiCalls, getPendingReflection, clearPendingReflection, generateContent, updatePriorities, loadCustomTopics, updateSearchTopics } from './claude.js'
 import { loadState, saveState, saveRunLog, calculateCost } from './state.js'
 import type { RunLog, TweetLog, ReplyLog, InteractionLog } from './types.js'
 
@@ -186,8 +186,11 @@ async function main() {
 
     // 20% topic search, 80% account browsing (X topic quality is low)
     if (Math.random() < 0.2) {
-      const topic = INTERESTING_TOPICS[Math.floor(Math.random() * INTERESTING_TOPICS.length)]
-      console.log(`   Searching: "${topic}"`)
+      // Merge built-in topics with custom topics from Claude
+      const customTopics = loadCustomTopics()
+      const allTopics = [...INTERESTING_TOPICS, ...customTopics]
+      const topic = allTopics[Math.floor(Math.random() * allTopics.length)]
+      console.log(`   Searching: "${topic}"${customTopics.includes(topic) ? ' (custom)' : ''}`)
       tweets = await searchTweets(topic, 10)
     } else {
       const account = INTERESTING_ACCOUNTS[Math.floor(Math.random() * INTERESTING_ACCOUNTS.length)]
@@ -198,7 +201,7 @@ async function main() {
     console.log(`   Found ${tweets.length} tweets`)
 
     // One API call: generate thread + decide interactions
-    const { thread, thinkingThread, interactions, reflection, prioritiesCompleted, newPriorities } = await generateContent(
+    const { thread, thinkingThread, interactions, reflection, prioritiesCompleted, newPriorities, newSearchTopics } = await generateContent(
       tweets.map(t => ({ id: t.id, text: t.text, authorUsername: t.authorUsername }))
     )
 
@@ -216,6 +219,12 @@ async function main() {
       if (newPriorities?.length) {
         console.log(`   ➕ New priorities: ${newPriorities.map(p => p.title).join(', ')}`)
       }
+    }
+
+    // Update search topics if any new ones
+    if (!checkOnly && newSearchTopics?.length) {
+      updateSearchTopics(newSearchTopics)
+      console.log(`   🔍 New search topics: ${newSearchTopics.join(', ')}`)
     }
 
     // Only post the thread, not thinking (thinking stays in logs)

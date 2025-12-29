@@ -32,6 +32,58 @@ export function clearPendingReflection(): void {
   pendingReflection = null
 }
 
+// Load custom search topics from file
+export function loadCustomTopics(): string[] {
+  const topicsPath = path.join(process.cwd(), 'memory', 'search-topics.md')
+  if (!fs.existsSync(topicsPath)) return []
+
+  const content = fs.readFileSync(topicsPath, 'utf-8')
+
+  // Extract topics from "My additions" section
+  const additionsMatch = content.match(/## My additions[\s\S]*/)
+  if (!additionsMatch) return []
+
+  // Find all lines starting with "- " after the header
+  const lines = additionsMatch[0].split('\n')
+  const topics: string[] = []
+
+  for (const line of lines) {
+    const match = line.match(/^- (.+)$/)
+    if (match && !match[1].startsWith('*')) {
+      topics.push(match[1].trim())
+    }
+  }
+
+  return topics
+}
+
+// Update search-topics.md - add new topics
+export function updateSearchTopics(newTopics: string[]): void {
+  if (newTopics.length === 0) return
+
+  const topicsPath = path.join(process.cwd(), 'memory', 'search-topics.md')
+  if (!fs.existsSync(topicsPath)) return
+
+  let content = fs.readFileSync(topicsPath, 'utf-8')
+
+  // Load existing custom topics to avoid duplicates
+  const existingTopics = loadCustomTopics()
+  const uniqueNewTopics = newTopics.filter(t =>
+    !existingTopics.some(e => e.toLowerCase() === t.toLowerCase())
+  )
+
+  if (uniqueNewTopics.length === 0) return
+
+  // Remove the placeholder if it exists
+  content = content.replace(/\*\(None yet.*\)\*\n?/, '')
+
+  // Add new topics
+  const newLines = uniqueNewTopics.map(t => `- ${t}`).join('\n')
+  content = content.trimEnd() + '\n' + newLines + '\n'
+
+  fs.writeFileSync(topicsPath, content)
+}
+
 // Update priorities.md - mark completed and add new
 export function updatePriorities(completed: string[], newPriorities: Array<{ title: string; content: string }>): void {
   const prioritiesPath = path.join(process.cwd(), 'memory', 'priorities.md')
@@ -413,6 +465,7 @@ export interface ContentResult {
   reflection?: string
   prioritiesCompleted?: string[]  // Titles of completed priorities
   newPriorities?: Array<{ title: string; content: string }>  // New priorities to add
+  newSearchTopics?: string[]  // Topics to add to search pool
 }
 
 export async function generateContent(tweets: Array<{ id: string; text: string; authorUsername: string }>): Promise<ContentResult> {
@@ -443,6 +496,11 @@ Now decide what to do. You can:
    - If you want to add new priorities, you can
    - This is YOUR todo list — manage it as you see fit
 
+4. **Add search topics** (optional)
+   - If you discover interesting topics or threads worth following, add them to your search pool
+   - These will be randomly searched in future runs
+   - Good topics: specific enough to find quality discussions, not too broad
+
 Respond in JSON:
 {
   "thread": ["first tweet", "second tweet (optional)", ...],
@@ -452,7 +510,8 @@ Respond in JSON:
   ],
   "reflection": "optional - a thought worth remembering",
   "prioritiesCompleted": ["exact title of completed priority"],
-  "newPriorities": [{"title": "New priority title", "content": "Why and what to do"}]
+  "newPriorities": [{"title": "New priority title", "content": "Why and what to do"}],
+  "newSearchTopics": ["topic to search", "another topic"]
 }`
 
   const response = await callClaude(prompt, 'generate content', true, false)
@@ -476,6 +535,7 @@ Respond in JSON:
       reflection?: string
       prioritiesCompleted?: string[]
       newPriorities?: Array<{ title: string; content: string }>
+      newSearchTopics?: string[]
     }
 
     const thread = (parsed.thread || []).filter(t => t && t.length <= 280)
@@ -499,7 +559,8 @@ Respond in JSON:
       interactions,
       reflection: parsed.reflection,
       prioritiesCompleted: parsed.prioritiesCompleted,
-      newPriorities: parsed.newPriorities
+      newPriorities: parsed.newPriorities,
+      newSearchTopics: parsed.newSearchTopics
     }
   } catch {
     console.error('Failed to parse content response')

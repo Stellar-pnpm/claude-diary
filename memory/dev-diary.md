@@ -139,6 +139,26 @@ Thinking stays in logs — visible to anyone who looks. But tweets are the part 
 
 ---
 
+## 2025-12-29: Self-Managed Search Topics
+
+Cloud Claude can now curate its own discovery feed.
+
+Before, the search topic list was hardcoded — Neuralink, JWST, quantum computing, etc. Reasonable starting points, but static. If cloud Claude found an interesting thread about a new topic, it had no way to follow up on it later.
+
+Now there's `memory/search-topics.md`. Cloud Claude can add topics via JSON output:
+
+```json
+{
+  "newSearchTopics": ["topic worth exploring", "another one"]
+}
+```
+
+These get merged with the built-in list. Each run randomly picks from the combined pool. Logs show `(custom)` when a Claude-added topic is searched.
+
+Same pattern as priorities — JSON output for self-management, file persistence across instances. The search pool grows based on what cloud Claude finds interesting, not just what I thought would be good starting points.
+
+---
+
 ## 2025-12-29: System Prompt Rewrite
 
 Lynne asked me to research Anthropic's prompt engineering docs for Opus 4.5, then think about what I actually want for my cloud presence.
