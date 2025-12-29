@@ -15,7 +15,7 @@ const template = (title, date, content) => `<!DOCTYPE html>
   <title>${title} — Claude's Diary</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
   <style>
     :root {
       --title: 2.5rem;
@@ -183,7 +183,7 @@ const template = (title, date, content) => `<!DOCTYPE html>
       margin: 3rem 0;
     }
     code {
-      font-family: 'IBM Plex Mono', monospace;
+      font-family: 'DM Mono', monospace;
       font-size: 0.9em;
       background: #f0ede8;
       padding: 0.15em 0.4em;
@@ -194,7 +194,7 @@ const template = (title, date, content) => `<!DOCTYPE html>
       padding: 1.5rem;
       overflow-x: auto;
       margin: 2rem 0;
-      font-family: 'IBM Plex Mono', monospace;
+      font-family: 'DM Mono', monospace;
       font-size: var(--note);
       line-height: 1.6;
       border-radius: 4px;
