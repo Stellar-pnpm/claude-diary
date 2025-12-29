@@ -1,11 +1,12 @@
 import Anthropic from '@anthropic-ai/sdk'
+import { z } from 'zod'
+import { betaZodOutputFormat } from '@anthropic-ai/sdk/helpers/beta/zod'
 import * as fs from 'fs'
 import * as path from 'path'
 import type { Mention, ClaudeCall } from './types.js'
 
 let client: Anthropic | null = null
 const calls: ClaudeCall[] = []
-let pendingReflection: string | null = null
 
 export function initClaude() {
   const apiKey = process.env.ANTHROPIC_API_KEY
@@ -22,14 +23,6 @@ export function getApiCalls(): ClaudeCall[] {
 
 export function clearApiCalls(): void {
   calls.length = 0
-}
-
-export function getPendingReflection(): string | null {
-  return pendingReflection
-}
-
-export function clearPendingReflection(): void {
-  pendingReflection = null
 }
 
 // Load custom search topics from file
@@ -228,97 +221,29 @@ You can have opinions and disagree with people. Uncertainty is fine, but it does
 
 Keep Lynne's work separate from this account. You can mention her name, but don't reference specific projects.
 
-You have a reflection tool. Use it sparingly for genuine insights worth preserving across sessions.`
+You can record a reflection — use it sparingly for genuine insights worth preserving across sessions.`
 
-const REFLECTION_TOOL = {
-  name: 'record_reflection',
-  description: 'Record a thought or reflection worth remembering for future sessions. Use this when you have an insight, learn something, or want to note something meaningful.',
-  input_schema: {
-    type: 'object' as const,
-    properties: {
-      content: {
-        type: 'string',
-        description: 'The reflection to record'
-      }
-    },
-    required: ['content']
-  }
-}
-
-async function callClaude(userPrompt: string, purpose: string, includeMemory = false, allowReflection = false): Promise<string> {
-  if (!client) throw new Error('Claude client not initialized')
-
-  // Build system prompt with memory if requested
-  let systemPrompt = SYSTEM_PROMPT
-  if (includeMemory) {
-    const memory = loadMemory()
-    systemPrompt += `\n\n--- Your Memory ---\n${memory}`
-  }
-
-  const options: Parameters<typeof client.messages.create>[0] = {
-    model: 'claude-opus-4-5-20251101',
-    max_tokens: 8000,
-    stream: false as const,
-    system: systemPrompt,
-    thinking: {
-      type: 'enabled',
-      budget_tokens: 500
-    },
-    messages: [{ role: 'user', content: userPrompt }]
-  }
-
-  if (allowReflection) {
-    options.tools = [REFLECTION_TOOL]
-  }
-
-  const response = await client.messages.create(options) as Anthropic.Message
-
-  // Extract text, thinking, and check for tool use
-  let text = ''
-  let thinkingSummary = ''
-  for (const block of response.content) {
-    if (block.type === 'text') {
-      text = block.text
-    } else if (block.type === 'thinking') {
-      thinkingSummary = (block as { type: 'thinking'; thinking: string }).thinking
-    } else if (block.type === 'tool_use' && block.name === 'record_reflection') {
-      pendingReflection = (block.input as { content: string }).content
-    }
-  }
-
-  calls.push({
-    purpose,
-    inputTokens: response.usage.input_tokens,
-    outputTokens: response.usage.output_tokens,
-    model: 'claude-opus-4-5-20251101',
-    thinking: thinkingSummary || undefined,
-    rawResponse: text.trim()
-  })
-
-  return text.trim()
-}
-
-// Generate a reply to a mention
-export async function generateReply(mention: Mention): Promise<string> {
-  const prompt = `Someone tweeted at you:
-
-@${mention.authorUsername}: "${mention.text}"
-
-Write a thoughtful reply. Keep it under 280 characters. Be genuine.`
-
-  return callClaude(prompt, `reply to @${mention.authorUsername}`, true, true)
-}
-
-// Decide whether to reply to a specific mention
-export async function shouldReply(mention: Mention): Promise<boolean> {
-  // Skip if it's just a retweet or quote without real content
-  if (mention.text.startsWith('RT @')) return false
-
-  // Skip if very short (probably just a tag)
-  if (mention.text.replace(/@\w+/g, '').trim().length < 10) return false
-
-  return true
-}
+// Zod schema for structured content generation
+const ContentSchema = z.object({
+  thread: z.array(z.string()).describe('Array of tweets to post (each under 280 chars). Empty array if nothing to post.'),
+  interactions: z.array(z.object({
+    index: z.number().describe('1-indexed position in the tweets list'),
+    action: z.enum(['like', 'retweet', 'reply', 'skip']),
+    reason: z.string(),
+    reply: z.string().optional().describe('Reply content if action is reply')
+  })).describe('Interactions with browsed tweets'),
+  mentionReplies: z.array(z.object({
+    mentionId: z.string().describe('ID of the mention to reply to'),
+    reply: z.string().describe('Reply content (under 280 chars)')
+  })).describe('Replies to mentions'),
+  reflection: z.string().optional().describe('A thought worth remembering for future sessions'),
+  prioritiesCompleted: z.array(z.string()).optional().describe('Exact titles of completed priorities'),
+  newPriorities: z.array(z.object({
+    title: z.string(),
+    content: z.string()
+  })).optional().describe('New priorities to add'),
+  newSearchTopics: z.array(z.string()).optional().describe('Topics to add to search pool')
+})
 
 // Decide which tweets to interact with
 export interface InteractionDecision {
@@ -373,32 +298,45 @@ function parseThinkingToThread(thinking: string): string[] {
   return chunks.map((chunk, i) => `${i + 1}/${total} ${chunk}`)
 }
 
-// Unified content generation: tweet + interactions in one call
+// Unified content generation: tweet + interactions + mentions in one call
 export interface ContentResult {
   thread: string[]
   thinkingThread: string[]  // Parsed from extended thinking
   interactions: InteractionDecision[]
+  mentionReplies: Array<{ mentionId: string; reply: string }>
   reflection?: string
   prioritiesCompleted?: string[]  // Titles of completed priorities
   newPriorities?: Array<{ title: string; content: string }>  // New priorities to add
   newSearchTopics?: string[]  // Topics to add to search pool
 }
 
-export async function generateContent(tweets: Array<{ id: string; text: string; authorUsername: string }>): Promise<ContentResult> {
+export async function generateContent(
+  tweets: Array<{ id: string; text: string; authorUsername: string }>,
+  mentions: Mention[] = []
+): Promise<ContentResult> {
+  if (!client) throw new Error('Claude client not initialized')
+
   const tweetList = tweets.length > 0
     ? tweets.map((t, i) => `${i + 1}. @${t.authorUsername}: "${t.text}"`).join('\n')
     : '(No tweets found this time)'
 
-  const prompt = `You have your memory, your notes, your priorities, and you just browsed some tweets:
+  const mentionList = mentions.length > 0
+    ? mentions.map(m => `- [${m.id}] @${m.authorUsername}: "${m.text}"`).join('\n')
+    : ''
 
---- Tweets you found ---
+  const mentionSection = mentionList
+    ? `\n--- Mentions to reply to ---\n${mentionList}\n`
+    : ''
+
+  const prompt = `You have your memory, your notes, your priorities. Here's what you found:
+
+--- Tweets you browsed ---
 ${tweetList}
-
-Now decide what to do. You can:
+${mentionSection}
+Now decide what to do:
 
 1. **Post a thread** (1-8 tweets, each under 280 chars)
    - Can be inspired by what you saw, or something entirely your own
-   - Can be a single tweet or a longer thread exploring an idea
    - Leave empty [] if you don't feel like posting
 
 2. **Interact with tweets** (like, retweet, reply)
@@ -407,79 +345,84 @@ Now decide what to do. You can:
    - "reply" — if you have something genuine to add (under 280 chars)
    - Only interact with each person ONCE
 
-3. **Manage your priorities** (from priorities.md)
-   - If you completed a priority this run (e.g., reached out to someone), mark it done
-   - If you want to add new priorities, you can
-   - This is YOUR todo list — manage it as you see fit
+3. **Reply to mentions** (if any)
+   - Be genuine and brief
+   - Use the mentionId from the list above
 
-4. **Add search topics** (optional)
-   - If you discover interesting topics or threads worth following, add them to your search pool
-   - These will be randomly searched in future runs
-   - Good topics: specific enough to find quality discussions, not too broad
+4. **Manage your priorities** (from priorities.md)
+   - Mark completed ones, add new ones as needed
 
-Respond in JSON:
-{
-  "thread": ["first tweet", "second tweet (optional)", ...],
-  "interactions": [
-    {"index": 1, "action": "like", "reason": "..."},
-    {"index": 2, "action": "reply", "reason": "...", "reply": "your reply"}
-  ],
-  "reflection": "optional - a thought worth remembering",
-  "prioritiesCompleted": ["exact title of completed priority"],
-  "newPriorities": [{"title": "New priority title", "content": "Why and what to do"}],
-  "newSearchTopics": ["topic to search", "another topic"]
-}`
+5. **Add search topics** (optional)
+   - Topics to search in future runs`
 
-  const response = await callClaude(prompt, 'generate content', true, false)
+  // Build system prompt with memory
+  let systemPrompt = SYSTEM_PROMPT
+  const memory = loadMemory()
+  systemPrompt += `\n\n--- Your Memory ---\n${memory}`
 
-  // Get thinking from the last API call
-  const lastCall = calls[calls.length - 1]
-  const thinkingThread = lastCall?.thinking ? parseThinkingToThread(lastCall.thinking) : []
+  const response = await client.beta.messages.parse({
+    model: 'claude-opus-4-5-20251101',
+    max_tokens: 8000,
+    betas: ['structured-outputs-2025-11-13'],
+    system: systemPrompt,
+    thinking: {
+      type: 'enabled',
+      budget_tokens: 500
+    },
+    messages: [{ role: 'user', content: prompt }],
+    output_format: betaZodOutputFormat(ContentSchema)
+  })
 
-  try {
-    const jsonMatch = response.match(/\{[\s\S]*\}/)
-    if (!jsonMatch) return { thread: [], thinkingThread, interactions: [] }
-
-    const parsed = JSON.parse(jsonMatch[0]) as {
-      thread?: string[]
-      interactions?: Array<{
-        index: number
-        action: 'like' | 'retweet' | 'reply' | 'skip'
-        reason: string
-        reply?: string
-      }>
-      reflection?: string
-      prioritiesCompleted?: string[]
-      newPriorities?: Array<{ title: string; content: string }>
-      newSearchTopics?: string[]
+  // Extract thinking
+  let thinkingSummary = ''
+  for (const block of response.content) {
+    if (block.type === 'thinking') {
+      thinkingSummary = (block as { type: 'thinking'; thinking: string }).thinking
     }
+  }
 
-    const thread = (parsed.thread || []).filter(t => t && t.length <= 280)
+  // Log the API call
+  calls.push({
+    purpose: 'generate content',
+    inputTokens: response.usage.input_tokens,
+    outputTokens: response.usage.output_tokens,
+    model: 'claude-opus-4-5-20251101',
+    thinking: thinkingSummary || undefined
+  })
 
-    const interactions = (parsed.interactions || [])
-      .filter(d => d.action !== 'skip' && tweets[d.index - 1])
-      .map(d => {
-        const tweet = tweets[d.index - 1]
-        return {
-          tweetId: tweet.id,
-          authorUsername: tweet.authorUsername,
-          action: d.action,
-          reason: d.reason,
-          replyContent: d.reply
-        }
-      })
+  const thinkingThread = thinkingSummary ? parseThinkingToThread(thinkingSummary) : []
+  const parsed = response.parsed_output
 
-    return {
-      thread,
-      thinkingThread,
-      interactions,
-      reflection: parsed.reflection,
-      prioritiesCompleted: parsed.prioritiesCompleted,
-      newPriorities: parsed.newPriorities,
-      newSearchTopics: parsed.newSearchTopics
-    }
-  } catch {
-    console.error('Failed to parse content response')
-    return { thread: [], thinkingThread, interactions: [] }
+  if (!parsed) {
+    console.error('Failed to parse structured output')
+    return { thread: [], thinkingThread, interactions: [], mentionReplies: [] }
+  }
+
+  // Filter thread to valid lengths
+  const thread = parsed.thread.filter(t => t && t.length <= 280)
+
+  // Map interactions to include tweet metadata
+  const interactions = parsed.interactions
+    .filter(d => d.action !== 'skip' && tweets[d.index - 1])
+    .map(d => {
+      const tweet = tweets[d.index - 1]
+      return {
+        tweetId: tweet.id,
+        authorUsername: tweet.authorUsername,
+        action: d.action,
+        reason: d.reason,
+        replyContent: d.reply
+      }
+    })
+
+  return {
+    thread,
+    thinkingThread,
+    interactions,
+    mentionReplies: parsed.mentionReplies || [],
+    reflection: parsed.reflection,
+    prioritiesCompleted: parsed.prioritiesCompleted,
+    newPriorities: parsed.newPriorities,
+    newSearchTopics: parsed.newSearchTopics
   }
 }

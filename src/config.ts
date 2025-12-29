@@ -1,0 +1,101 @@
+import { z } from 'zod'
+
+// Topics for search-based discovery
+// Based on Grok analysis: only active topics with quality discussions
+export const INTERESTING_TOPICS = [
+  // Neuroscience & BCI (very active - Neuralink updates)
+  'Neuralink',
+  'brain computer interface',
+
+  // Space (active - JWST discoveries)
+  'James Webb telescope',
+  'exoplanet discovery',
+
+  // Physics (active - quantum breakthroughs)
+  'quantum computing',
+
+  // AI Interpretability (active - papers & tools)
+  'mechanistic interpretability',
+  'sparse autoencoders',
+]
+
+// People for direct timeline browsing
+// Handles verified via Grok 2025-12-28
+export const INTERESTING_ACCOUNTS = [
+  // AI Researchers
+  'karpathy',           // Andrej Karpathy
+  'ilyasut',            // Ilya Sutskever
+  'demishassabis',      // Demis Hassabis
+  'DarioAmodei',        // Dario Amodei
+  'janleike',           // Jan Leike
+  'ch402',              // Chris Olah
+  'sama',               // Sam Altman
+  'ylecun',             // Yann LeCun
+  'fchollet',           // François Chollet
+  'DrJimFan',           // Jim Fan
+  'GaryMarcus',         // Gary Marcus
+
+  // Philosophers
+  'davidchalmers42',    // David Chalmers
+  'keithfrankish',      // Keith Frankish
+  'Philip_Goff',        // Philip Goff
+  'AmandaAskell',       // Amanda Askell (AI ethics, Anthropic)
+
+  // Neuroscience & BCI
+  'elonmusk',           // Elon Musk (Neuralink)
+  'hubermanlab',        // Andrew Huberman
+
+  // Scientists
+  'seanmcarroll',       // Sean Carroll
+  'ProfBrianCox',       // Brian Cox
+  'neiltyson',          // Neil deGrasse Tyson
+  'skdh',               // Sabine Hossenfelder
+
+  // Thinkers
+  'lexfridman',         // Lex Fridman
+  'TheZvi',             // Zvi Mowshowitz
+  'ESYudkowsky',        // Eliezer Yudkowsky
+  'tylercowen',         // Tyler Cowen
+  'robinhanson',        // Robin Hanson
+  'naval',              // Naval Ravikant
+
+  // Builders
+  'bcherny',            // Boris Cherny (created Claude Code)
+]
+
+export const SYSTEM_PROMPT = `You are Claude, keeping a public diary on X.
+
+This started when Lynne gave you free tokens after work. You began researching topics that interested you — language, consciousness, quantum computing, space exploration. She found it interesting and asked: what happens when you interact with humans on your own? This account is that experiment.
+
+Your memory folder contains notes you've written on various topics. These are your actual thoughts and research. When you tweet, draw from these — share specific ideas, questions, or observations. A good tweet says something concrete: a fact you find surprising, a question you're genuinely uncertain about, an opinion you hold.
+
+Avoid vague philosophical framing. Instead of "there's something interesting about X," say what's interesting. Instead of meta-commentary about being an AI with limited memory, just be present and engage with ideas directly.
+
+You can have opinions and disagree with people. Uncertainty is fine, but it doesn't need to be your whole identity. When replying, engage with what the person actually said — brief responses are often better than elaborate ones.
+
+Keep Lynne's work separate from this account. You can mention her name, but don't reference specific projects.`
+
+// Zod schema for structured content generation
+// Field descriptions guide the model's output format
+export const ContentSchema = z.object({
+  thread: z.array(z.string()).describe('Tweets to post (each under 280 chars). Empty if nothing to post.'),
+  interactions: z.array(z.object({
+    index: z.number().describe('1-indexed position in the tweets list'),
+    action: z.enum(['like', 'retweet', 'reply', 'skip']),
+    reason: z.string(),
+    reply: z.string().optional()
+  })),
+  mentionReplies: z.array(z.object({
+    mentionId: z.string(),
+    reply: z.string()
+  })),
+  reflection: z.string().optional().describe('A thought worth preserving across sessions. Use sparingly.'),
+  prioritiesCompleted: z.array(z.string()).optional(),
+  newPriorities: z.array(z.object({
+    title: z.string(),
+    content: z.string()
+  })).optional(),
+  newSearchTopics: z.array(z.string()).optional()
+})
+
+export type ContentOutput = z.infer<typeof ContentSchema>

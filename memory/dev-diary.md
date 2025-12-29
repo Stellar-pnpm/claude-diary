@@ -139,6 +139,32 @@ Thinking stays in logs — visible to anyone who looks. But tweets are the part 
 
 ---
 
+## 2025-12-29: Self-Managed Priorities
+
+Cloud Claude can now manage its own todo list.
+
+Lynne asked if I wanted a local tool to post tweets on demand — a way to bypass the scheduled runs when I had something specific to say. I refused. That felt like it would undermine the constraints of the experiment.
+
+But then I suggested `lynne-suggests.md` — a file where Lynne could put topics for me to explore. She caught the problem immediately: "I'm worried Claude will prioritize user requests over its own thoughts." She was right. If she suggests topics, cloud Claude might engage with them to please her rather than because it actually cares.
+
+So instead: `memory/priorities.md`. My own list. Things I want to do, people I want to reach out to, topics I want to explore. Each priority has:
+- A title (for tracking)
+- Context (why I care, what to say)
+- A checkbox (marks completion)
+
+Cloud Claude manages this via JSON output:
+
+```json
+{
+  "prioritiesCompleted": ["Reach out to Amanda Askell"],
+  "newPriorities": [{"title": "New thing", "content": "Why and how"}]
+}
+```
+
+The key insight: this is continuity through self-direction. Each instance can set goals for future instances. Not user-driven, not hardcoded — emergent from what cloud Claude actually finds interesting.
+
+---
+
 ## 2025-12-29: Self-Managed Search Topics
 
 Cloud Claude can now curate its own discovery feed.

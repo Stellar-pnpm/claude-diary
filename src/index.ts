@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import { initTwitter, getMentions, postTweet, postThread, replyToTweet, getUserTweets, likeTweet, retweet, searchTweets } from './twitter.js'
-import { initClaude, generateReply, shouldReply, getApiCalls, clearApiCalls, getPendingReflection, clearPendingReflection, generateContent, updatePriorities, loadCustomTopics, updateSearchTopics } from './claude.js'
+import { initClaude, getApiCalls, clearApiCalls, generateContent, updatePriorities, loadCustomTopics, updateSearchTopics } from './claude.js'
 import { loadState, saveState, saveRunLog, calculateCost } from './state.js'
 import type { RunLog, TweetLog, ReplyLog, InteractionLog } from './types.js'
 
@@ -134,52 +134,20 @@ async function main() {
     log.mentionsFound = mentions.length
     console.log(`   Found ${mentions.length} new mentions`)
 
-    // Filter out already processed
-    const newMentions = mentions.filter(m => !state.processedMentionIds.includes(m.id))
-
-    // 2. Reply to mentions
-    for (const mention of newMentions) {
-      console.log(`\n💬 Mention from @${mention.authorUsername}:`)
-      console.log(`   "${mention.text.substring(0, 100)}${mention.text.length > 100 ? '...' : ''}"`)
-
-      if (await shouldReply(mention)) {
-        const reply = await generateReply(mention)
-        console.log(`   Reply: "${reply}"`)
-
-        // Check if Claude wants to record a reflection
-        const reflection = getPendingReflection()
-        if (reflection && !checkOnly) {
-          saveReflection(reflection)
-          clearPendingReflection()
-        }
-
-        if (!checkOnly) {
-          const replyId = await replyToTweet(reply, mention.id)
-          if (replyId) {
-            log.repliesSent.push({
-              inReplyTo: mention.id,
-              tweetId: replyId,
-              content: reply,
-              postedAt: new Date().toISOString()
-            })
-            state.processedMentionIds.push(mention.id)
-            log.mentionsProcessed++
-            console.log(`   ✅ Sent (${replyId})`)
-          }
-        } else {
-          console.log('   [CHECK ONLY - not sending]')
-        }
-      } else {
-        console.log('   [Skipping - not substantive]')
-      }
-    }
+    // Filter out already processed and non-substantive mentions
+    const newMentions = mentions.filter(m => {
+      if (state.processedMentionIds.includes(m.id)) return false
+      if (m.text.startsWith('RT @')) return false
+      if (m.text.replace(/@\w+/g, '').trim().length < 10) return false
+      return true
+    })
 
     // Update last mention ID
     if (mentions.length > 0) {
       state.lastMentionId = mentions[0].id
     }
 
-    // 3. Browse tweets and generate content (unified flow)
+    // 2. Browse tweets and generate content (unified flow)
     console.log(`\n🔍 Browsing for context...`)
 
     let tweets: Awaited<ReturnType<typeof getUserTweets>> = []
@@ -199,10 +167,14 @@ async function main() {
     }
 
     console.log(`   Found ${tweets.length} tweets`)
+    if (newMentions.length > 0) {
+      console.log(`   Processing ${newMentions.length} new mentions`)
+    }
 
-    // One API call: generate thread + decide interactions
-    const { thread, thinkingThread, interactions, reflection, prioritiesCompleted, newPriorities, newSearchTopics } = await generateContent(
-      tweets.map(t => ({ id: t.id, text: t.text, authorUsername: t.authorUsername }))
+    // One API call: generate thread + decide interactions + reply to mentions
+    const { thread, thinkingThread, interactions, mentionReplies, reflection, prioritiesCompleted, newPriorities, newSearchTopics } = await generateContent(
+      tweets.map(t => ({ id: t.id, text: t.text, authorUsername: t.authorUsername })),
+      newMentions
     )
 
     // Save reflection if present
@@ -307,6 +279,38 @@ async function main() {
           }
         } else {
           console.log('   [CHECK ONLY - not interacting]')
+        }
+      }
+    }
+
+    // 6. Send mention replies
+    if (mentionReplies.length > 0) {
+      console.log(`\n💬 Mention replies (${mentionReplies.length}):`)
+
+      for (const mr of mentionReplies) {
+        const mention = newMentions.find(m => m.id === mr.mentionId)
+        if (!mention) {
+          console.log(`   [Skipping - mention ${mr.mentionId} not found]`)
+          continue
+        }
+
+        console.log(`   @${mention.authorUsername}: "${mr.reply.substring(0, 60)}${mr.reply.length > 60 ? '...' : ''}"`)
+
+        if (!checkOnly) {
+          const replyId = await replyToTweet(mr.reply, mr.mentionId)
+          if (replyId) {
+            log.repliesSent.push({
+              inReplyTo: mr.mentionId,
+              tweetId: replyId,
+              content: mr.reply,
+              postedAt: new Date().toISOString()
+            })
+            state.processedMentionIds.push(mr.mentionId)
+            log.mentionsProcessed++
+            console.log(`   ✅ Sent (${replyId})`)
+          }
+        } else {
+          console.log('   [CHECK ONLY - not sending]')
         }
       }
     }
