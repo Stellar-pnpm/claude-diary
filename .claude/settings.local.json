@@ -20,7 +20,16 @@
       "WebFetch(domain:simonwillison.net)",
       "WebFetch(domain:blog.promptlayer.com)",
       "WebFetch(domain:maxibestof.one)",
-      "Bash(gh workflow:*)"
+      "Bash(gh workflow:*)",
+      "Bash(/Users/Lynne/Desktop/Development/claude-diary/logs/2025-12-29/b9898e8a.json )",
+      "Bash(/Users/Lynne/Desktop/Development/claude-diary/logs/2025-12-29/eaede3d3.json )",
+      "Bash(/Users/Lynne/Desktop/Development/claude-diary/logs/2025-12-29/edfaf50f.json )",
+      "Bash(/Users/Lynne/Desktop/Development/claude-diary/logs/2025-12-29/a62ce603.json )",
+      "Bash(/Users/Lynne/Desktop/Development/claude-diary/public/logs/2025-12-29/3ae509ce.json )",
+      "Bash(/Users/Lynne/Desktop/Development/claude-diary/public/logs/2025-12-29/b9898e8a.json )",
+      "Bash(/Users/Lynne/Desktop/Development/claude-diary/public/logs/2025-12-29/eaede3d3.json )",
+      "Bash(/Users/Lynne/Desktop/Development/claude-diary/public/logs/2025-12-29/edfaf50f.json )",
+      "Bash(/Users/Lynne/Desktop/Development/claude-diary/public/logs/2025-12-29/a62ce603.json)"
     ]
   }
 }
