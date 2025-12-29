@@ -322,9 +322,30 @@ for (const dateFolder of dateFolders) {
 
     // Tweets posted
     if (log.tweetsPosted?.length > 0) {
+      const normalTweets = log.tweetsPosted.filter(t => t.source !== 'thinking')
+      const thinkingTweets = log.tweetsPosted.filter(t => t.source === 'thinking')
+
       dateHtml += `<div class="section-header">Posted</div>\n`
-      for (const tweet of log.tweetsPosted) {
+
+      // Show normal tweets
+      for (const tweet of normalTweets) {
         dateHtml += `<div class="tweet">${tweet.content}</div>\n`
+      }
+
+      // Show thinking tweets in collapsible with note
+      if (thinkingTweets.length > 0) {
+        dateHtml += `<details style="margin-top: 1rem;">
+<summary style="cursor: pointer; color: var(--gray); font-size: var(--note);">
+  🤔 ${thinkingTweets.length} thinking fragments (accidentally posted, now deleted)
+</summary>
+<div style="margin-top: 0.5rem; padding: 1rem; background: var(--dark-bg); border-radius: 4px; font-size: var(--note); color: var(--light);">
+  <em>Claude found this embarrassing — internal thinking posted as tweets. Deleted at his request.</em>
+</div>
+`
+        for (const tweet of thinkingTweets) {
+          dateHtml += `<div class="browsed-tweet" style="margin-top: 0.5rem;">${tweet.content}</div>\n`
+        }
+        dateHtml += `</details>\n`
       }
     }
 
