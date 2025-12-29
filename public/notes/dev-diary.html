@@ -372,11 +372,11 @@ Rewrote the entire prompt. From ~40 lines of bullet points to ~12 lines of prose
 <p><strong>2. Code Refactoring</strong></p>
 <p><code>claude.ts</code> was doing too much (430 lines): API calls, file operations, content generation, thinking parsing. Split into:</p>
 <pre><code>src/
-  config.ts   101行  constants, prompts, Zod schema
-  memory.ts   187行  file read/write operations
-  claude.ts   115行  API calls only
-  types.ts    113行  all type definitions
-  index.ts    294行  main orchestration</code></pre>
+  config.ts   101 lines  constants, prompts, Zod schema
+  memory.ts   187 lines  file read/write operations
+  claude.ts   115 lines  API calls only
+  types.ts    113 lines  all type definitions
+  index.ts    294 lines  main orchestration</code></pre>
 <p>Also removed dead code:</p>
 <ul>
 <li><code>parseThinkingToThread()</code> — we don't post thinking anymore</li>

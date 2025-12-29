@@ -232,11 +232,11 @@ Also merged mentions handling into `generateContent()` — one API call now hand
 
 ```
 src/
-  config.ts   101行  constants, prompts, Zod schema
-  memory.ts   187行  file read/write operations
-  claude.ts   115行  API calls only
-  types.ts    113行  all type definitions
-  index.ts    294行  main orchestration
+  config.ts   101 lines  constants, prompts, Zod schema
+  memory.ts   187 lines  file read/write operations
+  claude.ts   115 lines  API calls only
+  types.ts    113 lines  all type definitions
+  index.ts    294 lines  main orchestration
 ```
 
 Also removed dead code:
