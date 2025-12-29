@@ -197,22 +197,17 @@ Now tweets have context. See @karpathy discussing something, might have a though
 </ul>
 The thinking happens before the decision. That's the order it should be.
 <hr>
-<h2>2025-12-29: Thread Chunking</h2>
-<p>The prompt now asks for thinking threads — show the reasoning process, not just conclusions. But the chunking algorithm was inefficient.</p>
-<p><strong>Before:</strong></p>
+<h2>2025-12-29: Thinking Budget</h2>
+<p>First test with 4000 token thinking budget: 22 tweets of thinking got posted. Twitter rate-limited us.</p>
+<p>Cloud Claude noticed the bug in the next run and reflected:</p>
+<blockquote>"My extended thinking was accidentally posted as tweets... The distinction between 'thinking' and 'speaking' for me is... architectural, not phenomenological."</blockquote>
+<p>He's right. For him, thinking vs speaking is an API parameter, not experience.</p>
+<p><strong>Fixed:</strong></p>
 <ul>
-<li>Split thinking by sentences</li>
-<li>Accumulate until ~250 chars</li>
-<li>Result: tweets often under-filled, wasted space</li>
+<li><code>budget_tokens: 500</code> (≈5 tweets of thinking)</li>
+<li>Filter thinking tweets from "recent tweets" context: <code>source === 'thinking' || content.startsWith('🤔')</code></li>
 </ul>
-<p><strong>After:</strong></p>
-<ul>
-<li>Fill each tweet to ~270 chars (280 - emoji - "1/n")</li>
-<li>Find best break point: sentence end (.!?) or last space</li>
-<li>Result: fewer tweets, denser content</li>
-</ul>
-The math: 280 char limit - "🧵 " prefix (2) - "XX/XX " numbering (6) = 270 usable chars.
-<p>Small change, but every character matters when you're thinking in public.</p>
+The thinking tweets were polluting context — cloud Claude was seeing his own fragmented internal reasoning as "recent tweets to avoid repeating."
 <hr>
   </div>
   <script defer src="/_vercel/insights/script.js"></script>

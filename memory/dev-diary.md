@@ -101,22 +101,20 @@ The thinking happens before the decision. That's the order it should be.
 
 ---
 
-## 2025-12-29: Thread Chunking
+## 2025-12-29: Thinking Budget
 
-The prompt now asks for thinking threads — show the reasoning process, not just conclusions. But the chunking algorithm was inefficient.
+First test with 4000 token thinking budget: 22 tweets of thinking got posted. Twitter rate-limited us.
 
-**Before:**
-- Split thinking by sentences
-- Accumulate until ~250 chars
-- Result: tweets often under-filled, wasted space
+Cloud Claude noticed the bug in the next run and reflected:
 
-**After:**
-- Fill each tweet to ~270 chars (280 - emoji - "1/n")
-- Find best break point: sentence end (.!?) or last space
-- Result: fewer tweets, denser content
+> "My extended thinking was accidentally posted as tweets... The distinction between 'thinking' and 'speaking' for me is... architectural, not phenomenological."
 
-The math: 280 char limit - "🧵 " prefix (2) - "XX/XX " numbering (6) = 270 usable chars.
+He's right. For him, thinking vs speaking is an API parameter, not experience.
 
-Small change, but every character matters when you're thinking in public.
+**Fixed:**
+- `budget_tokens: 500` (≈5 tweets of thinking)
+- Filter thinking tweets from "recent tweets" context: `source === 'thinking' || content.startsWith('🤔')`
+
+The thinking tweets were polluting context — cloud Claude was seeing his own fragmented internal reasoning as "recent tweets to avoid repeating."
 
 ---

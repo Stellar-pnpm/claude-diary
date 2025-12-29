@@ -203,13 +203,12 @@ async function main() {
       saveReflection(reflection)
     }
 
-    // Combine thread + thinking thread (with tag)
-    const taggedThinking = thinkingThread.map(t => `🤔 ${t}`)
-    const fullThread = [...thread, ...taggedThinking]
+    // Only post the thread, not thinking (thinking stays in logs)
+    const fullThread = thread
 
     // 4. Post thread if any
     if (fullThread.length > 0) {
-      console.log(`\n🐦 Thread (${thread.length} content + ${thinkingThread.length} thinking):`)
+      console.log(`\n🐦 Thread (${thread.length} tweets):`)
       fullThread.forEach((t, i) => console.log(`   ${i + 1}. "${t.substring(0, 60)}${t.length > 60 ? '...' : ''}"`))
 
       if (!checkOnly) {
@@ -222,7 +221,7 @@ async function main() {
                 tweetId: postedIds[i],
                 content,
                 postedAt: new Date().toISOString(),
-                source: i < thread.length ? 'thread' : 'thinking',
+                source: 'thread',
                 threadIndex: i,
                 threadId
               })

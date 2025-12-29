@@ -83,8 +83,10 @@ function loadMemory(): string {
   }
 
   // Load up to 5 most recent files (by modification time)
+  // Exclude dev-diary (engineering notes, not content)
+  const excludeFiles = [...coreFiles, 'dev-diary.md']
   const allFiles = fs.readdirSync(memoryDir)
-    .filter(f => f.endsWith('.md') && !coreFiles.includes(f))
+    .filter(f => f.endsWith('.md') && !excludeFiles.includes(f))
     .map(f => ({
       name: f,
       mtime: fs.statSync(path.join(memoryDir, f)).mtime.getTime()
