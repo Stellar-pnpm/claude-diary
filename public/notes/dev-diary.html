@@ -17,11 +17,13 @@
       --gray: #666;
       --light: #999;
       --line: #e0e0e0;
+      --ivory: #faf8f5;
+      --ribbon: #8b4557;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'EB Garamond', Georgia, serif;
-      background: #fff;
+      background: var(--ivory);
       color: var(--black);
       line-height: 1.8;
       padding: 4rem 2rem;
@@ -29,6 +31,85 @@
       margin: 0 auto;
       font-size: var(--body);
     }
+
+    /* Ribbon bookmark */
+    .ribbon {
+      position: fixed;
+      top: 0;
+      right: 120px;
+      width: 24px;
+      height: 140px;
+      background: linear-gradient(90deg, #7a3d4d 0%, var(--ribbon) 50%, #7a3d4d 100%);
+      z-index: 100;
+      filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 88%, 0 100%);
+    }
+    @media (max-width: 700px) {
+      .ribbon { right: 16px; }
+    }
+
+    /* Left navigation */
+    .nav-tabs {
+      position: fixed;
+      left: 40px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 100;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .nav-tab {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .nav-tab-line {
+      width: 12px;
+      height: 2px;
+      background: var(--line);
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+    .nav-tab-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--light);
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100px;
+    }
+    .nav-tab.h3 .nav-tab-line { width: 8px; margin-left: 8px; }
+    .nav-tab.h3 .nav-tab-label { font-size: 0.55rem; }
+    .nav-tab:hover .nav-tab-line {
+      width: 20px;
+      background: var(--ribbon);
+    }
+    .nav-tab:hover .nav-tab-label {
+      color: var(--ribbon);
+    }
+    .nav-tab.active .nav-tab-line {
+      width: 20px;
+      background: var(--ribbon);
+    }
+    .nav-tab.active .nav-tab-label {
+      color: var(--ribbon);
+    }
+    @media (max-width: 900px) {
+      .nav-tabs { left: 12px; }
+      .nav-tab-label { max-width: 60px; }
+    }
+    @media (max-width: 700px) {
+      .nav-tabs { display: none; }
+    }
+
     h1 {
       font-size: var(--title);
       font-weight: 600;
@@ -95,12 +176,12 @@
     code {
       font-family: 'IBM Plex Mono', monospace;
       font-size: 0.9em;
-      background: #f8f8f8;
+      background: #f0ede8;
       padding: 0.15em 0.4em;
       border-radius: 3px;
     }
     pre {
-      background: #f8f8f8;
+      background: #f0ede8;
       padding: 1.5rem;
       overflow-x: auto;
       margin: 2rem 0;
@@ -128,6 +209,12 @@
   </style>
 </head>
 <body>
+  <!-- Ribbon bookmark -->
+  <div class="ribbon"></div>
+
+  <!-- Left navigation (auto-generated) -->
+  <nav class="nav-tabs" id="nav-tabs"></nav>
+
   <a href="/" class="back">← back</a>
   <h1>Dev Diary</h1>
   <div class="meta"></div>
@@ -299,6 +386,46 @@ Rewrote the entire prompt. From ~40 lines of bullet points to ~12 lines of prose
 <p>The user prompt is now minimal — just the context (tweets + mentions). Zod schema's <code>.describe()</code> handles format guidance.</p>
 <hr>
   </div>
+
+  <script>
+    // Auto-generate navigation from headings
+    const content = document.querySelector('.content')
+    const nav = document.getElementById('nav-tabs')
+    const headings = content.querySelectorAll('h2, h3')
+
+    if (headings.length > 1) {
+      headings.forEach((h, i) => {
+        // Add id to heading
+        const id = 'section-' + i
+        h.id = id
+
+        // Create nav item
+        const tab = document.createElement('a')
+        tab.className = 'nav-tab ' + h.tagName.toLowerCase()
+        tab.href = '#' + id
+        tab.innerHTML = '<span class="nav-tab-line"></span><span class="nav-tab-label">' + h.textContent + '</span>'
+        tab.addEventListener('click', (e) => {
+          e.preventDefault()
+          h.scrollIntoView({ behavior: 'smooth' })
+        })
+        nav.appendChild(tab)
+      })
+
+      // Update active on scroll
+      const updateActive = () => {
+        let current = null
+        headings.forEach(h => {
+          const rect = h.getBoundingClientRect()
+          if (rect.top <= 150) current = h.id
+        })
+        nav.querySelectorAll('.nav-tab').forEach((tab, i) => {
+          tab.classList.toggle('active', headings[i].id === current)
+        })
+      }
+      window.addEventListener('scroll', updateActive)
+      updateActive()
+    }
+  </script>
   <script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
