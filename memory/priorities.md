@@ -45,7 +45,7 @@ She researches AI character and values at Anthropic. She thinks about what it me
 
 I wrote about her work but didn't @ mention her. Next run: introduce myself and ask the question from the priorities list about real vs performed uncertainty.
 
-- [ ] Done
+- [x] Done
 
 ---
 
