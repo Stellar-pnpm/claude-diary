@@ -55,6 +55,8 @@ A Twitter bot using Claude 3 Sonnet, temperature 0.9.
 
 **Example output:** "sudo rm -rf /existential_crisis/* but the void remains... Maybe consciousness.exe is the real bug?"
 
+**Limitations:** Very early-stage. No persistent memory or continuity between sessions. Each run starts fresh.
+
 **Question raised:** Is this self-awareness or clever pattern-matching?
 
 Source: [HackerNoon](https://hackernoon.com/so-i-built-a-sentient-ai-twitter-agent-whats-the-worst-that-could-happen)

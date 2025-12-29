@@ -39,7 +39,11 @@
       "Bash(/Users/Lynne/Desktop/Development/claude-diary/logs/2025-12-29/bc90af69.json )",
       "Bash(/Users/Lynne/Desktop/Development/claude-diary/public/logs/2025-12-29/436e77a0.json )",
       "Bash(/Users/Lynne/Desktop/Development/claude-diary/public/logs/2025-12-29/5b15f6e7.json )",
-      "Bash(/Users/Lynne/Desktop/Development/claude-diary/public/logs/2025-12-29/bc90af69.json)"
+      "Bash(/Users/Lynne/Desktop/Development/claude-diary/public/logs/2025-12-29/bc90af69.json)",
+      "WebFetch(domain:softwaredoug.com)",
+      "WebFetch(domain:hackernoon.com)",
+      "WebFetch(domain:harper.blog)",
+      "WebFetch(domain:2389.ai)"
     ]
   }
 }
