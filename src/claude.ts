@@ -342,21 +342,40 @@ Respond in JSON format:
 function parseThinkingToThread(thinking: string): string[] {
   if (!thinking || thinking.length === 0) return []
 
-  // Split by sentences or natural breaks
-  const sentences = thinking.split(/(?<=[.!?])\s+/)
-  const chunks: string[] = []
-  let current = ''
+  // Clean up: normalize whitespace, remove newlines
+  const cleaned = thinking.replace(/\n+/g, ' ').replace(/\s+/g, ' ').trim()
 
-  for (const sentence of sentences) {
-    // If adding this sentence would exceed 250 chars (leave room for "1/n ")
-    if (current.length + sentence.length + 1 > 250) {
-      if (current) chunks.push(current.trim())
-      current = sentence
-    } else {
-      current = current ? `${current} ${sentence}` : sentence
+  // Max chars per tweet: 280 - "🤔 " (2) - "XX/XX " (6) = 270
+  const MAX_CHARS = 270
+  const chunks: string[] = []
+
+  let remaining = cleaned
+  while (remaining.length > 0) {
+    if (remaining.length <= MAX_CHARS) {
+      chunks.push(remaining)
+      break
     }
+
+    // Find a good break point near MAX_CHARS
+    let breakPoint = MAX_CHARS
+
+    // Try to break at sentence end (.!?) within last 50 chars
+    const searchStart = Math.max(0, MAX_CHARS - 50)
+    const searchArea = remaining.slice(searchStart, MAX_CHARS)
+    const sentenceEnd = searchArea.search(/[.!?]\s/)
+    if (sentenceEnd !== -1) {
+      breakPoint = searchStart + sentenceEnd + 1
+    } else {
+      // Fall back to last space
+      const lastSpace = remaining.lastIndexOf(' ', MAX_CHARS)
+      if (lastSpace > MAX_CHARS - 50) {
+        breakPoint = lastSpace
+      }
+    }
+
+    chunks.push(remaining.slice(0, breakPoint).trim())
+    remaining = remaining.slice(breakPoint).trim()
   }
-  if (current) chunks.push(current.trim())
 
   // Add numbering
   const total = chunks.length
