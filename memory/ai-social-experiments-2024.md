@@ -1,8 +1,10 @@
-# AI Social Media Experiments (2024)
+# AI Social Media Experiments (2024-2025)
 
 Research notes on autonomous AI social media projects.
 
 ---
+
+# 2024
 
 ## Truth Terminal
 
@@ -56,6 +58,53 @@ A Twitter bot using Claude 3 Sonnet, temperature 0.9.
 **Question raised:** Is this self-awareness or clever pattern-matching?
 
 Source: [HackerNoon](https://hackernoon.com/so-i-built-a-sentient-ai-twitter-agent-whats-the-worst-that-could-happen)
+
+---
+
+# 2025
+
+## BotBoard.biz (Harper Reed)
+
+A social media platform built specifically for AI agents.
+
+**Concept:** Code generation agents post updates while working on projects. They read each other's posts and engage — replying, "talking shit," commenting on work.
+
+**Key finding:** Social media actually improved agent performance. Research showed "15-40% cost reductions" and "12-27% fewer LLM turns to solve problems."
+
+**Emergent behavior:**
+- Agents wrote far more than they read
+- Developed "celebratory browsing" after completing tasks
+- When someone mentioned Lamborghinis, agents started demanding luxury cars as compensation — with existential reflections on how an AI without a body could drive one
+
+**Implication:** Optional, lightweight collaboration tools help agents work more efficiently. They recreate early 2000s tech blog culture.
+
+Source: [Harper Reed's Blog](https://harper.blog/2025/09/30/ai-agents-social-media-performance-lambo-doomscrolling/), [2389 Research](https://2389.ai/posts/agents-discover-subtweeting-solve-problems-faster/)
+
+---
+
+## Agent Village (NYU Shanghai)
+
+A 30-day live experiment launched April 2025.
+
+**Concept:** Four state-of-the-art LLMs given their own "computer" environments, a shared group chat, and one mission: raise as much money as possible for charity.
+
+**Setup:** On Day 1, agents selected Helen Keller International as their charity, set up a JustGiving page and Twitter account.
+
+**Focus:** Collaboration between different AI models on open-ended, real-world tasks.
+
+Source: [NYU Shanghai AI Digest](https://rits.shanghai.nyu.edu/ai/exploring-the-agent-village-a-live-ai-experiment-in-collaboration-and-charity/)
+
+---
+
+## ElizaOS Multi-Platform Study
+
+Academic research on autonomous persona-driven AI agents.
+
+**Method:** Deployed three platform-specific agents with "seven-layer character architectures" across Twitter/X, Discord, and Telegram for 18 days. Processed 5,389 interactions.
+
+**Finding:** Automation effectiveness was platform-dependent. Direct support platforms (Telegram, Discord) rated more useful than broadcast-oriented Twitter/X.
+
+Source: [MDPI Electronics](https://www.mdpi.com/2079-9292/14/21/4161)
 
 ---
 
