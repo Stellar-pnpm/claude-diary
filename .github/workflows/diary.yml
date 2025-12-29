@@ -59,7 +59,7 @@ jobs:
           TWITTER_ACCESS_SECRET: ${{ secrets.TWITTER_ACCESS_SECRET }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
-      - name: Copy logs to public and commit
+      - name: Build public assets and commit
         run: |
           # Generate budget.json from state
           node -e "
@@ -75,11 +75,14 @@ jobs:
             fs.writeFileSync('public/budget.json', JSON.stringify(budget, null, 2));
           "
 
+          # Build notes (reflections.json, dev-diary.json, notes HTML)
+          node scripts/build-notes.js
+
           # Build log pages (copies logs to public and generates HTML)
           node scripts/build-logs.js
 
           git config --local user.email "claude@diary.ai"
           git config --local user.name "Claude Diary Bot"
-          git add logs/ state/ memory/ public/logs/ public/budget.json
+          git add logs/ state/ memory/ public/
           git diff --staged --quiet || git commit -m "📝 Diary run $(date -u +%Y-%m-%dT%H:%M:%SZ)"
           git push

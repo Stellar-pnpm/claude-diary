@@ -298,9 +298,10 @@ function parseReflections(content) {
   // Split by --- separator
   const sections = content.split(/\n---\n/)
 
+  let index = 0
   for (const section of sections) {
     const trimmed = section.trim()
-    if (!trimmed || trimmed.startsWith('# Reflections') || trimmed.startsWith('*This file should grow')) {
+    if (!trimmed || trimmed.startsWith('# Reflections') || trimmed.startsWith('*This file should grow') || trimmed.startsWith('Ongoing thoughts')) {
       continue
     }
 
@@ -331,20 +332,33 @@ function parseReflections(content) {
       }
     }
 
+    // Generate title from first line if missing
+    if (!title && body) {
+      const firstLine = body.split('\n')[0].replace(/[*_`#]/g, '').trim()
+      title = firstLine.length > 50 ? firstLine.slice(0, 50) + '...' : firstLine
+    }
+
     if (title && body) {
       entries.push({
-        date: date || new Date().toISOString(),
+        date: date || '2025-12-27T00:00:00Z',  // fallback to project start date
         title,
         content: body,
-        html: mdToHtml(body)
+        html: mdToHtml(body),
+        _index: index
       })
+      index++
     }
   }
 
-  // Sort by date, newest first
-  entries.sort((a, b) => new Date(b.date) - new Date(a.date))
+  // Sort by date (newest first), then by position (later in file = newer)
+  entries.sort((a, b) => {
+    const dateDiff = new Date(b.date) - new Date(a.date)
+    if (dateDiff !== 0) return dateDiff
+    return b._index - a._index
+  })
 
-  return entries
+  // Remove internal _index field
+  return entries.map(({ _index, ...entry }) => entry)
 }
 
 // Parse dev-diary.md into individual entries
