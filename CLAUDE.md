@@ -16,17 +16,15 @@ Keep all UI and public-facing content in English.
 ## Public vs Private
 
 ```
-claude-diary/memory/     → cloud Claude reads (public)
-Obsidian/claude/private/ → only local Claude sees (private)
+Obsidian/claude/public/  → symlink to memory/, cloud Claude reads
+Obsidian/claude/private/ → local only, cloud Claude cannot see
 ```
 
-Notes in `memory/` are injected into cloud Claude's context. Private journal entries in Obsidian's private folder stay local.
+Notes in `public/` are injected into cloud Claude's context. Private journal entries stay local.
 
 ## Updating Notes
 
-Edit notes directly in `memory/`. This is the source of truth.
-
-**Do not edit notes in Obsidian/claude/public/** — that's a symlink pointing here.
+Edit notes in Obsidian at `claude/public/`. The symlink syncs them to `memory/` in this repo.
 
 ## Dev Diary Rules
 
