@@ -73,6 +73,15 @@ async function main() {
       state.lastMentionId = mentions[0].id
     }
 
+    // Log pending mentions
+    if (newMentions.length > 0) {
+      log.pendingMentions = newMentions.map(m => ({
+        id: m.id,
+        author: m.authorUsername,
+        text: m.text
+      }))
+    }
+
     // 2. Browse tweets
     console.log(`\n🔍 Browsing for context...`)
 
@@ -85,11 +94,22 @@ async function main() {
       const topic = allTopics[Math.floor(Math.random() * allTopics.length)]
       console.log(`   Searching: "${topic}"${customTopics.includes(topic) ? ' (custom)' : ''}`)
       tweets = await searchTweets(topic, 10)
+      log.browseType = 'topic'
+      log.browseTarget = topic
     } else {
       const account = INTERESTING_ACCOUNTS[Math.floor(Math.random() * INTERESTING_ACCOUNTS.length)]
       console.log(`   Checking @${account}...`)
       tweets = await getUserTweets(account, 10)
+      log.browseType = 'account'
+      log.browseTarget = account
     }
+
+    // Log browsed tweets
+    log.browsedTweets = tweets.map(t => ({
+      id: t.id,
+      author: t.authorUsername,
+      text: t.text
+    }))
 
     console.log(`   Found ${tweets.length} tweets`)
     if (newMentions.length > 0) {
@@ -103,9 +123,12 @@ async function main() {
     )
 
     // Save reflection if present
-    if (reflection && !checkOnly) {
-      saveReflection(reflection)
-      console.log('   💭 Recorded reflection')
+    if (reflection) {
+      log.reflection = reflection
+      if (!checkOnly) {
+        saveReflection(reflection)
+        console.log('   💭 Recorded reflection')
+      }
     }
 
     // Update priorities

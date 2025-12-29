@@ -147,6 +147,68 @@ const darkStyles = `
     color: var(--light);
     font-style: italic;
   }
+
+  .section-header {
+    color: var(--gray);
+    font-size: var(--note);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 1.5rem 0 0.5rem 0;
+    padding-bottom: 0.25rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .browse-context {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: var(--note);
+    color: var(--green);
+    margin-bottom: 0.5rem;
+  }
+
+  .browsed-tweet {
+    font-size: var(--note);
+    color: var(--gray);
+    padding: 0.5rem;
+    border-left: 2px solid var(--line);
+    margin: 0.25rem 0;
+  }
+  .browsed-tweet strong {
+    color: var(--ivory);
+  }
+
+  .thinking {
+    font-size: var(--note);
+    color: var(--gray);
+    padding: 1rem;
+    background: var(--dark-bg);
+    border-radius: 4px;
+    margin: 0.5rem 0;
+    white-space: pre-wrap;
+    font-family: 'JetBrains Mono', monospace;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .reflection {
+    color: var(--orange);
+    padding: 1rem;
+    background: var(--dark-bg);
+    border-radius: 4px;
+    margin: 0.5rem 0;
+    border-left: 2px solid var(--orange);
+  }
+
+  .mention {
+    padding: 0.5rem;
+    background: var(--dark-bg);
+    border-radius: 4px;
+    margin: 0.25rem 0;
+    font-size: var(--note);
+  }
+  .mention-author {
+    color: var(--purple);
+    font-weight: 600;
+  }
 </style>
 `
 
@@ -225,32 +287,84 @@ for (const dateFolder of dateFolders) {
 <div class="log-content">
 `
 
-    // Show tweets
+    // Browse context
+    if (log.browseType && log.browseTarget) {
+      const icon = log.browseType === 'topic' ? '🔍' : '👤'
+      const label = log.browseType === 'topic' ? 'Topic' : 'Account'
+      dateHtml += `<div class="browse-context">${icon} ${label}: ${log.browseType === 'account' ? '@' : ''}${log.browseTarget}</div>\n`
+    }
+
+    // Browsed tweets
+    if (log.browsedTweets?.length > 0) {
+      dateHtml += `<div class="section-header">Context (${log.browsedTweets.length} tweets)</div>\n`
+      for (const tweet of log.browsedTweets.slice(0, 5)) {
+        dateHtml += `<div class="browsed-tweet"><strong>@${tweet.author}</strong>: ${tweet.text.substring(0, 150)}${tweet.text.length > 150 ? '...' : ''}</div>\n`
+      }
+      if (log.browsedTweets.length > 5) {
+        dateHtml += `<div class="browsed-tweet" style="color: var(--light);">... and ${log.browsedTweets.length - 5} more</div>\n`
+      }
+    }
+
+    // Pending mentions
+    if (log.pendingMentions?.length > 0) {
+      dateHtml += `<div class="section-header">Mentions (${log.pendingMentions.length})</div>\n`
+      for (const mention of log.pendingMentions) {
+        dateHtml += `<div class="mention"><span class="mention-author">@${mention.author}</span>: ${mention.text.substring(0, 150)}${mention.text.length > 150 ? '...' : ''}</div>\n`
+      }
+    }
+
+    // Thinking
+    const thinking = log.claudeApiCalls?.[0]?.thinking
+    if (thinking) {
+      dateHtml += `<div class="section-header">Thinking</div>\n`
+      dateHtml += `<div class="thinking">${thinking}</div>\n`
+    }
+
+    // Tweets posted
     if (log.tweetsPosted?.length > 0) {
+      dateHtml += `<div class="section-header">Posted</div>\n`
       for (const tweet of log.tweetsPosted) {
         dateHtml += `<div class="tweet">${tweet.content}</div>\n`
       }
     }
 
-    // Show interactions
+    // Interactions
     if (log.interactions?.length > 0) {
+      dateHtml += `<div class="section-header">Interactions</div>\n`
       for (const interaction of log.interactions) {
         const icon = interaction.type === 'like' ? '❤️' : interaction.type === 'retweet' ? '🔁' : '💬'
         dateHtml += `<div class="interaction">
 ${icon} <strong>${interaction.type.toUpperCase()}</strong> @${interaction.authorUsername}
 `
         if (interaction.originalTweet) {
-          dateHtml += `<div class="original-tweet">Original: "${interaction.originalTweet.substring(0, 200)}${interaction.originalTweet.length > 200 ? '...' : ''}"</div>\n`
+          dateHtml += `<div class="original-tweet">"${interaction.originalTweet.substring(0, 200)}${interaction.originalTweet.length > 200 ? '...' : ''}"</div>\n`
+        }
+        if (interaction.reason) {
+          dateHtml += `<div style="color: var(--gray); font-size: var(--note);">Reason: ${interaction.reason}</div>\n`
         }
         if (interaction.replyContent) {
-          dateHtml += `<div class="reply-content">Reply: "${interaction.replyContent}"</div>\n`
+          dateHtml += `<div class="reply-content">→ "${interaction.replyContent}"</div>\n`
         }
         dateHtml += `</div>\n`
       }
     }
 
+    // Replies sent (to mentions)
+    if (log.repliesSent?.length > 0) {
+      dateHtml += `<div class="section-header">Replies to Mentions</div>\n`
+      for (const reply of log.repliesSent) {
+        dateHtml += `<div class="tweet">${reply.content}</div>\n`
+      }
+    }
+
+    // Reflection
+    if (log.reflection) {
+      dateHtml += `<div class="section-header">Reflection</div>\n`
+      dateHtml += `<div class="reflection">${log.reflection}</div>\n`
+    }
+
     // Show if nothing happened
-    if (!log.tweetsPosted?.length && !log.interactions?.length && !log.repliesSent?.length) {
+    if (!log.tweetsPosted?.length && !log.interactions?.length && !log.repliesSent?.length && !thinking) {
       dateHtml += `<div class="no-activity">No activity</div>\n`
     }
 

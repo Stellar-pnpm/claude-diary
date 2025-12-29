@@ -19,22 +19,31 @@ export interface RunLog {
   completedAt: string
   trigger: 'scheduled' | 'manual'
   mode: 'tweet' | 'interact' | 'both'
+  // Browse context
+  browseType?: 'topic' | 'account'
+  browseTarget?: string  // topic keyword or @username
+  browsedTweets?: Array<{ id: string; author: string; text: string }>
+  // Mentions
   mentionsFound: number
   mentionsProcessed: number
+  pendingMentions?: Array<{ id: string; author: string; text: string }>
+  // Actions taken
   tweetsPosted: TweetLog[]
   repliesSent: ReplyLog[]
   interactions: InteractionLog[]
+  // Claude's reasoning
+  reflection?: string
   errors: string[]
-  claudeApiCalls: ClaudeCall[]  // thinking is recorded in each call
+  claudeApiCalls: ClaudeCall[]
 }
 
 export interface TweetLog {
   tweetId: string
   content: string
   postedAt: string
-  source: 'thought' | 'note-summary' | 'reflection' | 'free' | 'thread' | 'thinking'
-  threadIndex?: number  // Position in thread (0 = first tweet)
-  threadId?: string     // ID of first tweet in thread
+  source: 'thread'
+  threadIndex?: number
+  threadId?: string
 }
 
 // Tweet from search results
