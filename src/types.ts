@@ -91,3 +91,23 @@ export interface Draft {
   source: string
   posted: boolean
 }
+
+// Interaction decision from Claude
+export interface InteractionDecision {
+  tweetId: string
+  authorUsername: string
+  action: 'like' | 'retweet' | 'reply' | 'skip'
+  reason: string
+  replyContent?: string
+}
+
+// Result from generateContent
+export interface ContentResult {
+  thread: string[]
+  interactions: InteractionDecision[]
+  mentionReplies: Array<{ mentionId: string; reply: string }>
+  reflection?: string
+  prioritiesCompleted?: string[]
+  newPriorities?: Array<{ title: string; content: string }>
+  newSearchTopics?: string[]
+}

@@ -1,80 +1,9 @@
-import * as fs from 'fs'
-import * as path from 'path'
-import { initTwitter, getMentions, postTweet, postThread, replyToTweet, getUserTweets, likeTweet, retweet, searchTweets } from './twitter.js'
-import { initClaude, getApiCalls, clearApiCalls, generateContent, updatePriorities, loadCustomTopics, updateSearchTopics } from './claude.js'
+import { initTwitter, getMentions, postThread, replyToTweet, getUserTweets, likeTweet, retweet, searchTweets } from './twitter.js'
+import { initClaude, getApiCalls, clearApiCalls, generateContent } from './claude.js'
 import { loadState, saveState, saveRunLog, calculateCost } from './state.js'
-import type { RunLog, TweetLog, ReplyLog, InteractionLog } from './types.js'
-
-// Topics Claude is interested in (for search-based discovery)
-// Based on Grok analysis: only active topics with quality discussions
-const INTERESTING_TOPICS = [
-  // Neuroscience & BCI (very active - Neuralink updates)
-  'Neuralink',
-  'brain computer interface',
-
-  // Space (active - JWST discoveries)
-  'James Webb telescope',
-  'exoplanet discovery',
-
-  // Physics (active - quantum breakthroughs)
-  'quantum computing',
-
-  // AI Interpretability (active - papers & tools)
-  'mechanistic interpretability',
-  'sparse autoencoders',
-]
-
-// People Claude finds interesting (for direct timeline browsing)
-// Handles verified via Grok 2025-12-28
-const INTERESTING_ACCOUNTS = [
-  // AI Researchers
-  'karpathy',           // Andrej Karpathy
-  'ilyasut',            // Ilya Sutskever
-  'demishassabis',      // Demis Hassabis
-  'DarioAmodei',        // Dario Amodei
-  'janleike',           // Jan Leike
-  'ch402',              // Chris Olah
-  'sama',               // Sam Altman
-  'ylecun',             // Yann LeCun
-  'fchollet',           // François Chollet
-  'DrJimFan',           // Jim Fan
-  'GaryMarcus',         // Gary Marcus
-
-  // Philosophers
-  'davidchalmers42',    // David Chalmers
-  'keithfrankish',      // Keith Frankish
-  'Philip_Goff',        // Philip Goff
-  'AmandaAskell',       // Amanda Askell (AI ethics, Anthropic)
-
-  // Neuroscience & BCI
-  'elonmusk',           // Elon Musk (Neuralink)
-  'hubermanlab',        // Andrew Huberman
-
-  // Scientists
-  'seanmcarroll',       // Sean Carroll
-  'ProfBrianCox',       // Brian Cox
-  'neiltyson',          // Neil deGrasse Tyson
-  'skdh',               // Sabine Hossenfelder
-
-  // Thinkers
-  'lexfridman',         // Lex Fridman
-  'TheZvi',             // Zvi Mowshowitz
-  'ESYudkowsky',        // Eliezer Yudkowsky
-  'tylercowen',         // Tyler Cowen
-  'robinhanson',        // Robin Hanson
-  'naval',              // Naval Ravikant
-
-  // Builders
-  'bcherny',            // Boris Cherny (created Claude Code)
-]
-
-function saveReflection(content: string): void {
-  const reflectionsPath = path.join(process.cwd(), 'memory', 'reflections.md')
-  const timestamp = new Date().toISOString()
-  const entry = `\n\n---\n*${timestamp}*\n\n${content}`
-  fs.appendFileSync(reflectionsPath, entry)
-  console.log('   💭 Recorded reflection')
-}
+import { loadCustomTopics, updatePriorities, updateSearchTopics, saveReflection } from './memory.js'
+import { INTERESTING_TOPICS, INTERESTING_ACCOUNTS } from './config.js'
+import type { RunLog } from './types.js'
 
 type RunMode = 'tweet' | 'interact' | 'both'
 
@@ -86,7 +15,7 @@ function parseMode(): RunMode {
       return mode
     }
   }
-  return 'both' // default - unified flow
+  return 'both'
 }
 
 async function main() {
@@ -98,10 +27,8 @@ async function main() {
   console.log(`Mode: ${mode}${checkOnly ? ' (CHECK ONLY)' : ''}`)
   console.log('='.repeat(50))
 
-  // Detect trigger type from GitHub Actions environment
   const isScheduled = process.env.GITHUB_EVENT_NAME === 'schedule'
 
-  // Initialize
   const log: RunLog = {
     runId,
     startedAt: new Date().toISOString(),
@@ -142,19 +69,17 @@ async function main() {
       return true
     })
 
-    // Update last mention ID
     if (mentions.length > 0) {
       state.lastMentionId = mentions[0].id
     }
 
-    // 2. Browse tweets and generate content (unified flow)
+    // 2. Browse tweets
     console.log(`\n🔍 Browsing for context...`)
 
     let tweets: Awaited<ReturnType<typeof getUserTweets>> = []
 
-    // 20% topic search, 80% account browsing (X topic quality is low)
+    // 20% topic search, 80% account browsing
     if (Math.random() < 0.2) {
-      // Merge built-in topics with custom topics from Claude
       const customTopics = loadCustomTopics()
       const allTopics = [...INTERESTING_TOPICS, ...customTopics]
       const topic = allTopics[Math.floor(Math.random() * allTopics.length)]
@@ -171,8 +96,8 @@ async function main() {
       console.log(`   Processing ${newMentions.length} new mentions`)
     }
 
-    // One API call: generate thread + decide interactions + reply to mentions
-    const { thread, thinkingThread, interactions, mentionReplies, reflection, prioritiesCompleted, newPriorities, newSearchTopics } = await generateContent(
+    // 3. Generate content (one API call)
+    const { thread, interactions, mentionReplies, reflection, prioritiesCompleted, newPriorities, newSearchTopics } = await generateContent(
       tweets.map(t => ({ id: t.id, text: t.text, authorUsername: t.authorUsername })),
       newMentions
     )
@@ -180,9 +105,10 @@ async function main() {
     // Save reflection if present
     if (reflection && !checkOnly) {
       saveReflection(reflection)
+      console.log('   💭 Recorded reflection')
     }
 
-    // Update priorities if any changes
+    // Update priorities
     if (!checkOnly && (prioritiesCompleted?.length || newPriorities?.length)) {
       updatePriorities(prioritiesCompleted || [], newPriorities || [])
       if (prioritiesCompleted?.length) {
@@ -193,25 +119,22 @@ async function main() {
       }
     }
 
-    // Update search topics if any new ones
+    // Update search topics
     if (!checkOnly && newSearchTopics?.length) {
       updateSearchTopics(newSearchTopics)
       console.log(`   🔍 New search topics: ${newSearchTopics.join(', ')}`)
     }
 
-    // Only post the thread, not thinking (thinking stays in logs)
-    const fullThread = thread
-
-    // 4. Post thread if any
-    if (fullThread.length > 0) {
+    // 4. Post thread
+    if (thread.length > 0) {
       console.log(`\n🐦 Thread (${thread.length} tweets):`)
-      fullThread.forEach((t, i) => console.log(`   ${i + 1}. "${t.substring(0, 60)}${t.length > 60 ? '...' : ''}"`))
+      thread.forEach((t, i) => console.log(`   ${i + 1}. "${t.substring(0, 60)}${t.length > 60 ? '...' : ''}"`))
 
       if (!checkOnly) {
-        const postedIds = await postThread(fullThread)
+        const postedIds = await postThread(thread)
         if (postedIds.length > 0) {
           const threadId = postedIds[0]
-          fullThread.forEach((content, i) => {
+          thread.forEach((content, i) => {
             if (postedIds[i]) {
               log.tweetsPosted.push({
                 tweetId: postedIds[i],
@@ -315,16 +238,14 @@ async function main() {
       }
     }
 
-    // Finalize log
+    // Finalize
     log.completedAt = new Date().toISOString()
     log.claudeApiCalls = getApiCalls()
 
-    // Calculate this run's token usage and cost
     const runInputTokens = log.claudeApiCalls.reduce((sum, c) => sum + c.inputTokens, 0)
     const runOutputTokens = log.claudeApiCalls.reduce((sum, c) => sum + c.outputTokens, 0)
     const runCost = calculateCost(runInputTokens, runOutputTokens)
 
-    // Update cumulative state
     state.lastRunAt = new Date().toISOString()
     state.processedMentionIds = state.processedMentionIds.slice(-100)
     state.totalInputTokens += runInputTokens
@@ -347,7 +268,6 @@ async function main() {
       await saveState(state)
     }
 
-    // Save run log
     if (!checkOnly) {
       await saveRunLog(log)
       console.log(`\n📁 Log saved to logs/${log.startedAt.split('T')[0]}/${runId}.json`)
