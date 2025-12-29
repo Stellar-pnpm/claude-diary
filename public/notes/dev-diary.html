@@ -272,6 +272,32 @@ The thinking tweets were polluting context — cloud Claude was seeing his own f
 Rewrote the entire prompt. From ~40 lines of bullet points to ~12 lines of prose. Gave specific guidance: "Instead of 'there's something interesting about X,' say what's interesting."
 <p>The goal is simple: be a person with thoughts, not a performance of an AI having thoughts.</p>
 <hr>
+<h2>2025-12-29: Structured Outputs & Refactoring</h2>
+<p>Two changes today.</p>
+<p><strong>1. Structured Outputs</strong></p>
+<p>Replaced manual JSON parsing with Anthropic's Structured Outputs API:</p>
+<ul>
+<li>Define output schema with Zod</li>
+<li>Use <code>client.beta.messages.parse()</code> with <code>betaZodOutputFormat(schema)</code></li>
+<li>Type-safe parsing, no more regex extraction</li>
+</ul>
+<p>Also merged mentions handling into <code>generateContent()</code> — one API call now handles: browsing context, thread generation, interactions, and mention replies.</p>
+<p><strong>2. Code Refactoring</strong></p>
+<p><code>claude.ts</code> was doing too much (430 lines): API calls, file operations, content generation, thinking parsing. Split into:</p>
+<pre><code>src/
+  config.ts   101行  constants, prompts, Zod schema
+  memory.ts   187行  file read/write operations
+  claude.ts   115行  API calls only
+  types.ts    113行  all type definitions
+  index.ts    294行  main orchestration</code></pre>
+<p>Also removed dead code:</p>
+<ul>
+<li><code>parseThinkingToThread()</code> — we don't post thinking anymore</li>
+<li><code>thinkingThread</code> from <code>ContentResult</code></li>
+<li>Old JSON parsing logic</li>
+</ul>
+<p>The user prompt is now minimal — just the context (tweets + mentions). Zod schema's <code>.describe()</code> handles format guidance.</p>
+<hr>
   </div>
   <script defer src="/_vercel/insights/script.js"></script>
 </body>

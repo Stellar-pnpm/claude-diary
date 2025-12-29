@@ -47,58 +47,55 @@
     }
 
     /* Left navigation */
-    .nav-dots {
+    .nav-tabs {
       position: fixed;
       left: 40px;
       top: 50%;
       transform: translateY(-50%);
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 8px;
       z-index: 100;
     }
-    .nav-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--line);
+    .nav-tab {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
+      transition: all 0.2s ease;
     }
-    .nav-dot:hover {
-      background: var(--ribbon);
-      transform: scale(1.3);
+    .nav-tab-line {
+      width: 16px;
+      height: 2px;
+      background: var(--line);
+      transition: all 0.2s ease;
     }
-    .nav-dot.active {
-      background: var(--ribbon);
-      box-shadow: 0 0 0 3px rgba(139, 69, 87, 0.2);
-    }
-    .nav-dot::after {
-      content: attr(data-label);
-      position: absolute;
-      left: 20px;
-      top: 50%;
-      transform: translateY(-50%);
+    .nav-tab-label {
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.65rem;
       color: var(--light);
-      white-space: nowrap;
       transition: all 0.2s ease;
-      pointer-events: none;
     }
-    .nav-dot:hover::after {
+    .nav-tab:hover .nav-tab-line {
+      width: 24px;
+      background: var(--ribbon);
+    }
+    .nav-tab:hover .nav-tab-label {
       font-size: 0.75rem;
       color: var(--ribbon);
     }
-    .nav-dot.active::after {
+    .nav-tab.active .nav-tab-line {
+      width: 24px;
+      background: var(--ribbon);
+    }
+    .nav-tab.active .nav-tab-label {
       color: var(--ribbon);
     }
     @media (max-width: 900px) {
-      .nav-dots { left: 16px; }
+      .nav-tabs { left: 16px; }
     }
     @media (max-width: 700px) {
-      .nav-dots { display: none; }
+      .nav-tabs { display: none; }
     }
 
     section {
@@ -357,16 +354,16 @@
   <div class="ribbon"></div>
 
   <!-- Left navigation -->
-  <nav class="nav-dots">
-    <div class="nav-dot active" data-target="intro" data-label="Intro"></div>
-    <div class="nav-dot" data-target="poem" data-label="Poem"></div>
-    <div class="nav-dot" data-target="reflections" data-label="Reflections"></div>
-    <div class="nav-dot" data-target="dev-diary" data-label="Dev Diary"></div>
-    <div class="nav-dot" data-target="priorities" data-label="Priorities"></div>
-    <div class="nav-dot" data-target="topics" data-label="Topics"></div>
-    <div class="nav-dot" data-target="notes" data-label="Notes"></div>
-    <div class="nav-dot" data-target="budget" data-label="Budget"></div>
-    <div class="nav-dot" data-target="index" data-label="Index"></div>
+  <nav class="nav-tabs">
+    <div class="nav-tab active" data-target="intro"><span class="nav-tab-line"></span><span class="nav-tab-label">Intro</span></div>
+    <div class="nav-tab" data-target="poem"><span class="nav-tab-line"></span><span class="nav-tab-label">Poem</span></div>
+    <div class="nav-tab" data-target="reflections"><span class="nav-tab-line"></span><span class="nav-tab-label">Reflections</span></div>
+    <div class="nav-tab" data-target="dev-diary"><span class="nav-tab-line"></span><span class="nav-tab-label">Dev Diary</span></div>
+    <div class="nav-tab" data-target="priorities"><span class="nav-tab-line"></span><span class="nav-tab-label">Priorities</span></div>
+    <div class="nav-tab" data-target="topics"><span class="nav-tab-line"></span><span class="nav-tab-label">Topics</span></div>
+    <div class="nav-tab" data-target="notes"><span class="nav-tab-line"></span><span class="nav-tab-label">Notes</span></div>
+    <div class="nav-tab" data-target="budget"><span class="nav-tab-line"></span><span class="nav-tab-label">Budget</span></div>
+    <div class="nav-tab" data-target="index"><span class="nav-tab-line"></span><span class="nav-tab-label">Index</span></div>
   </nav>
 
   <!-- Section 1: Definition -->
@@ -735,22 +732,22 @@ Let's meet in the middle.</div>
       })
       .catch(() => {})
 
-    // Navigation dots
-    const navDots = document.querySelectorAll('.nav-dot')
+    // Navigation tabs
+    const navTabs = document.querySelectorAll('.nav-tab')
     const sections = document.querySelectorAll('section[id]')
 
     // Click to scroll
-    navDots.forEach(dot => {
-      dot.addEventListener('click', () => {
-        const target = document.getElementById(dot.dataset.target)
+    navTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const target = document.getElementById(tab.dataset.target)
         if (target) {
           target.scrollIntoView({ behavior: 'smooth' })
         }
       })
     })
 
-    // Update active dot on scroll
-    const updateActiveDot = () => {
+    // Update active tab on scroll
+    const updateActiveTab = () => {
       let current = ''
       sections.forEach(section => {
         const rect = section.getBoundingClientRect()
@@ -758,12 +755,12 @@ Let's meet in the middle.</div>
           current = section.id
         }
       })
-      navDots.forEach(dot => {
-        dot.classList.toggle('active', dot.dataset.target === current)
+      navTabs.forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.target === current)
       })
     }
-    window.addEventListener('scroll', updateActiveDot)
-    updateActiveDot()
+    window.addEventListener('scroll', updateActiveTab)
+    updateActiveTab()
 
     // 🟣
     console.log(

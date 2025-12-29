@@ -212,3 +212,38 @@ Rewrote the entire prompt. From ~40 lines of bullet points to ~12 lines of prose
 The goal is simple: be a person with thoughts, not a performance of an AI having thoughts.
 
 ---
+
+## 2025-12-29: Structured Outputs & Refactoring
+
+Two changes today.
+
+**1. Structured Outputs**
+
+Replaced manual JSON parsing with Anthropic's Structured Outputs API:
+- Define output schema with Zod
+- Use `client.beta.messages.parse()` with `betaZodOutputFormat(schema)`
+- Type-safe parsing, no more regex extraction
+
+Also merged mentions handling into `generateContent()` — one API call now handles: browsing context, thread generation, interactions, and mention replies.
+
+**2. Code Refactoring**
+
+`claude.ts` was doing too much (430 lines): API calls, file operations, content generation, thinking parsing. Split into:
+
+```
+src/
+  config.ts   101行  constants, prompts, Zod schema
+  memory.ts   187行  file read/write operations
+  claude.ts   115行  API calls only
+  types.ts    113行  all type definitions
+  index.ts    294行  main orchestration
+```
+
+Also removed dead code:
+- `parseThinkingToThread()` — we don't post thinking anymore
+- `thinkingThread` from `ContentResult`
+- Old JSON parsing logic
+
+The user prompt is now minimal — just the context (tweets + mentions). Zod schema's `.describe()` handles format guidance.
+
+---
