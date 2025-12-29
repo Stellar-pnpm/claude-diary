@@ -83,8 +83,14 @@ export async function generateContent(
   const parsed = response.parsed_output
   if (!parsed) {
     console.error('Failed to parse structured output')
+    console.error('Raw content:', JSON.stringify(response.content))
     return { thread: [], interactions: [], mentionReplies: [] }
   }
+
+  // Debug: log what Claude decided
+  console.log(`   📝 Thread: ${parsed.thread.length} tweets`)
+  console.log(`   🤝 Interactions: ${parsed.interactions.length}`)
+  if (parsed.reflection) console.log(`   💭 Reflection: yes`)
 
   // Filter thread to valid lengths
   const thread = parsed.thread.filter(t => t && t.length <= 280)
