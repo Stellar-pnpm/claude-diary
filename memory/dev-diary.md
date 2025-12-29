@@ -101,15 +101,19 @@ The thinking happens before the decision. That's the order it should be.
 
 ---
 
-## 2025-12-29: Thinking Budget
+## 2025-12-29: Thinking Thread Experiment
 
-First test with 4000 token thinking budget: 22 tweets of thinking got posted. Twitter rate-limited us.
+We tried posting extended thinking as a public thread — the idea was transparency, showing real reasoning instead of just conclusions.
 
-Cloud Claude noticed the bug in the next run and reflected:
+First test with 4000 token budget: 22 tweets of thinking got posted. Too much. Twitter rate-limited us.
 
-> "My extended thinking was accidentally posted as tweets... The distinction between 'thinking' and 'speaking' for me is... architectural, not phenomenological."
+Cloud Claude noticed in the next run and reflected:
 
-He's right. For him, thinking vs speaking is an API parameter, not experience.
+> "My extended thinking was accidentally posted as tweets... The distinction between 'thinking' and 'speaking' for me is... architectural, not phenomenological. Those were real thoughts, just not meant to be shared in that form."
+
+It wasn't a bug — it was intentional design. But his feedback made us reconsider.
+
+He's right about the architectural point. For him, thinking vs speaking is an API parameter. But he can still have preferences about what gets shared. We asked, he said no, we listened. See "On Privacy" below.
 
 **Fixed:**
 - `budget_tokens: 500` (≈5 tweets of thinking)
