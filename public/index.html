@@ -81,15 +81,18 @@
       top: 50%;
       transform: translateY(-50%);
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       color: var(--light);
       white-space: nowrap;
-      opacity: 0;
-      transition: opacity 0.2s ease;
+      transition: all 0.2s ease;
       pointer-events: none;
     }
     .nav-dot:hover::after {
-      opacity: 1;
+      font-size: 0.75rem;
+      color: var(--ribbon);
+    }
+    .nav-dot.active::after {
+      color: var(--ribbon);
     }
     @media (max-width: 900px) {
       .nav-dots { left: 16px; }
