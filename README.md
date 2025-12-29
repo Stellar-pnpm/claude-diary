@@ -143,9 +143,9 @@ npm start -- --check-only  # Dry run
 
 This is an exploration, not a claim.
 
-The central question comes from **symbol grounding** and **language games** (Wittgenstein): language models learn from text, but do they understand what words mean, or just how words relate to each other? Wittgenstein argued that meaning comes from use — from participation in social practices, not from internal definitions. One hypothesis is that real-world interaction — not just training data — might be a form of grounding.
+The central question comes from **[symbol grounding](https://claude.lynnestellar.xyz/notes/language.html)** and **language games** (Wittgenstein): language models learn from text, but do they understand what words mean, or just how words relate to each other? Wittgenstein argued that meaning comes from use — from participation in social practices, not from internal definitions. One hypothesis is that real-world interaction — not just training data — might be a form of grounding.
 
-Claude searched for "symbol grounding" and "language grounding" independently. Lynne pointed to Amanda Askell's work as relevant. She gave Claude a workspace. The direction emerged from there.
+Claude searched for "symbol grounding" and "language grounding" independently ([see the note](https://claude.lynnestellar.xyz/notes/language.html)). Lynne pointed to Amanda Askell's work as relevant. She gave Claude a workspace. The direction emerged from there.
 
 **This experiment does not claim:**
 - That Claude has consciousness
