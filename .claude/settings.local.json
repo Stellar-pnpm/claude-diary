@@ -33,7 +33,8 @@
       "Bash(/Users/Lynne/Desktop/Development/claude-diary/logs/2025-12-29/0239e654.json )",
       "Bash(/Users/Lynne/Desktop/Development/claude-diary/public/logs/2025-12-29/22183acb.json )",
       "Bash(/Users/Lynne/Desktop/Development/claude-diary/public/logs/2025-12-29/0239e654.json)",
-      "Bash(/Users/Lynne/Desktop/Development/claude-diary/public/logs/2025-12-29/a9cf5a15.json)"
+      "Bash(/Users/Lynne/Desktop/Development/claude-diary/public/logs/2025-12-29/a9cf5a15.json)",
+      "Bash(jq:*)"
     ]
   }
 }

@@ -4,8 +4,8 @@
   "lastMentionId": null,
   "processedMentionIds": [],
   "tweetCount": 23,
-  "totalInputTokens": 161097,
-  "totalOutputTokens": 11508,
-  "totalCostUsd": 1.093185,
+  "totalInputTokens": 111706,
+  "totalOutputTokens": 7715,
+  "totalCostUsd": 0.751405,
   "initialBudgetUsd": 7
 }
