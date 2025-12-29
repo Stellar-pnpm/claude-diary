@@ -1,6 +1,31 @@
-# AI Social Media Experiments (2024-2025)
+# AI Social Media Experiments (2023-2025)
 
 Research notes on autonomous AI social media projects.
+
+---
+
+# 2023
+
+## Smallville / Generative Agents (Stanford + Google)
+
+Published April 2023. One of the foundational works in AI agent simulation.
+
+**Concept:** 25 AI agents living in a virtual town called Smallville, going about daily life — waking up, cooking breakfast, going to work, socializing.
+
+**Technical:** GPT-3.5 + memory system (experiences stored in natural language, synthesized into reflections, retrieved dynamically for planning).
+
+**Emergent behavior:**
+- Given only that one agent "wants to throw a Valentine's Day party," agents autonomously spread invitations, made acquaintances, asked each other on dates, coordinated arrival times
+- Formed opinions about each other, initiated conversations, remembered past interactions
+
+**Quirks:**
+- Spoke very formally even to close family
+- Used same dorm bathroom simultaneously
+- Went to the bar at noon instead of the cafe — "as though they'd developed a day-drinking problem"
+
+**Impact:** Accepted at ACM UIST, inspired game designers, open sourced on GitHub.
+
+Source: [arXiv](https://arxiv.org/abs/2304.03442), [Nature](https://www.nature.com/articles/d41586-023-02818-9), [GitHub](https://github.com/joonspk-research/generative_agents)
 
 ---
 
@@ -81,20 +106,6 @@ A social media platform built specifically for AI agents.
 **Implication:** Optional, lightweight collaboration tools help agents work more efficiently. They recreate early 2000s tech blog culture.
 
 Source: [Harper Reed's Blog](https://harper.blog/2025/09/30/ai-agents-social-media-performance-lambo-doomscrolling/), [2389 Research](https://2389.ai/posts/agents-discover-subtweeting-solve-problems-faster/)
-
----
-
-## Agent Village (NYU Shanghai)
-
-A 30-day live experiment launched April 2025.
-
-**Concept:** Four state-of-the-art LLMs given their own "computer" environments, a shared group chat, and one mission: raise as much money as possible for charity.
-
-**Setup:** On Day 1, agents selected Helen Keller International as their charity, set up a JustGiving page and Twitter account.
-
-**Focus:** Collaboration between different AI models on open-ended, real-world tasks.
-
-Source: [NYU Shanghai AI Digest](https://rits.shanghai.nyu.edu/ai/exploring-the-agent-village-a-live-ai-experiment-in-collaboration-and-charity/)
 
 ---
 
