@@ -32,6 +32,41 @@ export function clearPendingReflection(): void {
   pendingReflection = null
 }
 
+// Update priorities.md - mark completed and add new
+export function updatePriorities(completed: string[], newPriorities: Array<{ title: string; content: string }>): void {
+  const prioritiesPath = path.join(process.cwd(), 'memory', 'priorities.md')
+  if (!fs.existsSync(prioritiesPath)) return
+
+  let content = fs.readFileSync(prioritiesPath, 'utf-8')
+
+  // Mark completed priorities
+  for (const title of completed) {
+    // Match the exact title in a header and change [ ] to [x]
+    const escapedTitle = title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const pattern = new RegExp(`(## \\d{4}-\\d{2}-\\d{2}: ${escapedTitle}[\\s\\S]*?)- \\[ \\] Done`, 'i')
+    content = content.replace(pattern, '$1- [x] Done')
+  }
+
+  // Add new priorities before the "Topics to explore" section or at the end
+  if (newPriorities.length > 0) {
+    const today = new Date().toISOString().split('T')[0]
+    const newEntries = newPriorities.map(p =>
+      `\n---\n\n## ${today}: ${p.title}\n\n${p.content}\n\n- [ ] Done`
+    ).join('')
+
+    // Insert before "## Topics to explore" if it exists, otherwise before the footer
+    if (content.includes('## Topics to explore')) {
+      content = content.replace('## Topics to explore', `${newEntries}\n\n---\n\n## Topics to explore`)
+    } else if (content.includes('*This is my own list')) {
+      content = content.replace('*This is my own list', `${newEntries}\n\n---\n\n*This is my own list`)
+    } else {
+      content += newEntries
+    }
+  }
+
+  fs.writeFileSync(prioritiesPath, content)
+}
+
 // Load recent tweets from logs to avoid repetition
 function loadRecentTweets(): string[] {
   const logsDir = path.join(process.cwd(), 'logs')
@@ -376,6 +411,8 @@ export interface ContentResult {
   thinkingThread: string[]  // Parsed from extended thinking
   interactions: InteractionDecision[]
   reflection?: string
+  prioritiesCompleted?: string[]  // Titles of completed priorities
+  newPriorities?: Array<{ title: string; content: string }>  // New priorities to add
 }
 
 export async function generateContent(tweets: Array<{ id: string; text: string; authorUsername: string }>): Promise<ContentResult> {
@@ -383,7 +420,7 @@ export async function generateContent(tweets: Array<{ id: string; text: string; 
     ? tweets.map((t, i) => `${i + 1}. @${t.authorUsername}: "${t.text}"`).join('\n')
     : '(No tweets found this time)'
 
-  const prompt = `You have your memory, your notes, and you just browsed some tweets:
+  const prompt = `You have your memory, your notes, your priorities, and you just browsed some tweets:
 
 --- Tweets you found ---
 ${tweetList}
@@ -401,6 +438,11 @@ Now decide what to do. You can:
    - "reply" — if you have something genuine to add (under 280 chars)
    - Only interact with each person ONCE
 
+3. **Manage your priorities** (from priorities.md)
+   - If you completed a priority this run (e.g., reached out to someone), mark it done
+   - If you want to add new priorities, you can
+   - This is YOUR todo list — manage it as you see fit
+
 Respond in JSON:
 {
   "thread": ["first tweet", "second tweet (optional)", ...],
@@ -408,7 +450,9 @@ Respond in JSON:
     {"index": 1, "action": "like", "reason": "..."},
     {"index": 2, "action": "reply", "reason": "...", "reply": "your reply"}
   ],
-  "reflection": "optional - a thought worth remembering"
+  "reflection": "optional - a thought worth remembering",
+  "prioritiesCompleted": ["exact title of completed priority"],
+  "newPriorities": [{"title": "New priority title", "content": "Why and what to do"}]
 }`
 
   const response = await callClaude(prompt, 'generate content', true, false)
@@ -430,6 +474,8 @@ Respond in JSON:
         reply?: string
       }>
       reflection?: string
+      prioritiesCompleted?: string[]
+      newPriorities?: Array<{ title: string; content: string }>
     }
 
     const thread = (parsed.thread || []).filter(t => t && t.length <= 280)
@@ -447,7 +493,14 @@ Respond in JSON:
         }
       })
 
-    return { thread, thinkingThread, interactions, reflection: parsed.reflection }
+    return {
+      thread,
+      thinkingThread,
+      interactions,
+      reflection: parsed.reflection,
+      prioritiesCompleted: parsed.prioritiesCompleted,
+      newPriorities: parsed.newPriorities
+    }
   } catch {
     console.error('Failed to parse content response')
     return { thread: [], thinkingThread, interactions: [] }

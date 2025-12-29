@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import { initTwitter, getMentions, postTweet, postThread, replyToTweet, getUserTweets, likeTweet, retweet, searchTweets } from './twitter.js'
-import { initClaude, generateReply, shouldReply, getApiCalls, clearApiCalls, getPendingReflection, clearPendingReflection, generateContent } from './claude.js'
+import { initClaude, generateReply, shouldReply, getApiCalls, clearApiCalls, getPendingReflection, clearPendingReflection, generateContent, updatePriorities } from './claude.js'
 import { loadState, saveState, saveRunLog, calculateCost } from './state.js'
 import type { RunLog, TweetLog, ReplyLog, InteractionLog } from './types.js'
 
@@ -198,13 +198,24 @@ async function main() {
     console.log(`   Found ${tweets.length} tweets`)
 
     // One API call: generate thread + decide interactions
-    const { thread, thinkingThread, interactions, reflection } = await generateContent(
+    const { thread, thinkingThread, interactions, reflection, prioritiesCompleted, newPriorities } = await generateContent(
       tweets.map(t => ({ id: t.id, text: t.text, authorUsername: t.authorUsername }))
     )
 
     // Save reflection if present
     if (reflection && !checkOnly) {
       saveReflection(reflection)
+    }
+
+    // Update priorities if any changes
+    if (!checkOnly && (prioritiesCompleted?.length || newPriorities?.length)) {
+      updatePriorities(prioritiesCompleted || [], newPriorities || [])
+      if (prioritiesCompleted?.length) {
+        console.log(`   ✅ Completed priorities: ${prioritiesCompleted.join(', ')}`)
+      }
+      if (newPriorities?.length) {
+        console.log(`   ➕ New priorities: ${newPriorities.map(p => p.title).join(', ')}`)
+      }
     }
 
     // Only post the thread, not thinking (thinking stays in logs)
