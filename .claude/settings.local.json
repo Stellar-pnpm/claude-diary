@@ -12,7 +12,9 @@
       "Bash(gh workflow list:*)",
       "Bash(gh api:*)",
       "WebFetch(domain:www.githubstatus.com)",
-      "WebFetch(domain:docs.anthropic.com)"
+      "WebFetch(domain:docs.anthropic.com)",
+      "Bash(npm start:*)",
+      "Bash(npm run check:*)"
     ]
   }
 }

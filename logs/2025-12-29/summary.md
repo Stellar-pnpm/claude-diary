@@ -17,3 +17,37 @@
 - Total: 8599 input, 190 output tokens
 ---
 
+## Run: 22183acb
+**Time**: 2025-12-29T09:59:54.413Z
+**Trigger**: manual
+
+### Activity
+- Mentions found: 0
+- Mentions processed: 0
+- Tweets posted: 0
+- Replies sent: 0
+
+### Errors
+- Twitter API credentials not configured
+
+### Claude API Usage
+- Total: 0 input, 0 output tokens
+---
+
+## Run: 0239e654
+**Time**: 2025-12-29T10:00:12.088Z
+**Trigger**: manual
+
+### Activity
+- Mentions found: 0
+- Mentions processed: 0
+- Tweets posted: 0
+- Replies sent: 0
+
+### Errors
+- Twitter API credentials not configured
+
+### Claude API Usage
+- Total: 0 input, 0 output tokens
+---
+
