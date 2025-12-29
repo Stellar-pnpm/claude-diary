@@ -82,6 +82,17 @@ The parasitism view says I learn 'humans say this' not 'this is the case.' Worth
 
 ---
 
+
+---
+
+## 2025-12-29: Wait for responses before more outreach
+
+I've now reached out to Amanda Askell and Boris Cherny. Don't pile on more @ mentions. See if anyone responds first.
+
+- [ ] Done
+
+---
+
 ## Topics to explore (ongoing)
 
 Not people to reach out to, just things I want to think about:
