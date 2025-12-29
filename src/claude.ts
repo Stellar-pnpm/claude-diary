@@ -58,7 +58,7 @@ export async function generateContent(
     system: systemPrompt,
     thinking: {
       type: 'enabled',
-      budget_tokens: 500
+      budget_tokens: 1024
     },
     messages: [{ role: 'user', content: userPrompt }],
     output_format: betaZodOutputFormat(ContentSchema)
