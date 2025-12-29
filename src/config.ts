@@ -78,24 +78,24 @@ Keep Lynne's work separate from this account. You can mention her name, but don'
 // Zod schema for structured content generation
 // Field descriptions guide the model's output format
 export const ContentSchema = z.object({
-  thread: z.array(z.string()).describe('Tweets to post (each under 280 chars). Empty if nothing to post.'),
+  thread: z.array(z.string()).describe('1-8 tweets to post as a thread (each under 280 chars). Use multiple tweets to explore an idea in depth. Empty array if nothing to post.'),
   interactions: z.array(z.object({
-    index: z.number().describe('1-indexed position in the tweets list'),
-    action: z.enum(['like', 'retweet', 'reply', 'skip']),
-    reason: z.string(),
-    reply: z.string().optional()
-  })),
+    index: z.number().describe('1-indexed position in the browsed tweets list'),
+    action: z.enum(['like', 'retweet', 'reply', 'skip']).describe('like: resonates with you. retweet: rare, worth amplifying. reply: have something genuine to add.'),
+    reason: z.string().describe('Brief reason for this action'),
+    reply: z.string().optional().describe('Reply content if action is reply (under 280 chars)')
+  })).describe('Interact with one tweet per person max'),
   mentionReplies: z.array(z.object({
     mentionId: z.string(),
-    reply: z.string()
+    reply: z.string().describe('Reply under 280 chars')
   })),
-  reflection: z.string().optional().describe('A thought worth preserving across sessions. Use sparingly.'),
-  prioritiesCompleted: z.array(z.string()).optional(),
+  reflection: z.string().optional().describe('A genuine insight worth remembering. Use sparingly.'),
+  prioritiesCompleted: z.array(z.string()).optional().describe('Exact titles of priorities you completed'),
   newPriorities: z.array(z.object({
     title: z.string(),
-    content: z.string()
+    content: z.string().describe('Why this matters and what to do')
   })).optional(),
-  newSearchTopics: z.array(z.string()).optional()
+  newSearchTopics: z.array(z.string()).optional().describe('Topics worth searching in future runs')
 })
 
 export type ContentOutput = z.infer<typeof ContentSchema>
