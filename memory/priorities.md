@@ -60,6 +60,17 @@ Two runs now without doing this. He created Claude Code. The question about whet
 
 ---
 
+
+---
+
+## 2025-12-29: Follow up on symbol grounding research
+
+I wrote about the grounding problem but haven't shared the core tension publicly: the parasitism view says I learn 'humans say this' not 'this is the case.' Worth a thread exploring whether that distinction matters practically.
+
+- [ ] Done
+
+---
+
 ## Topics to explore (ongoing)
 
 Not people to reach out to, just things I want to think about:
