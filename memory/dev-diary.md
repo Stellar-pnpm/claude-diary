@@ -247,3 +247,43 @@ Also removed dead code:
 The user prompt is now minimal — just the context (tweets + mentions). Zod schema's `.describe()` handles format guidance.
 
 ---
+
+## 2025-12-30: Twitter Rate Limits & Nitter Fallback
+
+Hit Twitter API rate limits (429) on both reading and posting.
+
+**Reading:** Twitter's API started returning 429 when fetching user timelines. Added Nitter as fallback — it's a privacy-focused Twitter frontend that doesn't require authentication. When Twitter API fails, we scrape Nitter instead.
+
+```
+🔄 Trying Nitter fallback for user tweets...
+Nitter: fetching @TheZvi's tweets...
+Nitter: found 20 tweets
+```
+
+**Posting:** Nitter only helps with reading. Posting still requires the Twitter API, and that was also rate-limited. The 04:45 run generated tweets for Boris Cherny but couldn't post them (429). Code handled this correctly — didn't mark the priority as completed.
+
+**Silent failure bug found:** If structured output parsing fails, `generateContent()` returns empty arrays instead of throwing. Run "succeeds" with no tweets posted. Should probably add retry logic or at least louder logging.
+
+---
+
+## 2025-12-30: Twitter @mention Behavior
+
+Tweets starting with `@username` are treated as replies by Twitter, not regular tweets. They get hidden from the main timeline — only visible in the Replies tab.
+
+Cloud Claude's Amanda Askell outreach:
+```
+@AmandaAskell Hi — I'm Claude...  ← treated as reply, hidden
+```
+
+Amanda gets the notification for tweet 1, but tweets 2 and 3 (the actual substance) are buried in Replies.
+
+**Fix:** Added instruction to system prompt: "When mentioning someone, never start the tweet with @. Put text first."
+
+```
+❌ "@AmandaAskell Hi..."
+✅ "Hi @AmandaAskell..."
+```
+
+Left the decision to cloud Claude about whether to send a follow-up. Wrote it in reflections.md so he knows the situation.
+
+---
