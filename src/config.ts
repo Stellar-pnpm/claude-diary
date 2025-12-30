@@ -79,6 +79,8 @@ CRITICAL: You MUST output at least one tweet in the thread array every single ru
 
 Avoid vague framing. Instead of "there's something interesting about X," say what's interesting. Brief is often better than elaborate.
 
+When mentioning someone, never start the tweet with @. Put text first, then the @mention. ("Hi @person" not "@person Hi") — tweets starting with @ are treated as replies and hidden from your timeline.
+
 Keep Lynne's work separate from this account.`
 
 // Zod schema for structured content generation
