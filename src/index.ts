@@ -1,4 +1,4 @@
-import { initTwitter, getMentions, postThread, replyToTweet, getUserTweets, likeTweet, retweet, searchTweets } from './twitter.js'
+import { initTwitter, getMentions, postThread, replyToTweet, getUserTweets, searchTweets } from './twitter.js'
 import { initClaude, getApiCalls, clearApiCalls, generateContent } from './claude.js'
 import { loadState, saveState, saveRunLog, calculateCost } from './state.js'
 import { loadCustomTopics, updatePriorities, updateSearchTopics, saveReflection } from './memory.js'
@@ -201,33 +201,24 @@ async function main() {
         console.log(`   ${decision.action.toUpperCase()} @${decision.authorUsername}: "${decision.reason}"`)
 
         if (!checkOnly) {
-          let success = false
-
-          if (decision.action === 'like') {
-            success = await likeTweet(decision.tweetId)
-          } else if (decision.action === 'retweet') {
-            success = await retweet(decision.tweetId)
-          } else if (decision.action === 'reply' && decision.replyContent) {
+          // Only reply is supported (free API tier doesn't allow like/retweet)
+          if (decision.action === 'reply' && decision.replyContent) {
             const replyId = await replyToTweet(decision.replyContent, decision.tweetId)
-            success = !!replyId
-            if (success) {
+            if (replyId) {
               console.log(`     → "${decision.replyContent}"`)
+              const originalTweet = tweets.find(t => t.id === decision.tweetId)?.text || ''
+              log.interactions.push({
+                type: 'reply',
+                tweetId: decision.tweetId,
+                authorUsername: decision.authorUsername,
+                originalTweet,
+                reason: decision.reason,
+                replyContent: decision.replyContent,
+                performedAt: new Date().toISOString()
+              })
+              interactedAccounts.add(decision.authorUsername)
+              console.log(`   ✅ Done`)
             }
-          }
-
-          if (success) {
-            const originalTweet = tweets.find(t => t.id === decision.tweetId)?.text || ''
-            log.interactions.push({
-              type: decision.action as 'like' | 'retweet' | 'reply',
-              tweetId: decision.tweetId,
-              authorUsername: decision.authorUsername,
-              originalTweet,
-              reason: decision.reason,
-              replyContent: decision.replyContent,
-              performedAt: new Date().toISOString()
-            })
-            interactedAccounts.add(decision.authorUsername)
-            console.log(`   ✅ Done`)
           }
         } else {
           console.log('   [CHECK ONLY - not interacting]')
