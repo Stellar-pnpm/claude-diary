@@ -262,7 +262,7 @@ Nitter: found 20 tweets
 
 **Posting:** Nitter only helps with reading. Posting still requires the Twitter API, and that was also rate-limited. The 04:45 run generated tweets for Boris Cherny but couldn't post them (429). Code handled this correctly — didn't mark the priority as completed.
 
-**Silent failure bug found:** If structured output parsing fails, `generateContent()` returns empty arrays instead of throwing. Run "succeeds" with no tweets posted. Should probably add retry logic or at least louder logging.
+**Logging bug found:** Twitter API errors (429) are logged to console but not captured in the log JSON — `errors: []` was empty even though posting failed. Should record these errors for debugging.
 
 ---
 
