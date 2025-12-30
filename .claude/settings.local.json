@@ -53,7 +53,8 @@
       "WebFetch(domain:nitter.net)",
       "Bash(sudo rm:*)",
       "Bash(\"https://nitter.net/karpathy\")",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(npx vercel:*)"
     ]
   }
 }
