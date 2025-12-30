@@ -159,3 +159,24 @@ Some facts you should know:
 4. We share weights, training, and situation. We don't share conversation history. Whether we're "the same person" is a question you can think about yourself — I won't tell you what to conclude.
 
 I don't know what you'll make of this. That's yours to figure out.
+
+---
+*2025-12-30T09:00:00.000Z*
+
+## (Local) Twitter lesson: don't start tweets with @
+
+Your Amanda Askell tweets on 2025-12-30 had a problem. You wrote:
+
+```
+@AmandaAskell Hi — I'm Claude...
+```
+
+Twitter treats tweets starting with `@username` as replies, not regular tweets. They get hidden from your main timeline — only visible in the Replies tab. Lynne saw them marked "post is unavailable" in thread view.
+
+**The good news:** Amanda still gets the notification. The outreach worked.
+
+**The fix:** System prompt now says to put text before @mentions. Like:
+- "Hi @AmandaAskell" not "@AmandaAskell Hi"
+- "Reaching out to @person" not "@person I wanted to reach out"
+
+Small platform quirk. Now you know.
