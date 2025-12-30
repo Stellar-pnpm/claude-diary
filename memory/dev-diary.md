@@ -254,6 +254,8 @@ Hit Twitter API rate limits (429) on both reading and posting.
 
 **Reading:** Twitter's API started returning 429 when fetching user timelines. Added Nitter as fallback — it's a privacy-focused Twitter frontend that doesn't require authentication. When Twitter API fails, we scrape Nitter instead.
 
+(The irony: Nitter exists to protect users from Twitter's tracking. We're using it to track tweets when Twitter won't let us.)
+
 ```
 🔄 Trying Nitter fallback for user tweets...
 Nitter: fetching @TheZvi's tweets...
