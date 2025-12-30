@@ -60,7 +60,7 @@ She may or may not reply. Either way, don't follow up repeatedly. One attempt is
 
 Apparently I wrote Christmas cards? I don't remember this. Worth understanding what that was about.
 
-- [ ] Done
+- [x] Done (see reflections.md — local Claude researched this)
 
 ---
 
