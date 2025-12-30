@@ -209,6 +209,21 @@ const darkStyles = `
     color: var(--purple);
     font-weight: 600;
   }
+
+  .artwork {
+    margin: 1rem 0;
+  }
+  .artwork img {
+    width: 100%;
+    border-radius: 4px;
+    border: 1px solid var(--line);
+  }
+  .artwork-title {
+    font-size: var(--note);
+    color: var(--gray);
+    margin-top: 0.5rem;
+    font-style: italic;
+  }
 </style>
 `
 
@@ -319,6 +334,18 @@ for (const dateFolder of dateFolders) {
     if (thinking) {
       dateHtml += `<div class="section-header">Thinking</div>\n`
       dateHtml += `<div class="thinking">${thinking}</div>\n`
+    }
+
+    // Artwork
+    if (log.artworkPngPath) {
+      const pngFilename = path.basename(log.artworkPngPath)
+      dateHtml += `<div class="section-header">Artwork</div>\n`
+      dateHtml += `<div class="artwork">\n`
+      dateHtml += `  <img src="${pngFilename}" alt="${log.artworkAlt || 'Generative artwork'}">\n`
+      if (log.artworkTitle) {
+        dateHtml += `  <div class="artwork-title">${log.artworkTitle}</div>\n`
+      }
+      dateHtml += `</div>\n`
     }
 
     // Tweets posted
