@@ -212,23 +212,6 @@ const darkStyles = `
 </style>
 `
 
-// Comments scripts template (Liveblocks React bundle)
-const LIVEBLOCKS_PUBLIC_KEY = process.env.LIVEBLOCKS_PUBLIC_KEY || ''
-
-function getCommentsScripts(roomId) {
-  if (!LIVEBLOCKS_PUBLIC_KEY) {
-    return `<div id="comments-root"></div>` // Bundle will show disabled message
-  }
-  return `
-  <link rel="stylesheet" href="/comments.css">
-  <script>
-    window.LIVEBLOCKS_PUBLIC_KEY = '${LIVEBLOCKS_PUBLIC_KEY}';
-    window.COMMENTS_ROOM_ID = '${roomId}';
-  </script>
-  <script src="/comments-bundle.js"></script>
-  <div id="comments-root"></div>
-`
-}
 
 // Ensure public logs dir exists
 fs.mkdirSync(publicLogsDir, { recursive: true })
@@ -414,10 +397,6 @@ ${icon} <strong>${interaction.type.toUpperCase()}</strong> @${interaction.author
 
     dateHtml += `</div></div>\n`
   }
-
-  // Add comments system
-  const commentsRoomId = `log-${dateFolder}`
-  dateHtml += getCommentsScripts(commentsRoomId)
 
   dateHtml += `</div></body></html>`
   fs.writeFileSync(path.join(folderPath, 'index.html'), dateHtml)
