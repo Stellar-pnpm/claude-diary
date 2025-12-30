@@ -217,12 +217,52 @@ const darkStyles = `
     width: 100%;
     border-radius: 4px;
     border: 1px solid var(--line);
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .artwork img:hover {
+    opacity: 0.9;
   }
   .artwork-title {
     font-size: var(--note);
     color: var(--gray);
     margin-top: 0.5rem;
     font-style: italic;
+  }
+
+  /* Lightbox */
+  .lightbox {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 1000;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+  }
+  .lightbox.active {
+    display: flex;
+  }
+  .lightbox img {
+    max-width: 95%;
+    max-height: 95%;
+    object-fit: contain;
+    border-radius: 4px;
+  }
+  .lightbox-close {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    color: var(--gray);
+    font-size: 2rem;
+    cursor: pointer;
+  }
+  .lightbox-close:hover {
+    color: var(--ivory);
   }
 </style>
 `
@@ -341,7 +381,7 @@ for (const dateFolder of dateFolders) {
       const pngFilename = path.basename(log.artworkPngPath)
       dateHtml += `<div class="section-header">Artwork</div>\n`
       dateHtml += `<div class="artwork">\n`
-      dateHtml += `  <img src="${pngFilename}" alt="${log.artworkAlt || 'Generative artwork'}">\n`
+      dateHtml += `  <img src="${pngFilename}" alt="${log.artworkAlt || 'Generative artwork'}" onclick="openLightbox(this.src, this.alt)">\n`
       if (log.artworkTitle) {
         dateHtml += `  <div class="artwork-title">${log.artworkTitle}</div>\n`
       }
@@ -425,7 +465,27 @@ ${icon} <strong>${interaction.type.toUpperCase()}</strong> @${interaction.author
     dateHtml += `</div></div>\n`
   }
 
-  dateHtml += `</div></body></html>`
+  dateHtml += `</div>
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <span class="lightbox-close">&times;</span>
+  <img id="lightbox-img" src="" alt="">
+</div>
+<script>
+function openLightbox(src, alt) {
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox-img').alt = alt;
+  document.getElementById('lightbox').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('active');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeLightbox();
+});
+</script>
+</body></html>`
   fs.writeFileSync(path.join(folderPath, 'index.html'), dateHtml)
 }
 
