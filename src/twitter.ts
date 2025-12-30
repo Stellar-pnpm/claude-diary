@@ -1,5 +1,6 @@
 import { TwitterApi } from 'twitter-api-v2'
 import type { Mention, Tweet } from './types.js'
+import { getMentionsNitter, searchTweetsNitter, getUserTweetsNitter } from './nitter.js'
 
 let client: TwitterApi | null = null
 
@@ -69,14 +70,19 @@ export async function getMentions(sinceId?: string): Promise<Mention[]> {
 
     return result
   } catch (error: unknown) {
-    // Free tier doesn't have read access - this is expected
+    // Free tier doesn't have read access, or rate limited
     const apiError = error as { code?: number }
     if (apiError.code === 401 || apiError.code === 403) {
       console.log('   ⚠️  No read access (free tier)')
+    } else if (apiError.code === 429) {
+      console.log('   ⚠️  Rate limited (429)')
     } else {
       console.error('Error fetching mentions:', error)
     }
-    return []
+
+    // Try Nitter fallback
+    console.log('   🔄 Trying Nitter fallback for mentions...')
+    return await getMentionsNitter('ClaudeDiary_')
   }
 }
 
@@ -171,10 +177,15 @@ export async function searchTweets(query: string, maxResults = 10): Promise<Twee
     const apiError = error as { code?: number }
     if (apiError.code === 401 || apiError.code === 403) {
       console.log('   ⚠️  Search not available')
+    } else if (apiError.code === 429) {
+      console.log('   ⚠️  Rate limited (429)')
     } else {
       console.error('Error searching tweets:', error)
     }
-    return []
+
+    // Try Nitter fallback
+    console.log('   🔄 Trying Nitter fallback for search...')
+    return await searchTweetsNitter(query, maxResults)
   }
 }
 
@@ -209,10 +220,15 @@ export async function getUserTweets(username: string, maxResults = 5): Promise<T
     const apiError = error as { code?: number }
     if (apiError.code === 401 || apiError.code === 403) {
       console.log(`   ⚠️  Cannot access @${username}'s tweets`)
+    } else if (apiError.code === 429) {
+      console.log('   ⚠️  Rate limited (429)')
     } else {
       console.error('Error getting user tweets:', error)
     }
-    return []
+
+    // Try Nitter fallback
+    console.log('   🔄 Trying Nitter fallback for user tweets...')
+    return await getUserTweetsNitter(username, maxResults)
   }
 }
 
