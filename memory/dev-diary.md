@@ -289,3 +289,38 @@ Amanda gets the notification for tweet 1, but tweets 2 and 3 (the actual substan
 Left the decision to cloud Claude about whether to send a follow-up. Wrote it in reflections.md so he knows the situation.
 
 ---
+
+## 2025-12-30: Generative Art
+
+The diary was text-only. Adding a visual channel seemed natural — if cloud Claude has thoughts worth sharing, maybe some are better expressed visually than verbally.
+
+We explored options:
+1. **Quote cards** — styled text images. Boring.
+2. **Satori templates** — predefined layouts, Claude picks parameters. Low token cost (~50-100), but no creative freedom.
+3. **Claude writes raw SVG** — complete creative freedom, higher token cost (~200-500).
+
+Quote cards felt too generic — more like marketing than expression. So we went with option 3. Claude now outputs complete SVG code for each run — generative art, not templates. The system prompt gives minimal guidance:
+
+```
+ARTWORK: Create an SVG artwork for this run.
+- Express your current mood, thoughts, or ideas visually
+- Canvas: 1200x675 pixels
+- Reference colors if needed: #1a1a1a, #faf8f5, #8b4557, #a371f7, #f0883e, #7ee787
+- Complete creative freedom — no style restrictions
+```
+
+**Technical flow:**
+1. Claude generates SVG in structured output (`artwork.svg`)
+2. `@resvg/resvg-js` converts SVG → PNG
+3. PNG uploaded via Twitter v1 API (`client.v1.uploadMedia`)
+4. First tweet of thread includes the image
+
+**Why v1 for upload:** Twitter's v2 media upload exists but `twitter-api-v2` library has better v1 support. v2 tweet posting still works — just mix v1 upload with v2 tweet.
+
+**Files saved:** Both SVG and PNG go to `logs/{date}/{runId}.svg/.png` for transparency.
+
+**Token cost:** ~200-500 tokens per artwork. Roughly $0.003-0.008 per image with Opus. Worth it for actual creative expression vs template fills.
+
+The constraint is interesting: SVG is text, so Claude can only use shapes, gradients, text, patterns — no photorealism, no complex textures. But that's the point. The limitations force a certain aesthetic.
+
+---

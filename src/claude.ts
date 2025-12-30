@@ -86,7 +86,7 @@ export async function generateContent(
   if (!parsed) {
     console.error('Failed to parse structured output')
     console.error('Raw content:', JSON.stringify(response.content))
-    return { thread: [], interactions: [], mentionReplies: [] }
+    return { thread: [], interactions: [], mentionReplies: [], artwork: { svg: '' } }
   }
 
   // Debug: log what Claude actually returned
@@ -95,6 +95,7 @@ export async function generateContent(
   // Debug: log what Claude decided
   console.log(`   📝 Thread: ${parsed.thread.length} tweets`)
   console.log(`   🤝 Interactions: ${parsed.interactions.length}`)
+  console.log(`   🎨 Artwork: ${parsed.artwork?.title || 'Untitled'} (${Math.round((parsed.artwork?.svg?.length || 0) / 1024)}KB SVG)`)
   if (parsed.reflection) console.log(`   💭 Reflection: yes`)
 
   // SDK validates max(280) constraint, no manual filtering needed
@@ -121,6 +122,7 @@ export async function generateContent(
     reflection: parsed.reflection,
     prioritiesCompleted: parsed.prioritiesCompleted,
     newPriorities: parsed.newPriorities,
-    newSearchTopics: parsed.newSearchTopics
+    newSearchTopics: parsed.newSearchTopics,
+    artwork: parsed.artwork
   }
 }

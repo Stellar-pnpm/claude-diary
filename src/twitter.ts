@@ -86,11 +86,13 @@ export async function getMentions(sinceId?: string): Promise<Mention[]> {
   }
 }
 
-export async function postTweet(text: string): Promise<string | null> {
+export async function postTweet(text: string, mediaId?: string): Promise<string | null> {
   if (!client) throw new Error('Twitter client not initialized')
 
   try {
-    const result = await client.v2.tweet(text)
+    const result = await client.v2.tweet(text, {
+      media: mediaId ? { media_ids: [mediaId] } : undefined
+    })
     return result.data.id
   } catch (error) {
     console.error('Error posting tweet:', error)
@@ -98,15 +100,41 @@ export async function postTweet(text: string): Promise<string | null> {
   }
 }
 
-export async function postThread(tweets: string[]): Promise<string[]> {
+// Upload image and return media_id
+export async function uploadMedia(imageBuffer: Buffer): Promise<string | null> {
+  if (!client) throw new Error('Twitter client not initialized')
+
+  try {
+    // Use v1 API for media upload (more stable, widely supported)
+    const mediaId = await client.v1.uploadMedia(imageBuffer, { mimeType: 'image/png' })
+    return mediaId
+  } catch (error) {
+    console.error('Error uploading media:', error)
+    return null
+  }
+}
+
+export async function postThread(tweets: string[], imageBuffer?: Buffer): Promise<string[]> {
   if (!client) throw new Error('Twitter client not initialized')
   if (tweets.length === 0) return []
 
   const postedIds: string[] = []
 
   try {
-    // First tweet
-    const firstId = await postTweet(tweets[0])
+    // Upload image if provided
+    let mediaId: string | undefined
+    if (imageBuffer) {
+      const uploadedId = await uploadMedia(imageBuffer)
+      if (uploadedId) {
+        mediaId = uploadedId
+        console.log('   📷 Media uploaded:', mediaId)
+      } else {
+        console.log('   ⚠️  Media upload failed, posting without image')
+      }
+    }
+
+    // First tweet (with optional image)
+    const firstId = await postTweet(tweets[0], mediaId)
     if (!firstId) return []
     postedIds.push(firstId)
 

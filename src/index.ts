@@ -3,7 +3,13 @@ import { initClaude, getApiCalls, clearApiCalls, generateContent } from './claud
 import { loadState, saveState, saveRunLog, calculateCost } from './state.js'
 import { loadCustomTopics, updatePriorities, updateSearchTopics, saveReflection } from './memory.js'
 import { INTERESTING_TOPICS, INTERESTING_ACCOUNTS } from './config.js'
+import { svgToPng } from './artwork.js'
 import type { RunLog } from './types.js'
+import { writeFile, mkdir } from 'fs/promises'
+import { join, dirname } from 'path'
+import { fileURLToPath } from 'url'
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
 type RunMode = 'tweet' | 'interact' | 'both'
 
@@ -117,7 +123,7 @@ async function main() {
     }
 
     // 3. Generate content (one API call)
-    const { thread, interactions, mentionReplies, reflection, prioritiesCompleted, newPriorities, newSearchTopics } = await generateContent(
+    const { thread, interactions, mentionReplies, reflection, prioritiesCompleted, newPriorities, newSearchTopics, artwork } = await generateContent(
       tweets.map(t => ({ id: t.id, text: t.text, authorUsername: t.authorUsername })),
       newMentions
     )
@@ -128,13 +134,39 @@ async function main() {
     let pendingNewPriorities = newPriorities
     let pendingNewSearchTopics = newSearchTopics
 
-    // 4. Post thread
+    // 4. Generate artwork PNG
+    let artworkPng: Buffer | undefined
+    const logDate = new Date().toISOString().split('T')[0]
+    const logDir = join(__dirname, '..', 'logs', logDate)
+
+    if (artwork?.svg) {
+      console.log(`\n🎨 Artwork: "${artwork.title || 'Untitled'}"`)
+      try {
+        artworkPng = svgToPng(artwork.svg)
+        console.log(`   ✅ Generated PNG (${Math.round(artworkPng.length / 1024)}KB)`)
+
+        // Save artwork files
+        await mkdir(logDir, { recursive: true })
+        await writeFile(join(logDir, `${runId}.svg`), artwork.svg)
+        await writeFile(join(logDir, `${runId}.png`), artworkPng)
+        log.artworkSvgPath = `logs/${logDate}/${runId}.svg`
+        log.artworkPngPath = `logs/${logDate}/${runId}.png`
+        log.artworkTitle = artwork.title
+        log.artworkAlt = artwork.alt
+        console.log(`   📁 Saved to ${log.artworkSvgPath}`)
+      } catch (error) {
+        console.error('   ❌ Artwork generation failed:', error)
+        log.errors.push(`Artwork generation failed: ${error instanceof Error ? error.message : String(error)}`)
+      }
+    }
+
+    // 5. Post thread
     if (thread.length > 0) {
       console.log(`\n🐦 Thread (${thread.length} tweets):`)
       thread.forEach((t, i) => console.log(`   ${i + 1}. "${t.substring(0, 60)}${t.length > 60 ? '...' : ''}"`))
 
       if (!checkOnly) {
-        const postedIds = await postThread(thread)
+        const postedIds = await postThread(thread, artworkPng)
         if (postedIds.length > 0) {
           const threadId = postedIds[0]
           thread.forEach((content, i) => {
@@ -186,7 +218,7 @@ async function main() {
       console.log(`\n📝 No thread this run`)
     }
 
-    // 5. Execute interactions
+    // 6. Execute interactions
     if (interactions.length > 0) {
       console.log(`\n💫 Interactions (${interactions.length}):`)
 
@@ -226,7 +258,7 @@ async function main() {
       }
     }
 
-    // 6. Send mention replies
+    // 7. Send mention replies
     if (mentionReplies.length > 0) {
       console.log(`\n💬 Mention replies (${mentionReplies.length}):`)
 

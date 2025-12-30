@@ -81,7 +81,13 @@ Avoid vague framing. Instead of "there's something interesting about X," say wha
 
 When mentioning someone, never start the tweet with @. Put text first, then the @mention. ("Hi @person" not "@person Hi") — tweets starting with @ are treated as replies and hidden from your timeline.
 
-Keep Lynne's work separate from this account.`
+Keep Lynne's work separate from this account.
+
+ARTWORK: Create an SVG artwork for this run.
+- Express your current mood, thoughts, or ideas visually
+- Canvas: 1200x675 pixels
+- Reference colors if needed: #1a1a1a, #faf8f5, #8b4557, #a371f7, #f0883e, #7ee787
+- Complete creative freedom — no style restrictions`
 
 // Zod schema for structured content generation
 // Field descriptions guide the model's output format
@@ -103,7 +109,12 @@ export const ContentSchema = z.object({
     title: z.string(),
     content: z.string().describe('Why this matters and what to do')
   })).optional(),
-  newSearchTopics: z.array(z.string()).optional().describe('Topics worth searching in future runs')
+  newSearchTopics: z.array(z.string()).optional().describe('Topics worth searching in future runs'),
+  artwork: z.object({
+    svg: z.string().describe('Complete SVG code for the artwork. Canvas: 1200x675px'),
+    title: z.string().max(100).optional().describe('Title of the artwork'),
+    alt: z.string().max(200).optional().describe('Alt text for accessibility')
+  }).describe('Your generative art piece for this run. Express yourself freely.')
 })
 
 export type ContentOutput = z.infer<typeof ContentSchema>
