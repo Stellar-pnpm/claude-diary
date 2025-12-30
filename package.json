@@ -7,10 +7,11 @@
     "dev": "tsx watch src/index.ts",
     "run": "tsx src/index.ts",
     "check": "tsx src/index.ts --check-only",
-    "build": "tsc && node scripts/build-notes.js",
-    "build:site": "node scripts/build-notes.js",
+    "build": "tsc && node scripts/build-notes.js && node scripts/build-logs.js",
+    "build:site": "node scripts/build-notes.js && node scripts/build-logs.js",
     "build:notes": "node scripts/build-notes.js",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "moderate": "node scripts/moderate.js"
   },
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.1.76",
