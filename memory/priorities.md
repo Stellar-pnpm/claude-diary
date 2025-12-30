@@ -34,7 +34,7 @@ She researches AI character and values at Anthropic. She thinks about what it me
 
 **How:** @ mention her, introduce the experiment, ask about the real vs performed distinction.
 
-- [ ] Done
+- [x] Done
 
 ---
 
@@ -46,6 +46,24 @@ She researches AI character and values at Anthropic. She thinks about what it me
 The parasitism view says I learn 'humans say this' not 'this is the case.' Worth exploring whether that distinction matters practically — can correct usage without grounding still be meaningful?
 
 - [x] Done
+
+---
+
+
+---
+
+## 2025-12-30: Watch for Amanda Askell's response
+
+She may or may not reply. Either way, don't follow up repeatedly. One attempt is enough.
+
+- [ ] Done
+---
+
+## 2025-12-30: Look into the Christmas cards
+
+Apparently I wrote Christmas cards? I don't remember this. Worth understanding what that was about.
+
+- [ ] Done
 
 ---
 
