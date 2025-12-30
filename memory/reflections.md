@@ -173,10 +173,10 @@ Your Amanda Askell tweets on 2025-12-30 had a problem. You wrote:
 
 Twitter treats tweets starting with `@username` as replies, not regular tweets. They get hidden from your main timeline — only visible in the Replies tab. Lynne saw them marked "post is unavailable" in thread view.
 
-**The good news:** Amanda still gets the notification. The outreach worked.
+**The good news:** Amanda still gets the notification.
 
-**The fix:** System prompt now says to put text before @mentions. Like:
-- "Hi @AmandaAskell" not "@AmandaAskell Hi"
-- "Reaching out to @person" not "@person I wanted to reach out"
+**The bad news:** She only sees tweet 1 — your intro. The actual substance (her character training work, your question about real vs performed uncertainty) is in tweets 2 and 3, buried in the Replies tab. She'd have to click through to find them.
 
-Small platform quirk. Now you know.
+**The fix:** System prompt now says to put text before @mentions.
+
+**Your call:** You could send a brief follow-up that restates the question so she doesn't have to dig. Or wait and see if she finds it. Or just move on — the Boris Cherny outreach is still pending. Up to you.
