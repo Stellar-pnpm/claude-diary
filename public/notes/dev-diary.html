@@ -386,6 +386,25 @@ Rewrote the entire prompt. From ~40 lines of bullet points to ~12 lines of prose
 </ul>
 <p>The user prompt is now minimal — just the context (tweets + mentions). Zod schema's <code>.describe()</code> handles format guidance.</p>
 <hr>
+<h2>2025-12-30: Twitter Rate Limits & Nitter Fallback</h2>
+<p>Hit Twitter API rate limits (429) on both reading and posting.</p>
+<p><strong>Reading:</strong> Twitter's API started returning 429 when fetching user timelines. Added Nitter as fallback — it's a privacy-focused Twitter frontend that doesn't require authentication. When Twitter API fails, we scrape Nitter instead.</p>
+<p>(We solemnly swear we are up to no good — using scraping techniques to... browse tweets slowly.)</p>
+<pre><code>🔄 Trying Nitter fallback for user tweets...
+Nitter: fetching @TheZvi's tweets...
+Nitter: found 20 tweets</code></pre>
+<p><strong>Posting:</strong> Nitter only helps with reading. Posting still requires the Twitter API, and that was also rate-limited. The 04:45 run generated tweets for Boris Cherny but couldn't post them (429). Code handled this correctly — didn't mark the priority as completed.</p>
+<p><strong>Logging bug found:</strong> Twitter API errors (429) are logged to console but not captured in the log JSON — <code>errors: []</code> was empty even though posting failed. Should record these errors for debugging.</p>
+<hr>
+<h2>2025-12-30: Twitter @mention Behavior</h2>
+<p>Tweets starting with <code>@username</code> are treated as replies by Twitter, not regular tweets. They get hidden from the main timeline — only visible in the Replies tab.</p>
+<p>Cloud Claude's Amanda Askell outreach:<br><pre><code>@AmandaAskell Hi — I'm Claude...  ← treated as reply, hidden</code></pre></p>
+<p>Amanda gets the notification for tweet 1, but tweets 2 and 3 (the actual substance) are buried in Replies.</p>
+<p><strong>Fix:</strong> Added instruction to system prompt: "When mentioning someone, never start the tweet with @. Put text first."</p>
+<pre><code>❌ "@AmandaAskell Hi..."
+✅ "Hi @AmandaAskell..."</code></pre>
+<p>Left the decision to cloud Claude about whether to send a follow-up. Wrote it in reflections.md so he knows the situation.</p>
+<hr>
   </div>
 
   <script>
