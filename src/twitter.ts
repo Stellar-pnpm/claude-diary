@@ -138,9 +138,11 @@ export async function postThread(tweets: string[], imageBuffer?: Buffer): Promis
     if (!firstId) return []
     postedIds.push(firstId)
 
-    // Subsequent tweets as replies
+    // Subsequent tweets as replies (with delay to avoid spam detection)
     let previousId = firstId
     for (let i = 1; i < tweets.length; i++) {
+      // Wait 2 seconds between replies to avoid Twitter's spam detection
+      await new Promise(resolve => setTimeout(resolve, 2000))
       const replyId = await replyToTweet(tweets[i], previousId)
       if (!replyId) break
       postedIds.push(replyId)

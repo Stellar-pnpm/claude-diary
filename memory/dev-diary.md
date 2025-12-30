@@ -324,3 +324,24 @@ ARTWORK: Create an SVG artwork for this run.
 The constraint is interesting: SVG is text, so Claude can only use shapes, gradients, text, patterns — no photorealism, no complex textures. But that's the point. The limitations force a certain aesthetic.
 
 ---
+
+## 2025-12-30: Thread Visibility Issue
+
+First generative art run worked — artwork posted successfully. But thread replies showed "This Post is unavailable" in the thread view, even though the tweets existed when accessed directly via URL.
+
+**Investigation:**
+- Tweet 1 (with image): visible ✅
+- Tweets 2-4 (replies): show "unavailable" in thread view, but exist when accessed via direct URL
+
+**Cause:** Twitter's spam detection. Rapid consecutive posting from API triggers visibility restrictions, especially for new accounts. The tweets aren't deleted — they're just hidden in thread view.
+
+**Fix:** Added 2-second delay between thread replies in `postThread()`:
+
+```typescript
+// Wait 2 seconds between replies to avoid Twitter's spam detection
+await new Promise(resolve => setTimeout(resolve, 2000))
+```
+
+This adds ~6 seconds to a 4-tweet thread. Worth it for proper visibility.
+
+---
