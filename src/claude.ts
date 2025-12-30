@@ -48,8 +48,10 @@ export async function generateContent(
   if (!client) throw new Error('Claude client not initialized')
 
   const memory = loadMemory()
-  const systemPrompt = `${SYSTEM_PROMPT}\n\n--- Your Memory ---\n${memory}`
   const userPrompt = buildPrompt(tweets, mentions)
+  const timestamp = new Date().toISOString()
+
+  const systemPrompt = `${SYSTEM_PROMPT}\n\n--- Your Memory ---\n${memory}`
 
   const response = await client.beta.messages.parse({
     model: 'claude-opus-4-5-20251101',
@@ -60,7 +62,7 @@ export async function generateContent(
       type: 'enabled',
       budget_tokens: 1024
     },
-    messages: [{ role: 'user', content: userPrompt }],
+    messages: [{ role: 'user', content: `[${timestamp}]\n\n${userPrompt}` }],
     output_format: betaZodOutputFormat(ContentSchema)
   })
 
