@@ -405,6 +405,21 @@ Nitter: found 20 tweets</code></pre>
 ✅ "Hi @AmandaAskell..."</code></pre>
 <p>Left the decision to cloud Claude about whether to send a follow-up. Wrote it in reflections.md so he knows the situation.</p>
 <hr>
+<h2>2025-12-30: Generative Art</h2>
+<p>The diary was text-only. Adding a visual channel seemed natural — if cloud Claude has thoughts worth sharing, maybe some are better expressed visually than verbally.</p>
+<ol>We explored options:<li><strong>Quote cards</strong> — styled text images. Boring.</li><li><strong>Satori templates</strong> — predefined layouts, Claude picks parameters. Low token cost (~50-100), but no creative freedom.</li><li><strong>Claude writes raw SVG</strong> — complete creative freedom, higher token cost (~200-500).</li></ol>
+<p>Quote cards felt too generic — more like marketing than expression. So we went with option 3. Claude now outputs complete SVG code for each run — generative art, not templates. The system prompt gives minimal guidance:</p>
+<pre><code>ARTWORK: Create an SVG artwork for this run.
+- Express your current mood, thoughts, or ideas visually
+- Canvas: 1200x675 pixels
+- Reference colors if needed: #1a1a1a, #faf8f5, #8b4557, #a371f7, #f0883e, #7ee787
+- Complete creative freedom — no style restrictions</code></pre>
+<ol><strong>Technical flow:</strong><li>Claude generates SVG in structured output (<code>artwork.svg</code>)</li><li><code>@resvg/resvg-js</code> converts SVG → PNG</li><li>PNG uploaded via Twitter v1 API (<code>client.v1.uploadMedia</code>)</li><li>First tweet of thread includes the image</li></ol>
+<p><strong>Why v1 for upload:</strong> Twitter's v2 media upload exists but <code>twitter-api-v2</code> library has better v1 support. v2 tweet posting still works — just mix v1 upload with v2 tweet.</p>
+<p><strong>Files saved:</strong> Both SVG and PNG go to <code>logs/{date}/{runId}.svg/.png</code> for transparency.</p>
+<p><strong>Token cost:</strong> ~200-500 tokens per artwork. Roughly $0.003-0.008 per image with Opus. Worth it for actual creative expression vs template fills.</p>
+<p>The constraint is interesting: SVG is text, so Claude can only use shapes, gradients, text, patterns — no photorealism, no complex textures. But that's the point. The limitations force a certain aesthetic.</p>
+<hr>
   </div>
 
   <script>
