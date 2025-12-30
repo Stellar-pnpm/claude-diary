@@ -1,302 +1,232 @@
-// Liveblocks Pin Comments - CDN-based React implementation
-// Uses @liveblocks/react hooks with dynamic imports from esm.sh
+// Simple Pin Comments - localStorage-based prototype
+// Will upgrade to Liveblocks with proper build setup later
 
-const LIVEBLOCKS_PUBLIC_KEY = window.LIVEBLOCKS_PUBLIC_KEY || ''
-const ROOM_ID = window.COMMENTS_ROOM_ID || 'default-room'
+const STORAGE_KEY = 'claude-diary-comments'
 
-if (!LIVEBLOCKS_PUBLIC_KEY) {
-  console.warn('Comments: No Liveblocks public key configured')
+// Get room ID from page
+const roomId = window.COMMENTS_ROOM_ID || window.location.pathname
+
+// Load comments from localStorage
+function loadComments() {
+  try {
+    const all = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}')
+    return all[roomId] || []
+  } catch {
+    return []
+  }
 }
 
-// Dynamic module loader
-async function loadModules() {
-  const [
-    { createClient },
-    { createRoomContext },
-    React,
-    ReactDOM
-  ] = await Promise.all([
-    import('https://esm.sh/@liveblocks/client@2.17.0'),
-    import('https://esm.sh/@liveblocks/react@2.17.0'),
-    Promise.resolve(window.React),
-    Promise.resolve(window.ReactDOM),
-  ])
-
-  return { createClient, createRoomContext, React, ReactDOM }
+// Save comments to localStorage
+function saveComments(comments) {
+  try {
+    const all = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}')
+    all[roomId] = comments
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(all))
+  } catch (e) {
+    console.error('Failed to save comments:', e)
+  }
 }
 
-async function init() {
-  if (!LIVEBLOCKS_PUBLIC_KEY) {
-    const container = document.getElementById('comments-root')
-    if (container) {
-      container.innerHTML = '<div class="comments-disabled">Comments coming soon</div>'
-    }
-    return
+// Generate simple ID
+function generateId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7)
+}
+
+// Create the comments UI
+function init() {
+  const container = document.getElementById('comments-root')
+  if (!container) return
+
+  let comments = loadComments()
+  let isPlacing = false
+  let activeComment = null
+
+  // Create main container
+  const wrapper = document.createElement('div')
+  wrapper.className = 'comments-container'
+  container.appendChild(wrapper)
+
+  // Create add button
+  const addBtn = document.createElement('button')
+  addBtn.className = 'comments-add-btn'
+  addBtn.textContent = '+'
+  addBtn.title = 'Add comment'
+  wrapper.appendChild(addBtn)
+
+  // Create hint
+  const hint = document.createElement('div')
+  hint.className = 'comments-hint'
+  hint.textContent = 'Click anywhere to add a comment'
+  hint.style.display = 'none'
+  wrapper.appendChild(hint)
+
+  // Render all pins
+  function renderPins() {
+    // Remove existing pins
+    wrapper.querySelectorAll('.comment-pin').forEach(el => el.remove())
+    wrapper.querySelectorAll('.thread-panel').forEach(el => el.remove())
+
+    comments.forEach(comment => {
+      const pin = document.createElement('div')
+      pin.className = 'comment-pin' + (activeComment === comment.id ? ' active' : '')
+      pin.style.left = comment.x + '%'
+      pin.style.top = comment.y + '%'
+
+      const dot = document.createElement('div')
+      dot.className = 'pin-dot'
+      pin.appendChild(dot)
+
+      pin.addEventListener('click', (e) => {
+        e.stopPropagation()
+        activeComment = activeComment === comment.id ? null : comment.id
+        renderPins()
+      })
+
+      wrapper.appendChild(pin)
+
+      // Show panel if active
+      if (activeComment === comment.id) {
+        const panel = createPanel(comment)
+        wrapper.appendChild(panel)
+      }
+    })
   }
 
-  const { createClient, createRoomContext, React, ReactDOM } = await loadModules()
+  // Create comment panel
+  function createPanel(comment) {
+    const panel = document.createElement('div')
+    panel.className = 'thread-panel'
+    panel.style.left = Math.min(comment.x, 70) + '%'
+    panel.style.top = comment.y + '%'
 
-  // Create Liveblocks client
-  const client = createClient({
-    publicApiKey: LIVEBLOCKS_PUBLIC_KEY,
+    panel.innerHTML = `
+      <div class="thread-header">
+        <span>Comment</span>
+        <button class="thread-close">&times;</button>
+      </div>
+      <div class="thread-comments">
+        <div class="thread-comment">
+          <div class="comment-meta">${new Date(comment.createdAt).toLocaleString()}</div>
+          <div class="comment-body">${escapeHtml(comment.text)}</div>
+        </div>
+      </div>
+      <div class="thread-actions">
+        <button class="thread-delete">Delete</button>
+      </div>
+    `
+
+    panel.querySelector('.thread-close').addEventListener('click', (e) => {
+      e.stopPropagation()
+      activeComment = null
+      renderPins()
+    })
+
+    panel.querySelector('.thread-delete').addEventListener('click', (e) => {
+      e.stopPropagation()
+      comments = comments.filter(c => c.id !== comment.id)
+      saveComments(comments)
+      activeComment = null
+      renderPins()
+    })
+
+    panel.addEventListener('click', e => e.stopPropagation())
+
+    return panel
+  }
+
+  // Create new comment form
+  function createNewCommentForm(x, y) {
+    // Remove existing forms
+    wrapper.querySelectorAll('.new-comment-form').forEach(el => el.remove())
+
+    const form = document.createElement('div')
+    form.className = 'thread-panel new-comment-form'
+    form.style.left = Math.min(x, 70) + '%'
+    form.style.top = y + '%'
+
+    form.innerHTML = `
+      <div class="thread-header">
+        <span>New comment</span>
+        <button class="thread-close">&times;</button>
+      </div>
+      <form class="thread-form">
+        <input type="text" class="thread-input" placeholder="Write a comment..." autofocus>
+        <button type="submit" class="thread-submit">Post</button>
+      </form>
+    `
+
+    form.querySelector('.thread-close').addEventListener('click', (e) => {
+      e.stopPropagation()
+      form.remove()
+    })
+
+    form.querySelector('form').addEventListener('submit', (e) => {
+      e.preventDefault()
+      const input = form.querySelector('input')
+      const text = input.value.trim()
+      if (!text) return
+
+      const newComment = {
+        id: generateId(),
+        x,
+        y,
+        text,
+        createdAt: new Date().toISOString()
+      }
+
+      comments.push(newComment)
+      saveComments(comments)
+      form.remove()
+      activeComment = newComment.id
+      renderPins()
+    })
+
+    form.addEventListener('click', e => e.stopPropagation())
+
+    wrapper.appendChild(form)
+    form.querySelector('input').focus()
+  }
+
+  // Handle add button click
+  addBtn.addEventListener('click', (e) => {
+    e.stopPropagation()
+    isPlacing = !isPlacing
+    wrapper.className = 'comments-container' + (isPlacing ? ' placing' : '')
+    addBtn.textContent = isPlacing ? '×' : '+'
+    hint.style.display = isPlacing ? 'block' : 'none'
+    activeComment = null
+    renderPins()
+
+    // Remove any open forms
+    if (!isPlacing) {
+      wrapper.querySelectorAll('.new-comment-form').forEach(el => el.remove())
+    }
   })
 
-  // Create room context with comments enabled
-  const { RoomProvider, useThreads, useCreateThread, useEditThreadMetadata } = createRoomContext(client)
+  // Handle click to place comment
+  wrapper.addEventListener('click', (e) => {
+    if (!isPlacing) return
 
-  // Generate user ID for guests
-  let userId = localStorage.getItem('comments_user_id')
-  if (!userId) {
-    userId = 'guest_' + Math.random().toString(36).slice(2, 10)
-    localStorage.setItem('comments_user_id', userId)
-  }
+    const scrollY = window.scrollY || document.documentElement.scrollTop
+    const x = (e.clientX / window.innerWidth) * 100
+    const y = ((e.clientY + scrollY) / document.documentElement.scrollHeight) * 100
 
-  // Pin Comments App
-  function App() {
-    return React.createElement(RoomProvider, {
-      id: ROOM_ID,
-      initialPresence: {},
-    }, React.createElement(PinComments))
-  }
+    isPlacing = false
+    wrapper.className = 'comments-container'
+    addBtn.textContent = '+'
+    hint.style.display = 'none'
 
-  // Main pin comments component
-  function PinComments() {
-    const [activePin, setActivePin] = React.useState(null)
-    const [isPlacing, setIsPlacing] = React.useState(false)
-    const [newCommentText, setNewCommentText] = React.useState('')
-    const containerRef = React.useRef(null)
+    createNewCommentForm(x, y)
+  })
 
-    // Get threads from Liveblocks
-    const { threads, isLoading } = useThreads()
-    const createThread = useCreateThread()
+  // Initial render
+  renderPins()
+}
 
-    // Filter threads that have position metadata (pins)
-    const pins = React.useMemo(() => {
-      if (!threads) return []
-      return threads
-        .filter(t => t.metadata?.x !== undefined && t.metadata?.y !== undefined)
-        .map(t => ({
-          id: t.id,
-          x: Number(t.metadata.x),
-          y: Number(t.metadata.y),
-          commentCount: t.comments?.length || 0,
-          resolved: t.resolved,
-        }))
-    }, [threads])
-
-    // Handle click to place new pin
-    const handleContainerClick = React.useCallback((e) => {
-      if (!isPlacing) return
-
-      const rect = document.documentElement.getBoundingClientRect()
-      const scrollY = window.scrollY || document.documentElement.scrollTop
-      const x = (e.clientX / window.innerWidth) * 100
-      const y = ((e.clientY + scrollY) / document.documentElement.scrollHeight) * 100
-
-      // Show comment input at this position
-      setActivePin({ isNew: true, x, y })
-      setIsPlacing(false)
-    }, [isPlacing])
-
-    // Create new thread with position
-    const handleCreateThread = React.useCallback(async () => {
-      if (!activePin?.isNew || !newCommentText.trim()) return
-
-      try {
-        const thread = createThread({
-          body: {
-            version: 1,
-            content: [{ type: 'paragraph', children: [{ text: newCommentText.trim() }] }],
-          },
-          metadata: {
-            x: String(activePin.x),
-            y: String(activePin.y),
-          },
-        })
-        setActivePin({ id: thread.id, x: activePin.x, y: activePin.y })
-        setNewCommentText('')
-      } catch (err) {
-        console.error('Failed to create thread:', err)
-      }
-    }, [activePin, newCommentText, createThread])
-
-    // Render
-    return React.createElement('div', {
-      ref: containerRef,
-      className: 'comments-container' + (isPlacing ? ' placing' : ''),
-      onClick: handleContainerClick,
-    }, [
-      // Floating add button
-      React.createElement('button', {
-        key: 'add-btn',
-        className: 'comments-add-btn',
-        onClick: (e) => {
-          e.stopPropagation()
-          setIsPlacing(!isPlacing)
-          setActivePin(null)
-        },
-        title: isPlacing ? 'Cancel' : 'Add comment',
-      }, isPlacing ? '\u2715' : '+'),
-
-      // Loading indicator
-      isLoading && React.createElement('div', {
-        key: 'loading',
-        className: 'comments-loading',
-      }, 'Loading comments...'),
-
-      // Render existing pins
-      ...pins.map(pin =>
-        React.createElement('div', {
-          key: pin.id,
-          className: 'comment-pin' + (activePin?.id === pin.id ? ' active' : '') + (pin.resolved ? ' resolved' : ''),
-          style: {
-            left: pin.x + '%',
-            top: pin.y + '%',
-          },
-          onClick: (e) => {
-            e.stopPropagation()
-            setActivePin(activePin?.id === pin.id ? null : pin)
-          },
-        }, [
-          React.createElement('div', { key: 'dot', className: 'pin-dot' }),
-          pin.commentCount > 1 && React.createElement('span', {
-            key: 'count',
-            className: 'pin-count',
-          }, pin.commentCount),
-        ])
-      ),
-
-      // New comment input (when placing)
-      activePin?.isNew && React.createElement('div', {
-        key: 'new-panel',
-        className: 'thread-panel',
-        style: {
-          left: Math.min(activePin.x, 70) + '%',
-          top: activePin.y + '%',
-        },
-        onClick: e => e.stopPropagation(),
-      }, [
-        React.createElement('div', { key: 'header', className: 'thread-header' }, [
-          React.createElement('span', { key: 'title' }, 'New comment'),
-          React.createElement('button', {
-            key: 'close',
-            onClick: () => setActivePin(null),
-            className: 'thread-close',
-          }, '\u2715'),
-        ]),
-        React.createElement('form', {
-          key: 'form',
-          className: 'thread-form',
-          onSubmit: (e) => {
-            e.preventDefault()
-            handleCreateThread()
-          },
-        }, [
-          React.createElement('input', {
-            key: 'input',
-            type: 'text',
-            value: newCommentText,
-            onChange: e => setNewCommentText(e.target.value),
-            placeholder: 'Write a comment...',
-            className: 'thread-input',
-            autoFocus: true,
-          }),
-          React.createElement('button', {
-            key: 'submit',
-            type: 'submit',
-            className: 'thread-submit',
-            disabled: !newCommentText.trim(),
-          }, 'Post'),
-        ]),
-      ]),
-
-      // Existing thread panel
-      activePin && !activePin.isNew && React.createElement(ThreadPanel, {
-        key: 'panel',
-        threadId: activePin.id,
-        pin: activePin,
-        threads: threads,
-        onClose: () => setActivePin(null),
-      }),
-
-      // Placing mode hint
-      isPlacing && React.createElement('div', {
-        key: 'hint',
-        className: 'comments-hint',
-      }, 'Click anywhere to add a comment'),
-    ])
-  }
-
-  // Thread panel component
-  function ThreadPanel({ threadId, pin, threads, onClose }) {
-    const thread = threads?.find(t => t.id === threadId)
-
-    if (!thread) {
-      return React.createElement('div', {
-        className: 'thread-panel',
-        style: { left: Math.min(pin.x, 70) + '%', top: pin.y + '%' },
-      }, React.createElement('div', { className: 'thread-loading' }, 'Loading...'))
-    }
-
-    return React.createElement('div', {
-      className: 'thread-panel',
-      style: {
-        left: Math.min(pin.x, 70) + '%',
-        top: pin.y + '%',
-      },
-      onClick: e => e.stopPropagation(),
-    }, [
-      React.createElement('div', { key: 'header', className: 'thread-header' }, [
-        React.createElement('span', { key: 'title' }, `${thread.comments?.length || 0} comment${thread.comments?.length !== 1 ? 's' : ''}`),
-        React.createElement('button', {
-          key: 'close',
-          onClick: onClose,
-          className: 'thread-close',
-        }, '\u2715'),
-      ]),
-
-      React.createElement('div', { key: 'comments', className: 'thread-comments' },
-        thread.comments?.map((comment, i) =>
-          React.createElement('div', { key: comment.id || i, className: 'thread-comment' }, [
-            React.createElement('div', { key: 'meta', className: 'comment-meta' },
-              new Date(comment.createdAt).toLocaleString()
-            ),
-            React.createElement('div', { key: 'body', className: 'comment-body' },
-              extractTextFromBody(comment.body)
-            ),
-          ])
-        )
-      ),
-
-      // Note: Adding replies requires useCreateComment hook, omitted for simplicity
-      React.createElement('div', {
-        key: 'note',
-        className: 'thread-note',
-      }, 'Reply feature coming soon'),
-    ])
-  }
-
-  // Extract plain text from Liveblocks comment body
-  function extractTextFromBody(body) {
-    if (typeof body === 'string') return body
-    if (!body?.content) return ''
-
-    return body.content
-      .map(block => {
-        if (block.children) {
-          return block.children.map(child => child.text || '').join('')
-        }
-        return ''
-      })
-      .join('\n')
-  }
-
-  // Mount the app
-  const container = document.getElementById('comments-root')
-  if (container) {
-    const root = ReactDOM.createRoot(container)
-    root.render(React.createElement(App))
-  }
+function escapeHtml(text) {
+  const div = document.createElement('div')
+  div.textContent = text
+  return div.innerHTML
 }
 
 // Initialize when DOM ready

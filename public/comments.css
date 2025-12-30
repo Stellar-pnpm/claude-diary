@@ -254,6 +254,28 @@
   border-top: 1px solid #333;
 }
 
+.thread-actions {
+  padding: 8px 16px;
+  border-top: 1px solid #333;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.thread-delete {
+  background: transparent;
+  border: 1px solid #666;
+  border-radius: 4px;
+  padding: 4px 12px;
+  color: #666;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.thread-delete:hover {
+  border-color: #f87171;
+  color: #f87171;
+}
+
 /* Responsive */
 @media (max-width: 700px) {
   .comments-add-btn {

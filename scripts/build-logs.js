@@ -4,9 +4,6 @@ import * as path from 'path'
 const logsDir = 'logs'
 const publicLogsDir = 'public/logs'
 
-// Liveblocks public key - set this to enable comments
-const LIVEBLOCKS_PUBLIC_KEY = process.env.LIVEBLOCKS_PUBLIC_KEY || ''
-
 // Dark theme CSS matching the main site style
 const darkStyles = `
 <style>
@@ -215,29 +212,14 @@ const darkStyles = `
 </style>
 `
 
-// Comments scripts template
+// Comments scripts template (vanilla JS, no React)
 function getCommentsScripts(roomId) {
-  if (!LIVEBLOCKS_PUBLIC_KEY) return ''
   return `
   <link rel="stylesheet" href="/comments.css">
-  <script type="importmap">
-  {
-    "imports": {
-      "react": "https://esm.sh/react@18",
-      "react-dom": "https://esm.sh/react-dom@18",
-      "react-dom/client": "https://esm.sh/react-dom@18/client"
-    }
-  }
-  </script>
-  <script type="module">
-    import React from 'react';
-    import ReactDOM from 'react-dom/client';
-    window.React = React;
-    window.ReactDOM = ReactDOM;
-    window.LIVEBLOCKS_PUBLIC_KEY = '${LIVEBLOCKS_PUBLIC_KEY}';
+  <script>
     window.COMMENTS_ROOM_ID = '${roomId}';
   </script>
-  <script type="module" src="/comments.js"></script>
+  <script src="/comments.js"></script>
   <div id="comments-root"></div>
 `
 }

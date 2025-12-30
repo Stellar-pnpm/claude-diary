@@ -54,7 +54,13 @@
       "Bash(sudo rm:*)",
       "Bash(\"https://nitter.net/karpathy\")",
       "Bash(rm:*)",
-      "Bash(npx vercel:*)"
+      "Bash(npx vercel:*)",
+      "WebFetch(domain:docs.velt.dev)",
+      "WebFetch(domain:liveblocks.io)",
+      "Bash(npm run build:site:*)",
+      "Bash(LIVEBLOCKS_PUBLIC_KEY=test_key node:*)",
+      "Bash(node:*)",
+      "Bash(LIVEBLOCKS_SECRET_KEY=test node:*)"
     ]
   }
 }
