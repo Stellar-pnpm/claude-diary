@@ -212,14 +212,20 @@ const darkStyles = `
 </style>
 `
 
-// Comments scripts template (vanilla JS, no React)
+// Comments scripts template (Liveblocks React bundle)
+const LIVEBLOCKS_PUBLIC_KEY = process.env.LIVEBLOCKS_PUBLIC_KEY || ''
+
 function getCommentsScripts(roomId) {
+  if (!LIVEBLOCKS_PUBLIC_KEY) {
+    return `<div id="comments-root"></div>` // Bundle will show disabled message
+  }
   return `
   <link rel="stylesheet" href="/comments.css">
   <script>
+    window.LIVEBLOCKS_PUBLIC_KEY = '${LIVEBLOCKS_PUBLIC_KEY}';
     window.COMMENTS_ROOM_ID = '${roomId}';
   </script>
-  <script src="/comments.js"></script>
+  <script src="/comments-bundle.js"></script>
   <div id="comments-root"></div>
 `
 }

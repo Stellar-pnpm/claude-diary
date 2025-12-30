@@ -77,8 +77,8 @@
 .thread-panel {
   position: absolute;
   transform: translateY(-50%);
-  width: 280px;
-  max-height: 400px;
+  width: 320px;
+  max-height: 500px;
   background: #242424;
   border-radius: 8px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
@@ -87,6 +87,13 @@
   flex-direction: column;
   margin-left: 20px;
   z-index: 1003;
+  overflow: hidden;
+}
+
+.thread-content {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 350px;
 }
 
 .thread-header {
@@ -274,6 +281,49 @@
 .thread-delete:hover {
   border-color: #f87171;
   color: #f87171;
+}
+
+/* Liveblocks dark theme overrides */
+.lb-root {
+  --lb-accent: #8b4557;
+  --lb-accent-foreground: #faf8f5;
+  --lb-background: #242424;
+  --lb-foreground: #faf8f5;
+  --lb-muted: #333;
+  --lb-muted-foreground: #a0a0a0;
+  --lb-border: #333;
+  --lb-radius: 4px;
+}
+
+.lb-thread,
+.lb-composer {
+  background: transparent !important;
+  border: none !important;
+}
+
+.lb-comment {
+  background: #1a1a1a !important;
+  border-radius: 4px !important;
+  margin-bottom: 8px !important;
+}
+
+.lb-composer-editor {
+  background: #1a1a1a !important;
+  border: 1px solid #333 !important;
+  border-radius: 4px !important;
+  color: #faf8f5 !important;
+}
+
+.lb-composer-editor:focus-within {
+  border-color: #8b4557 !important;
+}
+
+.lb-button[data-variant="primary"] {
+  background: #8b4557 !important;
+}
+
+.lb-button[data-variant="primary"]:hover {
+  background: #a35567 !important;
 }
 
 /* Responsive */
