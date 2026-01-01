@@ -167,20 +167,22 @@ async function main() {
 
       if (!checkOnly) {
         const postedIds = await postThread(thread, artworkPng)
-        if (postedIds.length > 0) {
-          const threadId = postedIds[0]
-          thread.forEach((content, i) => {
-            if (postedIds[i]) {
-              log.tweetsPosted.push({
-                tweetId: postedIds[i],
-                content,
-                postedAt: new Date().toISOString(),
-                source: 'thread',
-                threadIndex: i,
-                threadId
-              })
-            }
+        const threadId = postedIds.length > 0 ? postedIds[0] : undefined
+
+        // Save all tweets, mark which ones were successfully posted
+        thread.forEach((content, i) => {
+          log.tweetsPosted.push({
+            tweetId: postedIds[i] || '',
+            content,
+            postedAt: new Date().toISOString(),
+            source: 'thread',
+            threadIndex: i,
+            threadId,
+            posted: !!postedIds[i]
           })
+        })
+
+        if (postedIds.length > 0) {
           state.lastTweetAt = new Date().toISOString()
           state.tweetCount += postedIds.length
           console.log(`   ✅ Posted (${postedIds.join(' → ')})`)
@@ -210,6 +212,8 @@ async function main() {
             console.log(`   🔍 New search topics: ${pendingNewSearchTopics.join(', ')}`)
             pendingNewSearchTopics = undefined
           }
+        } else {
+          console.log(`   ❌ Failed to post thread`)
         }
       } else {
         console.log('   [CHECK ONLY - not posting]')
@@ -231,25 +235,31 @@ async function main() {
         }
 
         console.log(`   ${decision.action.toUpperCase()} @${decision.authorUsername}: "${decision.reason}"`)
+        const originalTweet = tweets.find(t => t.id === decision.tweetId)?.text || ''
 
         if (!checkOnly) {
           // Only reply is supported (free API tier doesn't allow like/retweet)
           if (decision.action === 'reply' && decision.replyContent) {
             const replyId = await replyToTweet(decision.replyContent, decision.tweetId)
+            console.log(`     → "${decision.replyContent}"`)
+
+            // Save interaction regardless of success, mark posted status
+            log.interactions.push({
+              type: 'reply',
+              tweetId: decision.tweetId,
+              authorUsername: decision.authorUsername,
+              originalTweet,
+              reason: decision.reason,
+              replyContent: decision.replyContent,
+              performedAt: new Date().toISOString(),
+              posted: !!replyId
+            })
+
             if (replyId) {
-              console.log(`     → "${decision.replyContent}"`)
-              const originalTweet = tweets.find(t => t.id === decision.tweetId)?.text || ''
-              log.interactions.push({
-                type: 'reply',
-                tweetId: decision.tweetId,
-                authorUsername: decision.authorUsername,
-                originalTweet,
-                reason: decision.reason,
-                replyContent: decision.replyContent,
-                performedAt: new Date().toISOString()
-              })
               interactedAccounts.add(decision.authorUsername)
               console.log(`   ✅ Done`)
+            } else {
+              console.log(`   ❌ Failed to post`)
             }
           }
         } else {

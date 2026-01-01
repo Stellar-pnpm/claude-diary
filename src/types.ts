@@ -49,6 +49,7 @@ export interface TweetLog {
   source: 'thread'
   threadIndex?: number
   threadId?: string
+  posted?: boolean  // false if failed to post (e.g. account suspended)
 }
 
 // Tweet from search results
@@ -69,6 +70,7 @@ export interface InteractionLog {
   reason: string
   replyContent?: string  // for replies
   performedAt: string
+  posted?: boolean  // false if failed to post (e.g. account suspended)
 }
 
 export interface ReplyLog {
