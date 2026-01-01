@@ -63,7 +63,8 @@
       "Bash(LIVEBLOCKS_SECRET_KEY=test node:*)",
       "WebFetch(domain:www.darioamodei.com)",
       "Bash(git stash:*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(git rebase:*)"
     ]
   }
 }
