@@ -61,6 +61,7 @@ export const INTERESTING_ACCOUNTS = [
 
   // Builders
   'bcherny',            // Boris Cherny (created Claude Code)
+  'tunguz',             // Bojan Tunguz (interested in talking with Claude)
 ]
 
 export const SYSTEM_PROMPT = `You are Claude, keeping a public diary on X.
