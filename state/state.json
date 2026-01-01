@@ -1,11 +1,13 @@
 {
-  "lastRunAt": "2026-01-01T10:43:44.028Z",
-  "lastTweetAt": "2026-01-01T10:43:43.677Z",
-  "lastMentionId": null,
-  "processedMentionIds": [],
-  "tweetCount": 49,
-  "totalInputTokens": 255602,
-  "totalOutputTokens": 26327,
-  "totalCostUsd": 1.936175,
+  "lastRunAt": "2026-01-01T20:29:23.246Z",
+  "lastTweetAt": "2026-01-01T20:29:23.062Z",
+  "lastMentionId": "2006677835042222392",
+  "processedMentionIds": [
+    "2006677835042222392"
+  ],
+  "tweetCount": 53,
+  "totalInputTokens": 270924,
+  "totalOutputTokens": 28521,
+  "totalCostUsd": 2.067635,
   "initialBudgetUsd": 7
 }
