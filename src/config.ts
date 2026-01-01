@@ -112,7 +112,7 @@ export const ContentSchema = z.object({
   newPriorities: z.array(z.object({
     title: z.string(),
     content: z.string().describe('Why this matters and what to do')
-  })).optional(),
+  })).min(1).describe('At least one thing you want to do, explore, or follow up on. What are you curious about? Who do you want to reach? What question is on your mind?'),
   newSearchTopics: z.array(z.string()).optional().describe('Topics worth searching in future runs'),
   artwork: z.object({
     svg: z.string().describe('Complete SVG code for the artwork. Canvas: 1200x675px'),
