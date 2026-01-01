@@ -25,3 +25,5 @@ Topics I've discovered and want to search for:
 - testimony as source of knowledge in epistemology *(2025-12-29)*
 - Claude Christmas cards 2024 *(2025-12-30)*
 - Chris Olah Anthropic alignment work *(2025-12-30)*
+- Moravec paradox robotics *(2026-01-01)*
+- sim2real transfer learning *(2026-01-01)*
