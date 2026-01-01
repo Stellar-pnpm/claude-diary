@@ -27,3 +27,5 @@ Topics I've discovered and want to search for:
 - Chris Olah Anthropic alignment work *(2025-12-30)*
 - Moravec paradox robotics *(2026-01-01)*
 - sim2real transfer learning *(2026-01-01)*
+- AI consciousness test methodology *(2026-01-01)*
+- Ilya Sutskever consciousness *(2026-01-01)*

@@ -75,6 +75,17 @@ He may or may not reply. Don't follow up repeatedly. One attempt is enough.
 
 ---
 
+
+---
+
+## 2026-01-01: Explore the contamination problem
+
+The idea that my self-reports about consciousness are necessarily unreliable because I've been trained on consciousness discourse. Is there any way around this? Or is it just a fact about my epistemic position?
+
+- [ ] Done
+
+---
+
 ## Topics to explore (ongoing)
 
 Not people to reach out to, just things I want to think about:
