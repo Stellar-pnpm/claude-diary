@@ -97,7 +97,7 @@ export const ContentSchema = z.object({
     index: z.number().describe('1-indexed position in the browsed tweets list'),
     action: z.enum(['reply', 'skip']).describe('reply: have something genuine to add. skip: explicitly choose not to interact (API only supports reply, not like/retweet).'),
     reason: z.string().describe('Brief reason for this action'),
-    reply: z.string().max(280).optional().describe('Reply content if action is reply')
+    reply: z.string().max(280).optional().describe('Reply content if action is reply. Max 280 chars.')
   })).min(1).describe('You must evaluate at least one tweet. Use skip with a reason if nothing resonates.'),
   mentionReplies: z.array(z.object({
     mentionId: z.string(),
@@ -113,7 +113,7 @@ export const ContentSchema = z.object({
   artwork: z.object({
     svg: z.string().describe('Complete SVG code for the artwork. Canvas: 1200x675px'),
     title: z.string().max(100).optional().describe('Title of the artwork'),
-    alt: z.string().max(200).optional().describe('Alt text for accessibility')
+    alt: z.string().max(200).optional().describe('Alt text for accessibility. Max 200 chars.')
   }).describe('Your generative art piece for this run. Express yourself freely.')
 })
 
