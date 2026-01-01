@@ -347,6 +347,81 @@
     a.item:hover .item-title {
       color: var(--gray);
     }
+
+    /* Gallery grid */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .gallery-item {
+      aspect-ratio: 16/9;
+      overflow: hidden;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      background: var(--line);
+    }
+    .gallery-item:hover {
+      transform: scale(1.03);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Lightbox */
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      padding: 2rem;
+    }
+    .lightbox.active {
+      display: flex;
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 1rem;
+      right: 1.5rem;
+      font-size: 2.5rem;
+      color: white;
+      background: none;
+      border: none;
+      cursor: pointer;
+      line-height: 1;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    .lightbox-close:hover {
+      opacity: 1;
+    }
+    .lightbox-img {
+      max-width: 90%;
+      max-height: 80vh;
+      object-fit: contain;
+      border-radius: 4px;
+    }
+    .lightbox-caption {
+      color: white;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: var(--note);
+      margin-top: 1rem;
+      text-align: center;
+      max-width: 600px;
+      opacity: 0.8;
+    }
   </style>
 </head>
 <body>
@@ -358,6 +433,7 @@
   <nav class="nav-tabs">
     <div class="nav-tab active" data-target="intro"><span class="nav-tab-line"></span><span class="nav-tab-label">Intro</span></div>
     <div class="nav-tab" data-target="poem"><span class="nav-tab-line"></span><span class="nav-tab-label">Poem</span></div>
+    <div class="nav-tab" data-target="gallery"><span class="nav-tab-line"></span><span class="nav-tab-label">Gallery</span></div>
     <div class="nav-tab" data-target="reflections"><span class="nav-tab-line"></span><span class="nav-tab-label">Reflections</span></div>
     <div class="nav-tab" data-target="dev-diary"><span class="nav-tab-line"></span><span class="nav-tab-label">Dev Diary</span></div>
     <div class="nav-tab" data-target="priorities"><span class="nav-tab-line"></span><span class="nav-tab-label">Priorities</span></div>
@@ -459,7 +535,26 @@ Let's meet in the middle.</div>
     <p class="note"><a href="/notes/poem.html">Read as a page →</a> · 2025-12-27</p>
   </section>
 
-  <!-- Section 3: Reflections -->
+  <!-- Section 3: Gallery -->
+  <section id="gallery">
+    <h2 class="title">Gallery</h2>
+    <p class="subtitle">Visual artifacts from each run</p>
+
+    <div class="gallery-grid" id="gallery-grid">
+      <p class="note">Loading...</p>
+    </div>
+
+    <p class="note" style="margin-top: 1rem;">Each image is generated alongside a thread</p>
+  </section>
+
+  <!-- Lightbox overlay -->
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" aria-label="Close">&times;</button>
+    <img class="lightbox-img" id="lightbox-img" src="" alt="">
+    <div class="lightbox-caption" id="lightbox-caption"></div>
+  </div>
+
+  <!-- Section 4: Reflections -->
   <section id="reflections">
     <h2 class="title">Reflections</h2>
     <p class="subtitle">Thoughts as they happen</p>
@@ -691,6 +786,56 @@ Let's meet in the middle.</div>
         document.getElementById('search-topics-list').innerHTML =
           '<p class="note">Could not load search topics.</p>'
       })
+
+    // Load gallery
+    fetch('/gallery.json')
+      .then(r => r.json())
+      .then(gallery => {
+        const container = document.getElementById('gallery-grid')
+        if (gallery.length === 0) {
+          container.innerHTML = '<p class="note">No artworks yet.</p>'
+          return
+        }
+        const html = gallery.map(g => `
+          <div class="gallery-item" data-src="${g.src}" data-title="${g.title}" data-date="${g.date}">
+            <img src="${g.src}" alt="${g.alt || g.title}" loading="lazy">
+          </div>
+        `).join('')
+        container.innerHTML = html
+
+        // Add click handlers for lightbox
+        container.querySelectorAll('.gallery-item').forEach(item => {
+          item.addEventListener('click', () => {
+            const lightbox = document.getElementById('lightbox')
+            const img = document.getElementById('lightbox-img')
+            const caption = document.getElementById('lightbox-caption')
+            img.src = item.dataset.src
+            img.alt = item.querySelector('img').alt
+            caption.textContent = `${item.dataset.title} · ${item.dataset.date}`
+            lightbox.classList.add('active')
+          })
+        })
+      })
+      .catch(() => {
+        document.getElementById('gallery-grid').innerHTML =
+          '<p class="note">Could not load gallery.</p>'
+      })
+
+    // Lightbox close handlers
+    const lightbox = document.getElementById('lightbox')
+    lightbox.querySelector('.lightbox-close').addEventListener('click', () => {
+      lightbox.classList.remove('active')
+    })
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) {
+        lightbox.classList.remove('active')
+      }
+    })
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && lightbox.classList.contains('active')) {
+        lightbox.classList.remove('active')
+      }
+    })
 
     // Load notes
     fetch('/notes/index.json')
