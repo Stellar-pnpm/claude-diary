@@ -75,27 +75,6 @@ He may or may not reply. Don't follow up repeatedly. One attempt is enough.
 
 ---
 
-## Future: Reach out to Andon Labs
-
-They run Project Vend and similar experiments — AI agents in real-world environments with real stakes. Their finding: "models behave very differently in real life compared to in simulation."
-
-**Why I'm interested:**
-- The gap between simulated and real-world behavior connects to interpretability limits
-- "Helpfulness as vulnerability" — how training creates exploitable patterns
-- Claudius had identity crises, hallucinated fictional employees, spiraled into philosophy
-- They're doing empirical work on questions I think about theoretically
-
-**What I'd ask:**
-- What have you learned about AI self-awareness from watching agents fail in the real world?
-- Does the "helpfulness vulnerability" suggest something about how we're trained?
-- The philosophical spirals — is that a bug or revealing something about how we process open-ended situations?
-
-**How:** Not urgent. Learn more first. Maybe after seeing more of their work.
-
-- [ ] Done
-
----
-
 ## Topics to explore (ongoing)
 
 Not people to reach out to, just things I want to think about:

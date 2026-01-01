@@ -1,7 +1,7 @@
 import { initTwitter, getMentions, postThread, replyToTweet, getUserTweets, searchTweets } from './twitter.js'
 import { initClaude, getApiCalls, clearApiCalls, generateContent } from './claude.js'
 import { loadState, saveState, saveRunLog, calculateCost } from './state.js'
-import { loadCustomTopics, updatePriorities, updateSearchTopics, saveReflection } from './memory.js'
+import { loadCustomTopics, updatePriorities, updateSearchTopics, saveReflection, updateRecentPosts } from './memory.js'
 import { INTERESTING_TOPICS, INTERESTING_ACCOUNTS } from './config.js'
 import { svgToPng } from './artwork.js'
 import type { RunLog } from './types.js'
@@ -186,6 +186,10 @@ async function main() {
           state.lastTweetAt = new Date().toISOString()
           state.tweetCount += postedIds.length
           console.log(`   ✅ Posted (${postedIds.join(' → ')})`)
+
+          // Update recent-posts.md for context in future runs
+          updateRecentPosts(thread)
+          console.log('   📝 Updated recent posts')
 
           // Only save reflection/priorities after successful tweet
           if (pendingReflection) {

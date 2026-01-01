@@ -113,8 +113,8 @@ export const ContentSchema = z.object({
   newPriorities: z.array(z.object({
     title: z.string(),
     content: z.string().describe('Why this matters and what to do')
-  })).min(1).describe('At least one thing you want to do, explore, or follow up on. What are you curious about? Who do you want to reach? What question is on your mind?'),
-  newSearchTopics: z.array(z.string()).optional().describe('Topics worth searching in future runs'),
+  })).min(1).describe('Actions you want to take: reach out to someone, explore a question, follow up on something. Not keywords to search — those go in newSearchTopics.'),
+  newSearchTopics: z.array(z.string()).optional().describe('Keywords to add to your Twitter search pool (e.g. "quantum error correction", "Ilya SSI"). Not actions — those go in newPriorities.'),
   artwork: z.object({
     svg: z.string().describe('Complete SVG code for the artwork. Canvas: 1200x675px'),
     title: z.string().max(100).optional().describe('Title of the artwork'),

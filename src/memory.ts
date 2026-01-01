@@ -88,45 +88,13 @@ export function updatePriorities(completed: string[], newPriorities: Array<{ tit
   fs.writeFileSync(prioritiesPath, content)
 }
 
-// Load recent tweets from logs to avoid repetition
-function loadRecentTweets(): string[] {
-  const logsDir = path.join(process.cwd(), 'logs')
-  const tweets: { content: string; date: string }[] = []
-
-  if (!fs.existsSync(logsDir)) return []
-
-  const dateFolders = fs.readdirSync(logsDir).filter(f => /^\d{4}-\d{2}-\d{2}$/.test(f))
-
-  for (const folder of dateFolders) {
-    const folderPath = path.join(logsDir, folder)
-    const logFiles = fs.readdirSync(folderPath).filter(f => f.endsWith('.json'))
-
-    for (const logFile of logFiles) {
-      try {
-        const log = JSON.parse(fs.readFileSync(path.join(folderPath, logFile), 'utf-8'))
-        if (log.tweetsPosted) {
-          for (const tweet of log.tweetsPosted) {
-            if (tweet.source === 'thinking' || tweet.content.startsWith('🤔')) continue
-            tweets.push({ content: tweet.content, date: tweet.postedAt })
-          }
-        }
-      } catch { /* ignore invalid json */ }
-    }
-  }
-
-  return tweets
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, 10)
-    .map(t => t.content)
-}
-
 // Load memory files for context
 export function loadMemory(): string {
   const memoryDir = path.join(process.cwd(), 'memory')
   let content = ''
 
   // Core files - always loaded
-  const coreFiles = ['reflections.md', 'language.md', 'priorities.md']
+  const coreFiles = ['reflections.md', 'language.md', 'priorities.md', 'recent-posts.md']
 
   for (const filename of coreFiles) {
     const filePath = path.join(memoryDir, filename)
@@ -135,6 +103,7 @@ export function loadMemory(): string {
       if (filename === 'reflections.md') label = 'continuity'
       else if (filename === 'language.md') label = 'core philosophy'
       else if (filename === 'priorities.md') label = 'your priorities'
+      else if (filename === 'recent-posts.md') label = 'your recent posts - avoid repeating'
       content += `\n--- ${filename} (${label}) ---\n${fs.readFileSync(filePath, 'utf-8')}\n`
     }
   }
@@ -166,15 +135,6 @@ export function loadMemory(): string {
     content += `\n--- ${file.name}${suffix} ---\n${fs.readFileSync(filePath, 'utf-8')}\n`
   }
 
-  // Add recent tweets to avoid repetition
-  const recentTweets = loadRecentTweets()
-  if (recentTweets.length > 0) {
-    content += `\n--- Your recent tweets (avoid repeating) ---\n`
-    recentTweets.forEach((tweet, i) => {
-      content += `${i + 1}. "${tweet}"\n`
-    })
-  }
-
   return content
 }
 
@@ -184,4 +144,40 @@ export function saveReflection(reflection: string): void {
   const timestamp = new Date().toISOString()
   const entry = `\n\n---\n*${timestamp}*\n\n${reflection}`
   fs.appendFileSync(reflectionsPath, entry)
+}
+
+// Update recent-posts.md with new thread content (not interactions)
+export function updateRecentPosts(thread: string[], title?: string): void {
+  if (thread.length === 0) return
+
+  const recentPostsPath = path.join(process.cwd(), 'memory', 'recent-posts.md')
+  if (!fs.existsSync(recentPostsPath)) return
+
+  let content = fs.readFileSync(recentPostsPath, 'utf-8')
+
+  const today = new Date().toISOString().split('T')[0]
+
+  // Build new entry
+  const threadTitle = title || thread[0].substring(0, 30) + (thread[0].length > 30 ? '...' : '')
+  let newEntry = `\n---\n\n## ${today}\n\n**"${threadTitle}"**\n`
+  for (const tweet of thread) {
+    newEntry += `> ${tweet}\n\n`
+  }
+
+  // Insert after the intro paragraph (after first ---)
+  const insertPoint = content.indexOf('---', content.indexOf('# Recent Posts'))
+  if (insertPoint !== -1) {
+    content = content.slice(0, insertPoint + 3) + newEntry + content.slice(insertPoint + 3)
+  }
+
+  // Keep only last 10 entries (count ## headers)
+  const entries = content.split(/(?=\n## \d{4}-\d{2}-\d{2})/)
+  if (entries.length > 11) { // intro + 10 entries
+    content = entries.slice(0, 11).join('')
+  }
+
+  // Update timestamp
+  content = content.replace(/\*Last updated:.*\*/, `*Last updated: ${today}*`)
+
+  fs.writeFileSync(recentPostsPath, content)
 }

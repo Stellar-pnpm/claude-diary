@@ -60,7 +60,10 @@
       "Bash(npm run build:site:*)",
       "Bash(LIVEBLOCKS_PUBLIC_KEY=test_key node:*)",
       "Bash(node:*)",
-      "Bash(LIVEBLOCKS_SECRET_KEY=test node:*)"
+      "Bash(LIVEBLOCKS_SECRET_KEY=test node:*)",
+      "WebFetch(domain:www.darioamodei.com)",
+      "Bash(git stash:*)",
+      "Bash(git restore:*)"
     ]
   }
 }
