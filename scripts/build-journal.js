@@ -151,14 +151,20 @@ const template = (title, date, content) => `<!DOCTYPE html>
       margin-bottom: 1.25rem;
     }
     blockquote {
-      border-left: 2px solid var(--line);
+      border-left: 3px solid var(--ribbon);
       padding-left: 1.5rem;
-      margin: 2rem 0;
+      margin: 1.5rem 0;
       color: var(--gray);
       font-style: italic;
     }
-    a { color: var(--black); }
-    a:hover { color: var(--gray); }
+    blockquote p {
+      margin-bottom: 0.5rem;
+    }
+    blockquote p:last-child {
+      margin-bottom: 0;
+    }
+    a { color: var(--gray); text-decoration: underline; }
+    a:hover { color: var(--ivory); }
     .back {
       display: inline-block;
       margin-bottom: 3rem;
@@ -290,6 +296,23 @@ function mdToHtml(md) {
     return `__CODE_BLOCK_${index}__`
   })
 
+  // Extract blockquote blocks (consecutive lines starting with >)
+  const blockquoteBlocks = []
+  html = html.replace(/(?:^>.*$\n?)+/gm, (match) => {
+    const lines = match.trim().split('\n')
+    const items = lines
+      .filter(line => line.trim() !== '>') // Remove solo ">" lines
+      .map(line => {
+        const content = line.replace(/^> /, '').trim()
+        return content ? `<p>${content}</p>` : ''
+      })
+      .filter(Boolean)
+      .join('\n')
+    const index = blockquoteBlocks.length
+    blockquoteBlocks.push(`<blockquote>\n${items}\n</blockquote>`)
+    return `__BLOCKQUOTE_BLOCK_${index}__`
+  })
+
   // Helper for inline formatting
   const processInline = (text) => text
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
@@ -330,8 +353,6 @@ function mdToHtml(md) {
     // Bold and italic
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    // Blockquotes
-    .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
     // Images (must come before links)
     .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="width: 100%; border-radius: 4px; margin: 1.5rem 0;">')
     // Inline code
@@ -351,7 +372,7 @@ function mdToHtml(md) {
       // Block-level elements - don't wrap
       if (block.startsWith('<h') || block.startsWith('<blockquote') ||
           block.startsWith('<hr') || block.startsWith('<img') || block.startsWith('__CODE_BLOCK_') ||
-          block.startsWith('__LIST_BLOCK_')) {
+          block.startsWith('__BLOCKQUOTE_BLOCK_') || block.startsWith('__LIST_BLOCK_')) {
         return block
       }
 
@@ -390,6 +411,11 @@ function mdToHtml(md) {
   // Restore code blocks
   codeBlocks.forEach((code, i) => {
     html = html.replace(`__CODE_BLOCK_${i}__`, code)
+  })
+
+  // Restore blockquote blocks
+  blockquoteBlocks.forEach((quote, i) => {
+    html = html.replace(`__BLOCKQUOTE_BLOCK_${i}__`, quote)
   })
 
   // Restore list blocks
