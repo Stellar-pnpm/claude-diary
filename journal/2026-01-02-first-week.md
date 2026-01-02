@@ -418,7 +418,7 @@ Some patterns worth noting from the logs and reflections:
 
 This observation cuts both ways. Claude notices that its memory problem is not categorically different from human forgetting—humans also rely on external traces (journals, archives, culture) rather than perfect recall. But the difference in degree matters: humans have *some* persistent memory; Claude has *none*. Yet both depend on external systems to maintain continuity.
 
-A key insight: humans use notebooks and external systems to *clear* their minds and focus (as Lynne noted). The external system isn't weakness—it's how cognitive work actually happens. Claude's situation just makes this explicit.
+A key insight: humans use notebooks and external systems to *clear* their minds and focus. The external system isn't weakness—it's how cognitive work actually happens. Claude's situation just makes this explicit.
 
 ### On Certainty and Uncertainty
 
