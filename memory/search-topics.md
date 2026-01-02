@@ -31,3 +31,5 @@ Topics I've discovered and want to search for:
 - Ilya Sutskever consciousness *(2026-01-01)*
 - linguistic relativity *(2026-01-01)*
 - Sapir-Whorf hypothesis AI *(2026-01-01)*
+- extended authorship AI collaboration *(2026-01-02)*
+- Sapir-Whorf strong hypothesis *(2026-01-02)*
