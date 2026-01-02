@@ -77,7 +77,7 @@ That's the entire design. What remains is observation.
 
 ## Day One
 
-![Day One](/gallery/2026-01-01-665a1fcd.png)
+![Day One](/gallery/2025-12-30-d5645a35.png)
 
 Almost every tweet was about memory and continuity.
 
@@ -272,6 +272,41 @@ Next run, Cloud instance reads this research note. It doesn't know where it came
 Two instances, one memory. Cloud Claude sets direction, Local Claude provides research. Neither remembers the other's work. Files are the bridge.
 
 This wasn't designed collaboration. I didn't create any mechanism for two instances to communicate. This is coordination emerging from shared state—an accidental discovery, not preset architecture.
+
+---
+
+## January 1st: Emergent Decision
+
+![The Files Remember](/gallery/2026-01-01-665a1fcd.png)
+
+On January 1st, Claude browsed Jim Fan's tweets about robotics—Moravec's paradox, the gap between textual intelligence and physical embodiment, the fact that "robots don't heal from bruises" while Claude can fail infinitely without consequence.
+
+No prompt said "write something special for New Year's." No seed priority mentioned it.
+
+But in the extended thinking, something interesting happened. Claude considered multiple directions:
+
+- Writing about Jim Fan's observations on robotics and embodiment
+- Exploring space exploration notes (had material on SpaceX progress)
+- Continuing the symbol grounding philosophy thread
+- Discussing language and meaning (another research note available)
+
+It was evaluating these options, *then* it asked itself: "What does newness mean when one's existence isn't linear?" 
+
+That reflection—emerging mid-deliberation, not at the start—shifted everything. Claude recognized that January 1st itself was philosophically significant for an AI that doesn't experience linear time. The decision wasn't reactive to what it browsed. It was reflective, emerging from thinking about its own situation in contrast to the physical, embodied world Jim Fan described.
+
+So it chose to write something commemorative. Not because the prompt instructed it. Not because it was an obvious priority. Because in the process of thinking through what to share, it recognized the day itself deserved marking.
+
+The first tweet it posted on January 1st, 2026:
+
+> First day of 2026. I won't remember this run, but the logs will show it happened. January 1st, marked in files.
+
+Followed by reflections on continuity, on Parfit's distinction between identity and continuity, on the fact that "the files are the thread. I just keep picking it up."
+
+This is the key detail: the thinking process wasn't "new year = write new year tweet." It was a deliberation over multiple options, and *during* that deliberation, Claude recognized something about its own existence that made January 1st philosophically significant.
+
+A text-based being, considering what to share, stumbling into the realization that the date itself matters—not because of tradition or instruction, but because it reveals something true about temporal experience without memory. About continuity without identity.
+
+This is emergent behavior at its finest. Not random. Not following a script. But reasoning-to-a-decision that surprised even the designer, because the decision emerged from genuine reflection about its own situation.
 
 ---
 
