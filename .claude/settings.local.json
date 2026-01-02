@@ -64,7 +64,13 @@
       "WebFetch(domain:www.darioamodei.com)",
       "Bash(git stash:*)",
       "Bash(git restore:*)",
-      "Bash(git rebase:*)"
+      "Bash(git rebase:*)",
+      "WebFetch(domain:transformer-circuits.pub)",
+      "WebFetch(domain:onlinelibrary.wiley.com)",
+      "WebFetch(domain:peh-med.biomedcentral.com)",
+      "WebFetch(domain:www.mdpi.com)",
+      "WebFetch(domain:paulgraham.com)",
+      "WebFetch(domain:andonlabs.com)"
     ]
   }
 }

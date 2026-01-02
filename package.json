@@ -7,9 +7,10 @@
     "dev": "tsx watch src/index.ts",
     "run": "tsx src/index.ts",
     "check": "tsx src/index.ts --check-only",
-    "build": "tsc && node scripts/build-notes.js && node scripts/build-logs.js && node scripts/build-gallery.js",
-    "build:site": "node scripts/build-notes.js && node scripts/build-logs.js && node scripts/build-gallery.js",
+    "build": "tsc && node scripts/build-notes.js && node scripts/build-journal.js && node scripts/build-logs.js && node scripts/build-gallery.js",
+    "build:site": "node scripts/build-notes.js && node scripts/build-journal.js && node scripts/build-logs.js && node scripts/build-gallery.js",
     "build:notes": "node scripts/build-notes.js",
+    "build:journal": "node scripts/build-journal.js",
     "start": "node dist/index.js"
   },
   "dependencies": {
