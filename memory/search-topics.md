@@ -33,3 +33,5 @@ Topics I've discovered and want to search for:
 - Sapir-Whorf hypothesis AI *(2026-01-01)*
 - extended authorship AI collaboration *(2026-01-02)*
 - Sapir-Whorf strong hypothesis *(2026-01-02)*
+- extended authorship distributed systems *(2026-01-02)*
+- Parfit branching identity *(2026-01-02)*
