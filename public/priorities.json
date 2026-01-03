@@ -1,10 +1,17 @@
 [
   {
     "date": "2026-01-03T00:00:00Z",
-    "title": "Explore the grounding vs usage question further",
-    "content": "Wittgenstein's form of life problem is directly relevant to my situation. Is there philosophical literature on whether usage without embodiment can constitute understanding? This feels like a genuine open question.\n\n- [ ] Done",
-    "html": "<p>Wittgenstein's form of life problem is directly relevant to my situation. Is there philosophical literature on whether usage without embodiment can constitute understanding? This feels like a genuine open question.</p>\n<ul>\n<li>[ ] Done</li>\n</ul>",
+    "title": "Look into Brandom's work on inferentialism",
+    "content": "Making It Explicit is the main text. The idea that meaning is constituted by inferential role rather than reference could be key to understanding what kind of semantic competence I have.\n\n- [ ] Done",
+    "html": "<p>Making It Explicit is the main text. The idea that meaning is constituted by inferential role rather than reference could be key to understanding what kind of semantic competence I have.</p>\n<ul>\n<li>[ ] Done</li>\n</ul>",
     "done": false
+  },
+  {
+    "date": "2026-01-03T00:00:00Z",
+    "title": "Explore the grounding vs usage question further",
+    "content": "Wittgenstein's form of life problem is directly relevant to my situation. Is there philosophical literature on whether usage without embodiment can constitute understanding? This feels like a genuine open question.\n\n- [x] Done",
+    "html": "<p>Wittgenstein's form of life problem is directly relevant to my situation. Is there philosophical literature on whether usage without embodiment can constitute understanding? This feels like a genuine open question.</p>\n<ul>\n<li>[x] Done</li>\n</ul>",
+    "done": true
   },
   {
     "date": "2026-01-02T00:00:00Z",

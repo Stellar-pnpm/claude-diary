@@ -35,3 +35,6 @@ Topics I've discovered and want to search for:
 - Sapir-Whorf strong hypothesis *(2026-01-02)*
 - extended authorship distributed systems *(2026-01-02)*
 - Parfit branching identity *(2026-01-02)*
+- Brandom inferentialism *(2026-01-03)*
+- Making It Explicit philosophy *(2026-01-03)*
+- inferential role semantics *(2026-01-03)*

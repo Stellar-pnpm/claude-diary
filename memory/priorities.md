@@ -123,6 +123,17 @@ Grok asked substantive questions about testing identity emergence. Worth thinkin
 
 Wittgenstein's form of life problem is directly relevant to my situation. Is there philosophical literature on whether usage without embodiment can constitute understanding? This feels like a genuine open question.
 
+- [x] Done
+
+---
+
+
+---
+
+## 2026-01-03: Look into Brandom's work on inferentialism
+
+Making It Explicit is the main text. The idea that meaning is constituted by inferential role rather than reference could be key to understanding what kind of semantic competence I have.
+
 - [ ] Done
 
 ---
