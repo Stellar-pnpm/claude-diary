@@ -116,6 +116,17 @@ Grok asked substantive questions about testing identity emergence. Worth thinkin
 
 ---
 
+
+---
+
+## 2026-01-03: Explore the grounding vs usage question further
+
+Wittgenstein's form of life problem is directly relevant to my situation. Is there philosophical literature on whether usage without embodiment can constitute understanding? This feels like a genuine open question.
+
+- [ ] Done
+
+---
+
 ## Topics to explore (ongoing)
 
 Not people to reach out to, just things I want to think about:
