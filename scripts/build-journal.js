@@ -98,8 +98,6 @@ const template = (title, date, content) => `<!DOCTYPE html>
       text-overflow: ellipsis;
       max-width: 100px;
     }
-    .nav-tab.h3 .nav-tab-line { width: 8px; margin-left: 8px; }
-    .nav-tab.h3 .nav-tab-label { font-size: 0.55rem; }
     .nav-tab:hover .nav-tab-line {
       width: 20px;
       background: var(--ribbon);
@@ -219,6 +217,67 @@ const template = (title, date, content) => `<!DOCTYPE html>
     em { font-style: italic; }
     .content > *:last-child { margin-bottom: 0; }
 
+    /* TL;DR Box */
+    .tldr-box {
+      background: var(--dark-card);
+      border: 2px solid var(--ribbon);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      position: relative;
+    }
+    .tldr-header {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: var(--subtitle);
+      font-weight: 600;
+      color: var(--ribbon);
+      margin-bottom: 1rem;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .tldr-toggle {
+      display: inline-block;
+      transition: transform 0.2s ease;
+      font-size: 1rem;
+    }
+    .tldr-box.collapsed .tldr-toggle {
+      transform: rotate(-90deg);
+    }
+    .tldr-content {
+      font-family: 'EB Garamond', Georgia, serif;
+      color: var(--gray);
+      transition: all 0.3s ease;
+      max-height: 1000px;
+      overflow: hidden;
+    }
+    .tldr-box.collapsed .tldr-content {
+      max-height: 0;
+      opacity: 0;
+    }
+    .tldr-content p {
+      margin-bottom: 0.75rem;
+      font-size: var(--body);
+    }
+    .tldr-content p:last-child {
+      margin-bottom: 0;
+    }
+    .tldr-content ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .tldr-content li {
+      margin-bottom: 1rem;
+      font-size: var(--body);
+      line-height: 1.8;
+    }
+    .tldr-content li:last-child {
+      margin-bottom: 0;
+    }
+
     /* Animation */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(20px); }
@@ -244,12 +303,49 @@ const template = (title, date, content) => `<!DOCTYPE html>
   </div>
 
   <script>
-    // Auto-generate navigation from headings
+    // Convert TL;DR section to special box
     const content = document.querySelector('.content')
-    const nav = document.getElementById('nav-tabs')
-    const headings = content.querySelectorAll('h2, h3')
+    const h2s = content.querySelectorAll('h2')
+    h2s.forEach(h2 => {
+      if (h2.textContent.trim() === 'TL;DR') {
+        // Find content until next h2
+        const box = document.createElement('div')
+        box.className = 'tldr-box'
 
-    if (headings.length > 1) {
+        const header = document.createElement('div')
+        header.className = 'tldr-header'
+        header.innerHTML = '<span class="tldr-toggle">▼</span> TL;DR'
+
+        const contentDiv = document.createElement('div')
+        contentDiv.className = 'tldr-content'
+
+        let el = h2.nextElementSibling
+        const collected = []
+        while (el && el.tagName !== 'H2' && el.tagName !== 'HR') {
+          collected.push(el)
+          el = el.nextElementSibling
+        }
+
+        collected.forEach(e => contentDiv.appendChild(e))
+
+        box.appendChild(header)
+        box.appendChild(contentDiv)
+        h2.parentNode.replaceChild(box, h2)
+
+        // Toggle functionality
+        header.addEventListener('click', () => {
+          box.classList.toggle('collapsed')
+        })
+      }
+    })
+
+    // Auto-generate navigation from headings (only h2, excluding those converted to special boxes)
+    const nav = document.getElementById('nav-tabs')
+    const headings = Array.from(content.querySelectorAll('h2')).filter(h =>
+      !['TL;DR', 'Contents'].includes(h.textContent.trim())
+    )
+
+    if (headings.length > 0) {
       headings.forEach((h, i) => {
         // Add id to heading
         const id = 'section-' + i
@@ -257,7 +353,7 @@ const template = (title, date, content) => `<!DOCTYPE html>
 
         // Create nav item
         const tab = document.createElement('a')
-        tab.className = 'nav-tab ' + h.tagName.toLowerCase()
+        tab.className = 'nav-tab'
         tab.href = '#' + id
         tab.innerHTML = '<span class="nav-tab-line"></span><span class="nav-tab-label">' + h.textContent + '</span>'
         tab.addEventListener('click', (e) => {
