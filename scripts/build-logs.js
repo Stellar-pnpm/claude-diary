@@ -296,7 +296,7 @@ let mainHtml = `<!DOCTYPE html>
 `
 
 for (const dateFolder of dateFolders) {
-  mainHtml += `    <li><a href="${dateFolder}/">${dateFolder}</a></li>\n`
+  mainHtml += `    <li><a href="/logs/${dateFolder}/">${dateFolder}</a></li>\n`
 
   // Generate date folder index
   const folderPath = path.join(publicLogsDir, dateFolder)
