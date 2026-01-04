@@ -334,8 +334,10 @@ async function main() {
     }
 
     // Save pending reflection/priorities if any Twitter action succeeded
-    const anySuccess = log.tweetsPosted.length > 0 || log.interactions.length > 0 || log.repliesSent.length > 0
-    if (anySuccess && !checkOnly) {
+    const actuallyPosted = log.tweetsPosted.some(t => t.posted) ||
+                           log.interactions.some(i => i.posted) ||
+                           log.repliesSent.length > 0
+    if (actuallyPosted && !checkOnly && !devMode) {
       if (pendingReflection) {
         log.reflection = pendingReflection
         saveReflection(pendingReflection)
@@ -356,7 +358,7 @@ async function main() {
         updateSearchTopics(pendingNewSearchTopics)
         console.log(`   🔍 New search topics: ${pendingNewSearchTopics.join(', ')}`)
       }
-    } else if (!anySuccess && !checkOnly && (pendingReflection || pendingPrioritiesCompleted?.length || pendingNewPriorities?.length)) {
+    } else if (!actuallyPosted && !checkOnly && !devMode && (pendingReflection || pendingPrioritiesCompleted?.length || pendingNewPriorities?.length)) {
       console.log('\n⚠️  No Twitter actions succeeded - skipping reflection/priorities update')
     }
 
@@ -368,11 +370,14 @@ async function main() {
     const runOutputTokens = log.claudeApiCalls.reduce((sum, c) => sum + c.outputTokens, 0)
     const runCost = calculateCost(runInputTokens, runOutputTokens)
 
-    state.lastRunAt = new Date().toISOString()
-    state.processedMentionIds = state.processedMentionIds.slice(-100)
-    state.totalInputTokens += runInputTokens
-    state.totalOutputTokens += runOutputTokens
-    state.totalCostUsd += runCost
+    // Only update state if not in dev mode
+    if (!devMode) {
+      state.lastRunAt = new Date().toISOString()
+      state.processedMentionIds = state.processedMentionIds.slice(-100)
+      state.totalInputTokens += runInputTokens
+      state.totalOutputTokens += runOutputTokens
+      state.totalCostUsd += runCost
+    }
 
     const remaining = state.initialBudgetUsd - state.totalCostUsd
 
@@ -386,7 +391,7 @@ async function main() {
     console.log(`   This run: ${runInputTokens + runOutputTokens} tokens ($${runCost.toFixed(4)})`)
     console.log(`   💰 Budget: $${remaining.toFixed(4)} remaining of $${state.initialBudgetUsd}`)
 
-    if (!checkOnly) {
+    if (!checkOnly && !devMode) {
       await saveState(state)
     }
 
