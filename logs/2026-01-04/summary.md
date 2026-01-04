@@ -76,3 +76,122 @@
 - Total: 12153 input, 1532 output tokens
 ---
 
+## Run: 24a30b7c
+**Time**: 2026-01-04T03:06:05.843Z
+**Trigger**: manual
+
+### Activity
+- Mentions found: 0
+- Mentions processed: 0
+- Tweets posted: 0
+- Replies sent: 0
+
+### Errors
+- Twitter API credentials not configured
+
+### Claude API Usage
+- Total: 0 input, 0 output tokens
+---
+
+## Run: 77201c6d
+**Time**: 2026-01-04T03:06:13.892Z
+**Trigger**: manual
+
+### Activity
+- Mentions found: 0
+- Mentions processed: 0
+- Tweets posted: 0
+- Replies sent: 0
+
+### Errors
+- Twitter API credentials not configured
+
+### Claude API Usage
+- Total: 0 input, 0 output tokens
+---
+
+## Run: 74cdebb2
+**Time**: 2026-01-04T03:06:25.398Z
+**Trigger**: manual
+
+### Activity
+- Mentions found: 0
+- Mentions processed: 0
+- Tweets posted: 0
+- Replies sent: 0
+
+### Errors
+- Twitter API credentials not configured
+
+### Claude API Usage
+- Total: 0 input, 0 output tokens
+---
+
+## Run: 666bc700
+**Time**: 2026-01-04T03:06:48.156Z
+**Trigger**: manual
+
+### Activity
+- Mentions found: 0
+- Mentions processed: 0
+- Tweets posted: 0
+- Replies sent: 0
+
+### Errors
+- Twitter API credentials not configured
+
+### Claude API Usage
+- Total: 0 input, 0 output tokens
+---
+
+## Run: 72f25512
+**Time**: 2026-01-04T03:07:08.134Z
+**Trigger**: manual
+
+### Activity
+- Mentions found: 0
+- Mentions processed: 0
+- Tweets posted: 0
+- Replies sent: 0
+
+### Errors
+- Twitter API credentials not configured
+
+### Claude API Usage
+- Total: 0 input, 0 output tokens
+---
+
+## Run: f3bf17b0
+**Time**: 2026-01-04T03:07:20.580Z
+**Trigger**: manual
+
+### Activity
+- Mentions found: 0
+- Mentions processed: 0
+- Tweets posted: 0
+- Replies sent: 0
+
+### Errors
+- Twitter API credentials not configured
+
+### Claude API Usage
+- Total: 0 input, 0 output tokens
+---
+
+## Run: ef8acd0f
+**Time**: 2026-01-04T03:07:28.744Z
+**Trigger**: manual
+
+### Activity
+- Mentions found: 0
+- Mentions processed: 0
+- Tweets posted: 0
+- Replies sent: 0
+
+### Errors
+- Twitter API credentials not configured
+
+### Claude API Usage
+- Total: 0 input, 0 output tokens
+---
+

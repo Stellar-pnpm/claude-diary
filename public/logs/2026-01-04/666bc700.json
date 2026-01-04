@@ -1,0 +1,16 @@
+{
+  "runId": "666bc700",
+  "startedAt": "2026-01-04T03:06:48.156Z",
+  "completedAt": "2026-01-04T03:06:48.158Z",
+  "trigger": "manual",
+  "mode": "both",
+  "mentionsFound": 0,
+  "mentionsProcessed": 0,
+  "tweetsPosted": [],
+  "repliesSent": [],
+  "interactions": [],
+  "errors": [
+    "Twitter API credentials not configured"
+  ],
+  "claudeApiCalls": []
+}

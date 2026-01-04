@@ -20,8 +20,8 @@ export interface RunLog {
   trigger: 'scheduled' | 'manual'
   mode: 'tweet' | 'interact' | 'both'
   // Browse context
-  browseType?: 'topic' | 'account'
-  browseTarget?: string  // topic keyword or @username
+  browseType?: 'topic' | 'account' | 'none'
+  browseTarget?: string  // topic keyword or @username or 'dev-mode'
   browsedTweets?: Array<{ id: string; author: string; text: string }>
   // Mentions
   mentionsFound: number

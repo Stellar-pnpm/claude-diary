@@ -26,11 +26,12 @@ function parseMode(): RunMode {
 
 async function main() {
   const checkOnly = process.argv.includes('--check-only')
+  const devMode = process.argv.includes('--dev-mode')
   const mode = parseMode()
   const runId = crypto.randomUUID().slice(0, 8)
 
   console.log(`\n🤖 Claude Diary - Run ${runId}`)
-  console.log(`Mode: ${mode}${checkOnly ? ' (CHECK ONLY)' : ''}`)
+  console.log(`Mode: ${mode}${checkOnly ? ' (CHECK ONLY)' : ''}${devMode ? ' (DEV MODE - API only, no Twitter)' : ''}`)
   console.log('='.repeat(50))
 
   const isScheduled = process.env.GITHUB_EVENT_NAME === 'schedule'
@@ -51,7 +52,9 @@ async function main() {
   }
 
   try {
-    initTwitter()
+    if (!devMode) {
+      initTwitter()
+    }
     initClaude()
     clearApiCalls()
 
@@ -62,10 +65,15 @@ async function main() {
     console.log(`   Total tweets: ${state.tweetCount}`)
 
     // 1. Check mentions
-    console.log('\n📬 Checking mentions...')
-    const mentions = await getMentions(state.lastMentionId || undefined)
-    log.mentionsFound = mentions.length
-    console.log(`   Found ${mentions.length} new mentions`)
+    let mentions: Awaited<ReturnType<typeof getMentions>> = []
+    if (!devMode) {
+      console.log('\n📬 Checking mentions...')
+      mentions = await getMentions(state.lastMentionId || undefined)
+      log.mentionsFound = mentions.length
+      console.log(`   Found ${mentions.length} new mentions`)
+    } else {
+      console.log('\n📬 Skipping mentions check (dev mode)')
+    }
 
     // Filter out already processed and non-substantive mentions
     const newMentions = mentions.filter(m => {
@@ -89,15 +97,16 @@ async function main() {
     }
 
     // 2. Browse tweets
-    console.log(`\n🔍 Browsing for context...`)
-
     let tweets: Awaited<ReturnType<typeof getUserTweets>> = []
 
-    // 20% topic search, 80% account browsing
-    if (Math.random() < 0.2) {
-      const customTopics = loadCustomTopics()
-      const allTopics = [...INTERESTING_TOPICS, ...customTopics]
-      const topic = allTopics[Math.floor(Math.random() * allTopics.length)]
+    if (!devMode) {
+      console.log(`\n🔍 Browsing for context...`)
+
+      // 20% topic search, 80% account browsing
+      if (Math.random() < 0.2) {
+        const customTopics = loadCustomTopics()
+        const allTopics = [...INTERESTING_TOPICS, ...customTopics]
+        const topic = allTopics[Math.floor(Math.random() * allTopics.length)]
       console.log(`   Searching: "${topic}"${customTopics.includes(topic) ? ' (custom)' : ''}`)
       tweets = await searchTweets(topic, 10)
       log.browseType = 'topic'
@@ -108,18 +117,24 @@ async function main() {
       tweets = await getUserTweets(account, 10)
       log.browseType = 'account'
       log.browseTarget = account
-    }
+      }
 
-    // Log browsed tweets
-    log.browsedTweets = tweets.map(t => ({
-      id: t.id,
-      author: t.authorUsername,
-      text: t.text
-    }))
+      // Log browsed tweets
+      log.browsedTweets = tweets.map(t => ({
+        id: t.id,
+        author: t.authorUsername,
+        text: t.text
+      }))
 
-    console.log(`   Found ${tweets.length} tweets`)
-    if (newMentions.length > 0) {
-      console.log(`   Processing ${newMentions.length} new mentions`)
+      console.log(`   Found ${tweets.length} tweets`)
+      if (newMentions.length > 0) {
+        console.log(`   Processing ${newMentions.length} new mentions`)
+      }
+    } else {
+      console.log(`\n🔍 Skipping tweet browsing (dev mode)`)
+      log.browseType = 'none'
+      log.browseTarget = 'dev-mode'
+      log.browsedTweets = []
     }
 
     // 3. Generate content (one API call)
@@ -165,7 +180,7 @@ async function main() {
       console.log(`\n🐦 Thread (${thread.length} tweets):`)
       thread.forEach((t, i) => console.log(`   ${i + 1}. "${t.substring(0, 60)}${t.length > 60 ? '...' : ''}"`))
 
-      if (!checkOnly) {
+      if (!checkOnly && !devMode) {
         const postedIds = await postThread(thread, artworkPng)
         const threadId = postedIds.length > 0 ? postedIds[0] : undefined
 
@@ -219,6 +234,20 @@ async function main() {
         } else {
           console.log(`   ❌ Failed to post thread`)
         }
+      } else if (devMode) {
+        console.log('   [DEV MODE - not posting to Twitter]')
+        // Log generated content but don't post
+        thread.forEach((content, i) => {
+          log.tweetsPosted.push({
+            tweetId: '',
+            content,
+            postedAt: new Date().toISOString(),
+            source: 'thread',
+            threadIndex: i,
+            threadId: '',
+            posted: false
+          })
+        })
       } else {
         console.log('   [CHECK ONLY - not posting]')
       }
@@ -361,9 +390,10 @@ async function main() {
       await saveState(state)
     }
 
-    if (!checkOnly) {
-      await saveRunLog(log)
-      console.log(`\n📁 Log saved to logs/${log.startedAt.split('T')[0]}/${runId}.json`)
+    if (!checkOnly || devMode) {
+      await saveRunLog(log, devMode)
+      const logDir = devMode ? 'dev-logs' : 'logs'
+      console.log(`\n📁 Log saved to ${logDir}/${log.startedAt.split('T')[0]}/${runId}.json`)
     }
 
     console.log('\n✅ Done!\n')

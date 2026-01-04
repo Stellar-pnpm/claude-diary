@@ -15,3 +15,6 @@ dist/
 
 # Logs are public, but you might want to gitignore locally
 # logs/
+
+# Dev logs (not committed)
+dev-logs/

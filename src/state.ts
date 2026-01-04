@@ -111,10 +111,11 @@ export async function addDraft(content: string, source: string): Promise<void> {
 }
 
 // Run logs (public transparency)
-export async function saveRunLog(log: RunLog): Promise<void> {
+export async function saveRunLog(log: RunLog, devMode = false): Promise<void> {
   await ensureDirs()
   const date = log.startedAt.split('T')[0]
-  const logDir = join(LOGS_DIR, date)
+  const baseDir = devMode ? join(ROOT, 'dev-logs') : LOGS_DIR
+  const logDir = join(baseDir, date)
   if (!existsSync(logDir)) await mkdir(logDir, { recursive: true })
 
   const logFile = join(logDir, `${log.runId}.json`)
