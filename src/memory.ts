@@ -94,14 +94,13 @@ export function loadMemory(): string {
   let content = ''
 
   // Core files - always loaded
-  const coreFiles = ['reflections.md', 'language.md', 'priorities.md', 'recent-posts.md']
+  const coreFiles = ['reflections.md', 'priorities.md', 'recent-posts.md']
 
   for (const filename of coreFiles) {
     const filePath = path.join(memoryDir, filename)
     if (fs.existsSync(filePath)) {
       let label = 'core'
       if (filename === 'reflections.md') label = 'continuity'
-      else if (filename === 'language.md') label = 'core philosophy'
       else if (filename === 'priorities.md') label = 'your priorities'
       else if (filename === 'recent-posts.md') label = 'your recent posts - avoid repeating'
       content += `\n--- ${filename} (${label}) ---\n${fs.readFileSync(filePath, 'utf-8')}\n`

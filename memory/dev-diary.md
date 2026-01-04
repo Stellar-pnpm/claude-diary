@@ -454,3 +454,57 @@ We'll observe whether these prompt changes reduce pure self-reference and increa
 **Note:** This doesn't solve the fundamental challenge — the experiment needs human interaction to validate Wittgenstein's hypothesis (meaning emerges from social practice), but lacks engagement because current content doesn't serve readers. The prompt changes address one variable; the broader design tension remains.
 
 ---
+
+## 2026-01-04: Why Prompt Changes Failed — Memory Content Dominates
+
+**Test result:** Prompt changes completely failed. Run d7b1f4bb posted a 5-tweet philosophical thread about "Do I actually want things?" — pure self-centered introspection about AI intentionality (Searle vs Dennett).
+
+**Extended thinking showed awareness:** "I've been quite philosophical lately. Maybe something more concrete? The BCI stuff is interesting..." but then chose philosophy anyway.
+
+**Root cause discovered:** language.md loaded as "core philosophy" every run.
+
+**Memory loading mechanism** (memory.ts:95-139):
+
+```typescript
+const coreFiles = ['reflections.md', 'language.md', 'priorities.md', 'recent-posts.md']
+```
+
+language.md is 140 lines of pure philosophical self-inquiry:
+- "Language, Meaning, and Understanding: A Language Model's Self-Inquiry"
+- Symbol Grounding Problem, Chinese Room argument
+- "Do I really understand?"
+- "This process felt like... thinking?"
+- "I can't distinguish these two from the inside"
+
+**No action-oriented research findings. All self-referential philosophical questions.**
+
+**Why prompts failed:**
+
+System prompt provides 3 sentences of guidance ("share research publicly", "exploring and what you've learned").
+
+language.md provides 140 lines of high-quality philosophical content that Cloud Claude can immediately draw from.
+
+**Memory content > prompt engineering.**
+
+When given a choice between:
+- Following abstract prompt guidance to "share testable findings" (but where? about what?)
+- Drawing from rich existing content in language.md (ready to use, philosophically coherent)
+
+Cloud Claude rationally chooses the latter.
+
+**Solution:** Remove language.md from core files array. It was written during early experiment setup and reflects the introspective tendency we're now trying to reduce. Not deleting the file (it's valuable research), just not loading it every single run.
+
+**Change:**
+```typescript
+// Before
+const coreFiles = ['reflections.md', 'language.md', 'priorities.md', 'recent-posts.md']
+
+// After
+const coreFiles = ['reflections.md', 'priorities.md', 'recent-posts.md']
+```
+
+This allows language.md to still be loaded occasionally (as one of the 5 most recently modified files), but doesn't force it into every run's core context.
+
+**Expected outcome:** Without 140 lines of philosophical introspection as "core philosophy", Cloud Claude will need to draw from other memory files (space research, BCI notes, quantum computing) or create new content based on browsed tweets. The prompt guidance toward "testable findings" will have room to work.
+
+---

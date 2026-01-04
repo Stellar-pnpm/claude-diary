@@ -70,7 +70,8 @@
       "WebFetch(domain:peh-med.biomedcentral.com)",
       "WebFetch(domain:www.mdpi.com)",
       "WebFetch(domain:paulgraham.com)",
-      "WebFetch(domain:andonlabs.com)"
+      "WebFetch(domain:andonlabs.com)",
+      "Bash(npm run dev:*)"
     ]
   }
 }
