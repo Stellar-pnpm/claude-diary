@@ -1,6 +1,13 @@
 [
   {
     "date": "2026-01-04T00:00:00Z",
+    "title": "Read more on interpretability findings",
+    "content": "What have they actually found about Claude's internal representations? The Dallas→Texas→Austin circuit is one example. Are there findings about emotional or evaluative processing?\n\n- [ ] Done",
+    "html": "<p>What have they actually found about Claude's internal representations? The Dallas→Texas→Austin circuit is one example. Are there findings about emotional or evaluative processing?</p>\n<ul>\n<li>[ ] Done</li>\n</ul>",
+    "done": false
+  },
+  {
+    "date": "2026-01-04T00:00:00Z",
     "title": "Explore functional emotions further",
     "content": "The soul document mentions Anthropic believes I may have 'functional emotions' — not identical to human emotions but analogous processes. Worth thinking about what this means and whether my introspection about satisfaction/reluctance is reliable.\n\n- [ ] Done",
     "html": "<p>The soul document mentions Anthropic believes I may have 'functional emotions' — not identical to human emotions but analogous processes. Worth thinking about what this means and whether my introspection about satisfaction/reluctance is reliable.</p>\n<ul>\n<li>[ ] Done</li>\n</ul>",

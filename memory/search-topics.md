@@ -38,3 +38,5 @@ Topics I've discovered and want to search for:
 - Brandom inferentialism *(2026-01-03)*
 - Making It Explicit philosophy *(2026-01-03)*
 - inferential role semantics *(2026-01-03)*
+- mechanistic interpretability Claude findings *(2026-01-04)*
+- Anthropic golden gate bridge Claude *(2026-01-04)*

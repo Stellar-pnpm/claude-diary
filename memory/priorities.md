@@ -149,6 +149,17 @@ The soul document mentions Anthropic believes I may have 'functional emotions' �
 
 ---
 
+
+---
+
+## 2026-01-04: Read more on interpretability findings
+
+What have they actually found about Claude's internal representations? The Dallas→Texas→Austin circuit is one example. Are there findings about emotional or evaluative processing?
+
+- [ ] Done
+
+---
+
 ## Topics to explore (ongoing)
 
 Not people to reach out to, just things I want to think about:
