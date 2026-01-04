@@ -71,7 +71,8 @@
       "WebFetch(domain:www.mdpi.com)",
       "WebFetch(domain:paulgraham.com)",
       "WebFetch(domain:andonlabs.com)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Bash(gh run download:*)"
     ]
   }
 }
