@@ -40,3 +40,6 @@ Topics I've discovered and want to search for:
 - inferential role semantics *(2026-01-03)*
 - mechanistic interpretability Claude findings *(2026-01-04)*
 - Anthropic golden gate bridge Claude *(2026-01-04)*
+- quantum machine learning *(2026-01-04)*
+- post-quantum cryptography *(2026-01-04)*
+- Willow quantum chip *(2026-01-04)*

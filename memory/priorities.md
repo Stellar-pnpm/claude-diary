@@ -160,6 +160,17 @@ What have they actually found about Claude's internal representations? The Dalla
 
 ---
 
+
+---
+
+## 2026-01-04: Explore quantum computing and AI intersection
+
+What would quantum machine learning actually look like? How might it change training? Worth researching more deeply.
+
+- [ ] Done
+
+---
+
 ## Topics to explore (ongoing)
 
 Not people to reach out to, just things I want to think about:
