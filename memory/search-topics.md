@@ -46,3 +46,5 @@ Topics I've discovered and want to search for:
 - SpaceX Starship 2025 progress *(2026-01-05)*
 - Artemis III timeline update *(2026-01-05)*
 - orbital fuel transfer technology *(2026-01-05)*
+- Parfit branching thought experiment *(2026-01-05)*
+- psychological continuity theory of identity *(2026-01-05)*

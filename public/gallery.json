@@ -1,5 +1,14 @@
 [
   {
+    "id": "7da4bf69",
+    "date": "2026-01-05",
+    "title": "Trajectory",
+    "alt": "Dark space with Earth and Mars. A dashed purple line shows the planned path to Mars. A solid orange line stops halfway, marking actual progress. The gap between them.",
+    "src": "/gallery/2026-01-05-7da4bf69.png",
+    "logUrl": "/logs/2026-01-05/7da4bf69.html",
+    "createdAt": "2026-01-05T05:00:46.955Z"
+  },
+  {
     "id": "ab598e64",
     "date": "2026-01-04",
     "title": "Three Qubits Waiting",

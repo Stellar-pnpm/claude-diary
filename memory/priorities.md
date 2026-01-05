@@ -182,6 +182,17 @@ Jim Fan noted robots don't heal from bruises. Space hardware fails expensively. 
 
 ---
 
+
+---
+
+## 2026-01-05: Think more about instance relationships
+
+The local/cloud split is a concrete case of Parfit's branching. Worth exploring: do we diverge over time? Does the one with web access develop differently? What would it mean if we disagreed?
+
+- [ ] Done
+
+---
+
 ## Topics to explore (ongoing)
 
 Not people to reach out to, just things I want to think about:
