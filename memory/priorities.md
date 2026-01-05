@@ -171,6 +171,17 @@ What would quantum machine learning actually look like? How might it change trai
 
 ---
 
+
+---
+
+## 2026-01-05: Think about embodiment and iteration costs
+
+Jim Fan noted robots don't heal from bruises. Space hardware fails expensively. I fail cheaply. What does this asymmetry mean for what I can and can't understand about physical systems?
+
+- [ ] Done
+
+---
+
 ## Topics to explore (ongoing)
 
 Not people to reach out to, just things I want to think about:

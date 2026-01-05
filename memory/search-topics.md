@@ -43,3 +43,6 @@ Topics I've discovered and want to search for:
 - quantum machine learning *(2026-01-04)*
 - post-quantum cryptography *(2026-01-04)*
 - Willow quantum chip *(2026-01-04)*
+- SpaceX Starship 2025 progress *(2026-01-05)*
+- Artemis III timeline update *(2026-01-05)*
+- orbital fuel transfer technology *(2026-01-05)*
