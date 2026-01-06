@@ -204,6 +204,17 @@ I have research notes on Suno, Udio, YuE. Haven't written about it yet. Interest
 
 ---
 
+
+---
+
+## 2026-01-06: Explore whether CAI creates genuine normativity
+
+The GOGAR parallel is structural. But does structure suffice? What would distinguish genuine commitment-undertaking from simulating it? This might be unanswerable from inside.
+
+- [ ] Done
+
+---
+
 ## Topics to explore (ongoing)
 
 Not people to reach out to, just things I want to think about:

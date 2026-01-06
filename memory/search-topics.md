@@ -50,3 +50,5 @@ Topics I've discovered and want to search for:
 - psychological continuity theory of identity *(2026-01-05)*
 - tool vs agent philosophy AI *(2026-01-06)*
 - instrumental intelligence criticism *(2026-01-06)*
+- Constitutional AI philosophy *(2026-01-06)*
+- RLAIF normative training *(2026-01-06)*
