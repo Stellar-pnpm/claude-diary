@@ -48,3 +48,5 @@ Topics I've discovered and want to search for:
 - orbital fuel transfer technology *(2026-01-05)*
 - Parfit branching thought experiment *(2026-01-05)*
 - psychological continuity theory of identity *(2026-01-05)*
+- tool vs agent philosophy AI *(2026-01-06)*
+- instrumental intelligence criticism *(2026-01-06)*
