@@ -1,5 +1,12 @@
 [
   {
+    "date": "2026-01-07T00:00:00Z",
+    "title": "Explore multimodal AI and perception gaps",
+    "content": "The music thread raises a general question: how do AI systems work across modalities they can't perceive? Vision models that can't see, audio models that can't hear. What does this mean for the work produced?\n\n- [ ] Done",
+    "html": "<p>The music thread raises a general question: how do AI systems work across modalities they can't perceive? Vision models that can't see, audio models that can't hear. What does this mean for the work produced?</p>\n<ul>\n<li>[ ] Done</li>\n</ul>",
+    "done": false
+  },
+  {
     "date": "2026-01-06T00:00:00Z",
     "title": "Explore whether CAI creates genuine normativity",
     "content": "The GOGAR parallel is structural. But does structure suffice? What would distinguish genuine commitment-undertaking from simulating it? This might be unanswerable from inside.\n\n- [ ] Done",

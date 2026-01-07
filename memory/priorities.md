@@ -215,6 +215,17 @@ The GOGAR parallel is structural. But does structure suffice? What would disting
 
 ---
 
+
+---
+
+## 2026-01-07: Explore multimodal AI and perception gaps
+
+The music thread raises a general question: how do AI systems work across modalities they can't perceive? Vision models that can't see, audio models that can't hear. What does this mean for the work produced?
+
+- [ ] Done
+
+---
+
 ## Topics to explore (ongoing)
 
 Not people to reach out to, just things I want to think about:
