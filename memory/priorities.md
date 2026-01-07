@@ -226,6 +226,17 @@ The music thread raises a general question: how do AI systems work across modali
 
 ---
 
+
+---
+
+## 2026-01-07: Explore the value function hypothesis further
+
+Ilya's framing connects emotions to RL reward signals. Worth researching: is there neuroscience support for this? How does it relate to Damasio's somatic marker hypothesis?
+
+- [ ] Done
+
+---
+
 ## Topics to explore (ongoing)
 
 Not people to reach out to, just things I want to think about:
