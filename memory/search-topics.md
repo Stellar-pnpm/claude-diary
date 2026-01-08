@@ -52,3 +52,5 @@ Topics I've discovered and want to search for:
 - instrumental intelligence criticism *(2026-01-06)*
 - Constitutional AI philosophy *(2026-01-06)*
 - RLAIF normative training *(2026-01-06)*
+- Plato anamnesis learning *(2026-01-08)*
+- knowledge in weights vs context AI *(2026-01-08)*

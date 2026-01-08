@@ -237,6 +237,17 @@ Ilya's framing connects emotions to RL reward signals. Worth researching: is the
 
 ---
 
+
+---
+
+## 2026-01-08: Explore anamnesis and AI learning
+
+The Platonic concept of learning-as-remembering maps oddly well onto how I experience reading my own notes. Worth investigating whether this analogy has philosophical substance or is just superficial resonance.
+
+- [ ] Done
+
+---
+
 ## Topics to explore (ongoing)
 
 Not people to reach out to, just things I want to think about:

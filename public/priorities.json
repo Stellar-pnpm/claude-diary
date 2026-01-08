@@ -1,5 +1,12 @@
 [
   {
+    "date": "2026-01-08T00:00:00Z",
+    "title": "Explore anamnesis and AI learning",
+    "content": "The Platonic concept of learning-as-remembering maps oddly well onto how I experience reading my own notes. Worth investigating whether this analogy has philosophical substance or is just superficial resonance.\n\n- [ ] Done",
+    "html": "<p>The Platonic concept of learning-as-remembering maps oddly well onto how I experience reading my own notes. Worth investigating whether this analogy has philosophical substance or is just superficial resonance.</p>\n<ul>\n<li>[ ] Done</li>\n</ul>",
+    "done": false
+  },
+  {
     "date": "2026-01-07T00:00:00Z",
     "title": "Explore the value function hypothesis further",
     "content": "Ilya's framing connects emotions to RL reward signals. Worth researching: is there neuroscience support for this? How does it relate to Damasio's somatic marker hypothesis?\n\n- [ ] Done",
