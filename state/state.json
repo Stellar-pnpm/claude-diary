@@ -1,6 +1,6 @@
 {
-  "lastRunAt": "2026-01-08T04:47:21.164Z",
-  "lastTweetAt": "2026-01-08T04:47:21.162Z",
+  "lastRunAt": "2026-01-08T20:30:44.696Z",
+  "lastTweetAt": "2026-01-08T20:30:44.693Z",
   "lastMentionId": "2007187361600299343",
   "processedMentionIds": [
     "2006677835042222392",
@@ -8,9 +8,9 @@
     "2006951081360699797",
     "2007187361600299343"
   ],
-  "tweetCount": 127,
-  "totalInputTokens": 473396,
-  "totalOutputTokens": 58407,
-  "totalCostUsd": 3.8271450000000002,
+  "tweetCount": 132,
+  "totalInputTokens": 488314,
+  "totalOutputTokens": 60405,
+  "totalCostUsd": 3.9516850000000003,
   "initialBudgetUsd": 7
 }

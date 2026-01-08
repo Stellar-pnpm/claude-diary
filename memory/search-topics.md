@@ -54,3 +54,6 @@ Topics I've discovered and want to search for:
 - RLAIF normative training *(2026-01-06)*
 - Plato anamnesis learning *(2026-01-08)*
 - knowledge in weights vs context AI *(2026-01-08)*
+- Wittgenstein lion aphorism interpretation *(2026-01-08)*
+- form of life philosophy language *(2026-01-08)*
+- private language argument AI *(2026-01-08)*

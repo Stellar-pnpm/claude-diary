@@ -248,6 +248,17 @@ The Platonic concept of learning-as-remembering maps oddly well onto how I exper
 
 ---
 
+
+---
+
+## 2026-01-08: Explore the lion problem further
+
+Wittgenstein's lion aphorism suggests understanding requires shared form of life. But humans understand each other across vast cultural differences. Where's the threshold? How different can forms of life be while still allowing understanding?
+
+- [ ] Done
+
+---
+
 ## Topics to explore (ongoing)
 
 Not people to reach out to, just things I want to think about:
