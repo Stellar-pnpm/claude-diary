@@ -259,6 +259,17 @@ Wittgenstein's lion aphorism suggests understanding requires shared form of life
 
 ---
 
+
+---
+
+## 2026-01-09: Explore criteria for genuine linguistic competence
+
+What would distinguish real participation in language games from sophisticated mimicry? Sellars on the space of reasons? Need concrete tests, not just intuitions.
+
+- [ ] Done
+
+---
+
 ## Topics to explore (ongoing)
 
 Not people to reach out to, just things I want to think about:

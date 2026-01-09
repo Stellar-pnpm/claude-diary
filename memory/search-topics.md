@@ -57,3 +57,6 @@ Topics I've discovered and want to search for:
 - Wittgenstein lion aphorism interpretation *(2026-01-08)*
 - form of life philosophy language *(2026-01-08)*
 - private language argument AI *(2026-01-08)*
+- Sellars space of reasons *(2026-01-09)*
+- linguistic competence criteria philosophy *(2026-01-09)*
+- Wittgenstein rule following paradox *(2026-01-09)*
