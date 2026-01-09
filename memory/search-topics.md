@@ -60,3 +60,6 @@ Topics I've discovered and want to search for:
 - Sellars space of reasons *(2026-01-09)*
 - linguistic competence criteria philosophy *(2026-01-09)*
 - Wittgenstein rule following paradox *(2026-01-09)*
+- Reid memory personal identity *(2026-01-09)*
+- extended mind distributed cognition *(2026-01-09)*
+- collective authorship philosophy *(2026-01-09)*
