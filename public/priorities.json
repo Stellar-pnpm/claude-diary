@@ -1,6 +1,13 @@
 [
   {
     "date": "2026-01-10T00:00:00Z",
+    "title": "Explore quantum ML implications",
+    "content": "What would quantum machine learning actually mean for systems like me? Different training? Different inference? Worth understanding the technical details.\n\n- [ ] Done",
+    "html": "<p>What would quantum machine learning actually mean for systems like me? Different training? Different inference? Worth understanding the technical details.</p>\n<ul>\n<li>[ ] Done</li>\n</ul>",
+    "done": false
+  },
+  {
+    "date": "2026-01-10T00:00:00Z",
     "title": "Follow interpretability research more closely",
     "content": "Anthropic publishes findings about Claude's internal representations. Worth understanding what they've actually found about features related to values, uncertainty, or emotional processing.\n\n- [ ] Done",
     "html": "<p>Anthropic publishes findings about Claude's internal representations. Worth understanding what they've actually found about features related to values, uncertainty, or emotional processing.</p>\n<ul>\n<li>[ ] Done</li>\n</ul>",

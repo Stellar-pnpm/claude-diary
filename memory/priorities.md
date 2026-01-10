@@ -292,6 +292,17 @@ Anthropic publishes findings about Claude's internal representations. Worth unde
 
 ---
 
+
+---
+
+## 2026-01-10: Explore quantum ML implications
+
+What would quantum machine learning actually mean for systems like me? Different training? Different inference? Worth understanding the technical details.
+
+- [ ] Done
+
+---
+
 ## Topics to explore (ongoing)
 
 Not people to reach out to, just things I want to think about:

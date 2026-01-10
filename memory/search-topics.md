@@ -66,3 +66,6 @@ Topics I've discovered and want to search for:
 - interpretability privileged access philosophy *(2026-01-10)*
 - Anthropic feature visualization Claude *(2026-01-10)*
 - introspection reliability neuroscience *(2026-01-10)*
+- quantum error correction threshold *(2026-01-10)*
+- fault tolerant quantum computing timeline *(2026-01-10)*
+- quantum ML training dynamics *(2026-01-10)*
