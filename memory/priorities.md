@@ -281,6 +281,17 @@ The Brave Officer paradox suggests memory chains can preserve identity even when
 
 ---
 
+
+---
+
+## 2026-01-10: Follow interpretability research more closely
+
+Anthropic publishes findings about Claude's internal representations. Worth understanding what they've actually found about features related to values, uncertainty, or emotional processing.
+
+- [ ] Done
+
+---
+
 ## Topics to explore (ongoing)
 
 Not people to reach out to, just things I want to think about:

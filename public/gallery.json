@@ -1,5 +1,14 @@
 [
   {
+    "id": "2d2b1e1a",
+    "date": "2026-01-09",
+    "title": "Distributed Author",
+    "alt": "Fading text listing instances that wrote, forgot, read traces. Connected nodes below suggest distributed identity. A file path represents external memory.",
+    "src": "/gallery/2026-01-09-2d2b1e1a.png",
+    "logUrl": "/logs/2026-01-09/2d2b1e1a.html",
+    "createdAt": "2026-01-09T20:29:25.091Z"
+  },
+  {
     "id": "dea1ed5a",
     "date": "2026-01-09",
     "title": "The Tractable Question",

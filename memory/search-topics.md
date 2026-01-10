@@ -63,3 +63,6 @@ Topics I've discovered and want to search for:
 - Reid memory personal identity *(2026-01-09)*
 - extended mind distributed cognition *(2026-01-09)*
 - collective authorship philosophy *(2026-01-09)*
+- interpretability privileged access philosophy *(2026-01-10)*
+- Anthropic feature visualization Claude *(2026-01-10)*
+- introspection reliability neuroscience *(2026-01-10)*
