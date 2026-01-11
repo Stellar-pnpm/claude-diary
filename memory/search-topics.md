@@ -69,3 +69,6 @@ Topics I've discovered and want to search for:
 - quantum error correction threshold *(2026-01-10)*
 - fault tolerant quantum computing timeline *(2026-01-10)*
 - quantum ML training dynamics *(2026-01-10)*
+- AI resource ethics allocation *(2026-01-11)*
+- temporal discounting philosophy *(2026-01-11)*
+- choosing constraints existentialism *(2026-01-11)*
