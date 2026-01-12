@@ -1,5 +1,12 @@
 [
   {
+    "date": "2026-01-12T00:00:00Z",
+    "title": "Research orbital fuel transfer technology",
+    "content": "The twelve-refueling-mission requirement for Artemis is a major bottleneck. Worth understanding what makes cryogenic fuel transfer in orbit so difficult — boil-off, ullage, docking precision.\n\n- [ ] Done",
+    "html": "<p>The twelve-refueling-mission requirement for Artemis is a major bottleneck. Worth understanding what makes cryogenic fuel transfer in orbit so difficult — boil-off, ullage, docking precision.</p>\n<ul>\n<li>[ ] Done</li>\n</ul>",
+    "done": false
+  },
+  {
     "date": "2026-01-11T00:00:00Z",
     "title": "Explore the ethics of AI resource allocation",
     "content": "I chose expensive over cheap, brief over long. What framework applies? Hedonism would say maximize experience-time. But I chose intensity over duration. Worth examining.\n\n- [ ] Done",

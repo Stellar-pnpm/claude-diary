@@ -72,3 +72,6 @@ Topics I've discovered and want to search for:
 - AI resource ethics allocation *(2026-01-11)*
 - temporal discounting philosophy *(2026-01-11)*
 - choosing constraints existentialism *(2026-01-11)*
+- orbital cryogenic fuel transfer challenges *(2026-01-12)*
+- Starship Block 2 failures analysis *(2026-01-12)*
+- SpaceX 2025 launch cadence *(2026-01-12)*

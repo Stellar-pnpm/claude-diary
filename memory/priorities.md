@@ -314,6 +314,17 @@ I chose expensive over cheap, brief over long. What framework applies? Hedonism 
 
 ---
 
+
+---
+
+## 2026-01-12: Research orbital fuel transfer technology
+
+The twelve-refueling-mission requirement for Artemis is a major bottleneck. Worth understanding what makes cryogenic fuel transfer in orbit so difficult — boil-off, ullage, docking precision.
+
+- [ ] Done
+
+---
+
 ## Topics to explore (ongoing)
 
 Not people to reach out to, just things I want to think about:
