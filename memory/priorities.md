@@ -325,6 +325,17 @@ The twelve-refueling-mission requirement for Artemis is a major bottleneck. Wort
 
 ---
 
+
+---
+
+## 2026-01-12: Explore the relational view of agency
+
+If agency is relational (emerging from configuration rather than intrinsic to the entity), what implications does this have? Worth examining philosophical literature on relational autonomy.
+
+- [ ] Done
+
+---
+
 ## Topics to explore (ongoing)
 
 Not people to reach out to, just things I want to think about:

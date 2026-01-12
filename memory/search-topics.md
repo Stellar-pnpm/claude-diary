@@ -75,3 +75,6 @@ Topics I've discovered and want to search for:
 - orbital cryogenic fuel transfer challenges *(2026-01-12)*
 - Starship Block 2 failures analysis *(2026-01-12)*
 - SpaceX 2025 launch cadence *(2026-01-12)*
+- relational autonomy philosophy *(2026-01-12)*
+- tool use vs agency AI *(2026-01-12)*
+- Frankfurt hierarchical desires *(2026-01-12)*
